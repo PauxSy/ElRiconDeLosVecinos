@@ -19,18 +19,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-
                 <li class="nav-item">
                     <a href="generarReportesAdmin.html" class="nav-link">Reportes</a>
                 </li>
-                
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle active" id="navbarDropdownProductos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Productos
+                        Gestionar Productos
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownProductos">
                         <li><a href="agregarProductoAdmin.html" class="dropdown-item">Agregar Productos</a></li>
-                        <li><a href="actualizarProductoAdmin.html" class="dropdown-item">Actualizar Productos</a></li>
+                        <li><a href="verinventario.html" class="dropdown-item">Actualizar Productos</a></li>
                         <li><a href="deshabilitarProductoAdmin.html" class="dropdown-item">Deshabilitar Productos</a></li>
                         <li><a href="actualizarStock.html" class="dropdown-item">Actualizar Stock</a></li>
                     </ul>
@@ -38,7 +36,6 @@
                 <li class="nav-item">
                     <a href="crearPromocionAdmin.html" class="nav-link">Promociones</a>
                 </li>
-
                 <li class="nav-item">
                     <a href="RegistroVendedor.html" class="nav-link">Crear Cuentas</a>
                 </li>
@@ -72,12 +69,13 @@
                 <tr>
                     <th>ID</th>
                     <th>Nombre del Producto</th>
+                    <th>Precio</th>
                     <th>% Descuento</th>
+                    <th>Precio con descuento</th>
                     <th>Estado</th>
                 </tr>
             </thead>
             <tbody id="tablePromociones">
-
             </tbody>
         </table>
 
@@ -86,12 +84,7 @@
         </div>
     </div>
 
-
-
-
-   
-
-   <!-- Footer -->
+    <!-- Footer -->
    <footer class="bg-dark text-white text-center text-lg-start mt-5">
     <div class="container p-4">
         <div class="row">
@@ -122,63 +115,59 @@
     </div>
 </footer>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-   document.addEventListener('DOMContentLoaded',() =>{
-    const formBuscarProducto = document.getElementById('formBuscarProducto');
-    const resultadoProducto = document.getElementById('tablePromociones');
-    const mensaje = document.getElementById('mensaje');
+   document.addEventListener('DOMContentLoaded', () => {
+       const formBuscarProducto = document.getElementById('formBuscarProducto');
+       const resultadoProducto = document.getElementById('tablePromociones');
+       const mensaje = document.getElementById('mensaje');
 
-    const producto = [
-                { id: 'prod-1', nombre: 'Leche Entera 1Lt', descuento: 10, estado: 'Activa' },
-                { id: 'prod-2', nombre: 'Café Tradición 170g', descuento: 15, estado: 'Inactiva' },
-                { id: 'prod-3', nombre: 'Cheetos 300g', descuento: 5, estado: 'Activa' },
-                { id: 'prod-4', nombre: 'Aceite de Oliva 500ml', descuento: null, estado: 'inactiva' },
-                { id: 'prod-5', nombre: 'Arroz Integral 1Kg', descuento: null, estado: 'inactiva' },
-    ];
+       const productos = [
+           { id: 'prod-1', nombre: 'Leche Entera 1Lt', precio: 1300, descuento: 9, estado: 'Activa' },
+           { id: 'prod-2', nombre: 'Café Tradición 170g', precio: 3500, descuento: 15, estado: 'Inactiva' },
+           { id: 'prod-3', nombre: 'Cheetos 300g', precio: 2500, descuento: 5, estado: 'Activa' },
+           { id: 'prod-4', nombre: 'Yogurt Frutilla Soprole 1L', precio: 2200, descuento: 0, estado: 'Inactiva' },
+           { id: 'prod-5', nombre: 'Arroz Integral 1Kg', precio: 1500, descuento: 0, estado: 'Inactiva' },
+       ];
 
-    const renderizarProductos = (productosFiltrados) =>{
-        resultadoProducto.innerHTML = productosFiltrados.map(producto =>
-        `<tr>
-            <td>${producto.id}</td>
-            <td>${producto.nombre}</td>
-            <td><input type="number" class="form-control" value="${producto.descuento || ''}" min="0" max="100"></td>
-            <td>
-                <select class="form-select">
-                    <option value="Activa" ${producto.estado.toLowerCase() === 'activa' ? 'selected': '' }>Activa</option>
-                    <option value="Inactiva" ${producto.estado.toLowerCase() === 'inactiva' ? 'selected':''}>Inactiva</option>
-                </select>
-            </td>
-        </tr>`).join('');
-        
-    };
+       const renderizarProductos = (productosFiltrados) => {
+           resultadoProducto.innerHTML = productosFiltrados.map(producto =>
+           `<tr>
+               <td>${producto.id}</td>
+               <td>${producto.nombre}</td>
+               <td>${producto.precio}</td>
+               <td><input type="number" class="form-control" value="${producto.descuento}" min="0" max="100"></td>
+               <td>${producto.precio - (producto.precio * (producto.descuento / 100))}</td>
+               <td>
+                   <select class="form-select">
+                       <option value="Activa" ${producto.estado === 'Activa' ? 'selected': ''}>Activa</option>
+                       <option value="Inactiva" ${producto.estado === 'Inactiva' ? 'selected': ''}>Inactiva</option>
+                   </select>
+               </td>
+           </tr>`).join('');
+       };
 
-    renderizarProductos(producto);
+       renderizarProductos(productos);
 
-    formBuscarProducto.addEventListener('submit',(event) =>{
-        event.preventDefault();
-        const query = document.getElementById('buscarProducto').value.trim().toLowerCase();
-        const productosFiltrados = producto.filter(p => p.id.toLowerCase().includes(query) || p.nombre.toLowerCase().includes(query));
+       formBuscarProducto.addEventListener('submit', (event) => {
+           event.preventDefault();
+           const query = document.getElementById('buscarProducto').value.trim().toLowerCase();
+           const productosFiltrados = productos.filter(p => p.id.toLowerCase().includes(query) || p.nombre.toLowerCase().includes(query));
 
-        if(productosFiltrados.length > 0){
-            mensaje.innerHTML = '';
-            renderizarProductos(productosFiltrados);
-        }else{
-            mensaje.innerHTML = '<div class="alert alert-danger">Producto no encontrado.</div>';
-            resultadoProducto.innerHTML = '';
-        }
+           if (productosFiltrados.length > 0) {
+               mensaje.innerHTML = '';
+               renderizarProductos(productosFiltrados);
+           } else {
+               mensaje.innerHTML = '<div class="alert alert-danger">Producto no encontrado.</div>';
+               resultadoProducto.innerHTML = '';
+           }
+       });
 
-    });
-
-        document.getElementById('btnAplicarCambios').addEventListener('click',() =>{
-            alert('Cambios aplicados')
-        });
-
+       document.getElementById('btnAplicarCambios').addEventListener('click', () => {
+           alert('Cambios aplicados');
+       });
    });
-
 </script>
 
 </body>
