@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regiro Usuario</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+ <!-- NavBar -->
+ <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+    <div class="container-fluid">
+        <a href="#" class="navbar-brand">El Rincón de los Vecinos</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarNav" aria-controls="navBarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a href="catalogo.html" class="nav-link">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Promociones</a>
+                </li>
+                <li class="nav-item">
+                    <a href="inicioSesioónUser.html" class="nav-link">Iniciar sesión/Registro</a>
+                </li>
+                <!-- se crea lo que se denomina una ventana modal en el icono de carrito es una ventana emergente con la info en la misma vista
+                esto posterior de controla por medio de JS -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="cart-toggle" data-bs-toggle="modal" data-bs-target="#cartModal">
+                        <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="badge bg-danger">0</span>
+                    </a>
+                </li>
+
+                <!-- se agrega incono de user con menú desplegable -->
+
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="me-2">Bienvenido, <strong>Juan Pérez</strong></span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="30" height="30" class="rounded-cricle me-2">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="perfilUser.html">Ver Perfil</a></li>
+                        <li><a class="dropdown-item" href="historialCompraUser.html">Historial De Compras</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <form action="" class="custom-form">
+                    <h2 class="form-title">Registro de Usuario</h2>
+
+                    <div class="mb-3">
+                        <label for="rutCliente" class="form-label"> Rut</label>
+                        <input type="text" class="form-control" id="rutCliente" name="rutCliente" placeholder="Ingrese su Rut">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombreCliente" class="form-label"> Nombre</label>
+                        <input type="text" class="form-control" id="nombreCliente" name="nombreCliente" placeholder="Ingrese su Nombre">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellido1Cliente" class="form-label"> Primer Apellido</label>
+                        <input type="text" id="apellido1Cliente" class="form-control" name="apellido1Cliente" placeholder="Ingrese su primer apellido">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellido2Cliente" class="form-label"> Segundo Apellido</label>
+                        <input type="text" id="apellido2Cliente" class="form-control" name="apellido2Cliente" placeholder="Ingrese su segundo apellido">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="emailCliente" class="form-label"> Email</label>
+                        <input type="text" id="emailCliente" class="form-control" name="emailCliente" placeholder="Ingrese su Email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="passCliente" class="form-label"> Password</label>
+                        <input type="text" id="passCliente" class="form-control" name="passCliente" placeholder="Ingrese su contraseña">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirmPassCliente" class="form-label"> Confirme Password</label>
+                        <input type="text" id="confirmPassCliente" class="form-control" name="confirmPassCliente" placeholder="Confirme su contraseña">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="particularCliente" class="form-label"> Dirección Particular</label>
+                        <input type="text" class="form-control" id="particularCliente" name="particularCliente" placeholder="Ingrese su Dirección particular">
+                    </div>
+
+                    <div class="mb-3">
+                       <label for="facturacionCliente" class="form-label"> Dirección de facturación</label>
+                       <input type="text" id="facturacionCliente" class="form-control" name="facturacionCliente" placeholder="Ingrese su Dirección de facturación">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="telefonoCliente" class="form-label"> Número de Teléfono</label>
+                        <input type="text" id="telefonoCliente" class="form-control" name="telefonoCliente" placeholder="Ingrese su Teléfono">
+                    </div>
+
+                    <div class="text-center">
+                        <input type="submit" class="btn btn-custom btn-lg" value="Registrar" >
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">El Rincón de los Vecinos</h5>
+                    <p>
+                        Calle Falsa 123, 28080 Santiago, Chile
+                        <br>
+                        Teléfono: +56 920 123 456
+                        <br>
+                        Email: contacto@elrincondelosvecinos.cl
+                    </p>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Horario de Atención</h5>
+                    <p>
+                        Lunes a Viernes: 9:00 AM - 22:30 PM
+                        <br>
+                        Sábados: 10:00 AM - 16:00 PM
+                        <br>
+                        Domingos: Cerrado
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3 bg-secondary">
+            © 2024 El Rincón de los Vecinos - Todos los derechos reservados
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+</html>

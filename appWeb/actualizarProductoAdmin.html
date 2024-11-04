@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    
+ <!-- nav admin -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a href="#" class="navbar-brand">Gestión El Rincón de los Vecinos</a>
+        <button class="navbar-toggler" type="button" data-bs.toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggle-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a href="generarReportesAdmin.html" class="nav-link">Reportes</a>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" id="navbarDropdownProductos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Productos
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownProductos">
+                        <li><a href="agregarProductoAdmin.html" class="dropdown-item">Agregar Productos</a></li>
+                        <li><a href="actualizarProductoAdmin.html" class="dropdown-item">Actualizar Productos</a></li>
+                        <li><a href="deshabilitarProductoAdmin.html" class="dropdown-item">Deshabilitar Productos</a></li>
+                        <li><a href="actualizarStock.html" class="dropdown-item">Actualizar Stock</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="crearPromocionAdmin.html" class="nav-link">Promociones</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="RegistroVendedor.html" class="nav-link">Crear Cuentas</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownPerfil" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownPerfil">
+                        <li><a href="#" class="dropdown-item">Mi Cuenta</a></li>
+                        <li><a href="#" class="dropdown-item text-danger">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    
+    <div class="container mt-5">
+        <h2 class="form-title">Actualizar Producto en el Inventario</h2>
+
+        <form id="form-actualizar-producto" class="custom-form">
+            
+            <!-- ver si el id se genera de manera automatica o se rellena manual y luego tiramos validaciones
+            para que sea único e irrepetible -->
+            <div class="mb-3">
+                <label for="idProducto" class="form-label">ID del Producto</label>
+                <input type="text" class="form-control" id="idProducto" required>
+                <div class="invalid-feedback">ID no encontrado. Por favor, ingrese un ID válido.</div>
+            </div>
+
+            <!-- aqui el admin tiene la opcion de cambiar la imagen si es que quiere  -->
+            <div class="mb-3">
+                <label for="imagenProducto" class="form-label">Cambiar Imagen del Producto (opcional)</label>
+                <input type="file" class="form-control" id="imagenProducto" accept="image/*">
+            </div>
+
+            <div class="mb-3">
+                <label for="nombreProducto" class="form-label">Nombre del producto</label>
+                <input type="text" class="form-control" id="nombreProducto" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="descripcionProducto" class="form-label">Descripción del Producto</label>
+                <textarea class="form-control" id="descripcionProducto" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="stockProducto" class="form-label">Stock del producto</label>
+                <input type="number" class="form-control" id="stockProducto" min="0" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="precioProducto" class="form-label">Precio del producto</label>
+                <input type="number" class="form-control" id="precioProducto" min="0" step="0.01" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="ivaProducto" class="form-label">IVA del producto (%)</label>
+                <input type="number" class="form-control" id="ivaProducto" min="0" step="0.01" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="categoriaProducto" class="form-label">Categoría del producto</label>
+                <input type="text" class="form-control" id="categoriaProducto" required>
+            </div>
+
+            <!-- se supone que aqui voy a tener 2 funciones 1 colocando el id deberia rellenarme los campos con la info de ese id 
+            y se quiero modificar algo lo relleno o cambio en los campos  y luego aplico esto, es muy similar a lo que hicimos en la eva2 de IOT (la Fran debe acordarse) -->
+
+            <div class="text-center">
+                <button type="button" class="btn btn-custom">Buscar Producto</button>
+                <button type="button" class="btn btn-custom">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center text-lg-start mt-5">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">El Rincón de los Vecinos</h5>
+                    <p>
+                        Calle Falsa 123, 28080 Santiago, Chile
+                        <br>
+                        Teléfono: +56 920 123 456
+                        <br>
+                        Email: contacto@elrincondelosvecinos.cl
+                    </p>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h5 class="text-uppercase">Horario de Atención</h5>
+                    <p>
+                        Lunes a Viernes: 9:00 AM - 22:30 PM
+                        <br>
+                        Sábados: 10:00 AM - 16:00 PM
+                        <br>
+                        Domingos: Cerrado
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3 bg-secondary">
+            © 2024 El Rincón de los Vecinos - Todos los derechos reservados
+        </div>
+    </footer>
+
+     <!-- Scripts -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

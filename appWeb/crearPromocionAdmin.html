@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Promociones</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="estilos/estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+   <!-- nav admin -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a href="#" class="navbar-brand">Gestión El Rincón de los Vecinos</a>
+        <button class="navbar-toggler" type="button" data-bs.toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggle-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a href="generarReportesAdmin.html" class="nav-link">Reportes</a>
+                </li>
+                
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" id="navbarDropdownProductos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Productos
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownProductos">
+                        <li><a href="agregarProductoAdmin.html" class="dropdown-item">Agregar Productos</a></li>
+                        <li><a href="actualizarProductoAdmin.html" class="dropdown-item">Actualizar Productos</a></li>
+                        <li><a href="deshabilitarProductoAdmin.html" class="dropdown-item">Deshabilitar Productos</a></li>
+                        <li><a href="actualizarStock.html" class="dropdown-item">Actualizar Stock</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="crearPromocionAdmin.html" class="nav-link">Promociones</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="RegistroVendedor.html" class="nav-link">Crear Cuentas</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownPerfil" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownPerfil">
+                        <li><a href="#" class="dropdown-item">Mi Cuenta</a></li>
+                        <li><a href="#" class="dropdown-item text-danger">Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <div class="containter mt-5">
+        <h2 class="text-center">Panel de Promociones</h2>
+
+        <div class="container mt-3">
+            <form  class="d-flex" id="formBuscarProducto" role="search">
+                <input type="text" class="form-control me-2" id="buscarProducto" placeholder="Puede buscar el producto por Nombre o ID" aria-label="Buscar">
+                <button class="btn btn-success" type="submit">Buscar</button>
+            </form>
+            <div id="mensaje" class="mt-3"></div>
+        </div>
+
+        <table class="table table-bordered mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Producto</th>
+                    <th>% Descuento</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tablePromociones">
+
+            </tbody>
+        </table>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-success" id="btnAplicarCambios">Aplicar Cambios</button>
+        </div>
+    </div>
+
+
+
+
+   
+
+   <!-- Footer -->
+   <footer class="bg-dark text-white text-center text-lg-start mt-5">
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                <h5 class="text-uppercase">El Rincón de los Vecinos</h5>
+                <p>
+                    Calle Falsa 123, 28080 Santiago, Chile
+                    <br>
+                    Teléfono: +56 920 123 456
+                    <br>
+                    Email: contacto@elrincondelosvecinos.cl
+                </p>
+            </div>
+            <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                <h5 class="text-uppercase">Horario de Atención</h5>
+                <p>
+                    Lunes a Viernes: 9:00 AM - 22:30 PM
+                    <br>
+                    Sábados: 10:00 AM - 16:00 PM
+                    <br>
+                    Domingos: Cerrado
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="text-center p-3 bg-secondary">
+        © 2024 El Rincón de los Vecinos - Todos los derechos reservados
+    </div>
+</footer>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+   document.addEventListener('DOMContentLoaded',() =>{
+    const formBuscarProducto = document.getElementById('formBuscarProducto');
+    const resultadoProducto = document.getElementById('tablePromociones');
+    const mensaje = document.getElementById('mensaje');
+
+    const producto = [
+                { id: 'prod-1', nombre: 'Leche Entera 1Lt', descuento: 10, estado: 'Activa' },
+                { id: 'prod-2', nombre: 'Café Tradición 170g', descuento: 15, estado: 'Inactiva' },
+                { id: 'prod-3', nombre: 'Cheetos 300g', descuento: 5, estado: 'Activa' },
+                { id: 'prod-4', nombre: 'Aceite de Oliva 500ml', descuento: null, estado: 'inactiva' },
+                { id: 'prod-5', nombre: 'Arroz Integral 1Kg', descuento: null, estado: 'inactiva' },
+    ];
+
+    const renderizarProductos = (productosFiltrados) =>{
+        resultadoProducto.innerHTML = productosFiltrados.map(producto =>
+        `<tr>
+            <td>${producto.id}</td>
+            <td>${producto.nombre}</td>
+            <td><input type="number" class="form-control" value="${producto.descuento || ''}" min="0" max="100"></td>
+            <td>
+                <select class="form-select">
+                    <option value="Activa" ${producto.estado.toLowerCase() === 'activa' ? 'selected': '' }>Activa</option>
+                    <option value="Inactiva" ${producto.estado.toLowerCase() === 'inactiva' ? 'selected':''}>Inactiva</option>
+                </select>
+            </td>
+        </tr>`).join('');
+        
+    };
+
+    renderizarProductos(producto);
+
+    formBuscarProducto.addEventListener('submit',(event) =>{
+        event.preventDefault();
+        const query = document.getElementById('buscarProducto').value.trim().toLowerCase();
+        const productosFiltrados = producto.filter(p => p.id.toLowerCase().includes(query) || p.nombre.toLowerCase().includes(query));
+
+        if(productosFiltrados.length > 0){
+            mensaje.innerHTML = '';
+            renderizarProductos(productosFiltrados);
+        }else{
+            mensaje.innerHTML = '<div class="alert alert-danger">Producto no encontrado.</div>';
+            resultadoProducto.innerHTML = '';
+        }
+
+    });
+
+        document.getElementById('btnAplicarCambios').addEventListener('click',() =>{
+            alert('Cambios aplicados')
+        });
+
+   });
+
+</script>
+
+</body>
+</html>
