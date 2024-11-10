@@ -1,9 +1,13 @@
 from django.shortcuts import render
 
-# ---------------usuario---------------- 
+# ---------------usuario----------------
+ 
 
 def vista_catalogo(request):
     return render(request, 'catalogo.html')
+
+def vista_detalleproducto(request):
+    return render(request,'Detalleproducto1.html')
 
 def vista_registrouser(request):
     return render(request,'registroUser.html')
@@ -17,10 +21,73 @@ def vista_perfiluser(request):
 def vista_historialuser(request):
     return render(request,'historialCompraUser.html')
 
-
 # ---------------Admin---------------- 
+def vista_inicioadmin(request):
+    return render(request,'inicioAdmin.html')
+
+def vista_reporteadmin(request):
+    return render(request,'generarReportesAdmin.html')
+
+def vista_agregarproductoadmin(request):
+    return render(request,'agregarProductoAdmin.html')
+
+def vista_inventario(request):
+    return render(request,'verinventario.html')
+
+def vista_actualizarproducto(request):
+    return render(request,'actualizarProductoAdmin.html')
 
 
+def vista_deshabilitarproducto(request):
+    return render(request,'deshabilitarProductoAdmin.html')
+
+def vista_actualizarstock(request):
+    return render(request,'actualizarStock.html')
+
+
+def vista_panelpromociones(request):
+    return render(request,'agregarProductoAdmin.html')
+
+
+def vista_registrovendedor(request):
+    return render(request,'RegistroVendedor.html')
+
+
+def vista_registrobodeguero(request):
+    return render(request,'Registrobodeguero.html')
+
+def vista_dashboard(request):
+    return render(request,'dashboard.html')
+
+
+# ---------------vendedor---------------- 
+def vista_iniciovendedor(request):
+    return render(request,'inicioVendedor.html')
+
+def vista_panelvendedor(request):
+    return render(request,'panelvendedor.html')
+
+
+# ---------------bodeguero---------------- 
+def vista_iniciobodeguero(request):
+    return render(request,'inicioBodeguero.html')
+
+def vista_panelbodeguero(request):
+    return render(request,'panelBodeguero.html')
+
+
+#--------------vistas_añadidas_extras_---------------
+
+#para que puedan seleccionar su tipo de cuenta antes de iniciar sesión en catalogo
+# (aun no añadida a catalogo 
+# porque pau esta trabajando en ella)
+
+def vista_seleccionarcuentainicio(request):
+    return render(request,'seleccionarcuentainicio.html')
+
+#para que puedan seleccionar su tipo de cuenta al pinchar en crear cuenta como admin
+def vista_elegircuentaacrear(request):
+    return render(request,'elegircuentaacrear.html')
 
 
 
