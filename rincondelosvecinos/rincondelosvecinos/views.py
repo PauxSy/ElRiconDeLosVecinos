@@ -20,7 +20,7 @@ def vista_historialuser(request):
 
 # ---------------Admin---------------- 
 
-def vista_
+
 
 
 
