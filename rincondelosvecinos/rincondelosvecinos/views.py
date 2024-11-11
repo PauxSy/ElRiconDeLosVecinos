@@ -46,7 +46,7 @@ def vista_actualizarstock(request):
 
 
 def vista_panelpromociones(request):
-    return render(request,'agregarProductoAdmin.html')
+    return render(request,'crearPromocionAdmin.html')
 
 
 def vista_registrovendedor(request):

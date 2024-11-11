@@ -48,7 +48,8 @@
     </thead>
     <tbody>
         <tr>
-            <td><img src="media/lecheEntera1Lt.webp" alt="Producto A" class="img-thumbnail"></td>
+
+            <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
             <td>prod-1</td>
             <td>Producto A</td>
             <td>Descripcion A</td>
@@ -58,13 +59,13 @@
             <td>Categoria A</td>
             <td>
                 <button class="btn btn-danger mt-3">
-                    <a href="actualizarProductoAdmin.html" class="nav-link" >Modificar</a>
+                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
                 </button>
             </td>
         </tr>
 
         <tr>
-            <td><img src="media/cafeTradicion170g.webp" alt="Producto A" class="img-thumbnail"></td>
+            <td><img src="{% static 'media/cafeTradicion170g.webp' %}"alt="Producto A" class="img-thumbnail"></td>
             <td>prod-2</td>
             <td>Producto B</td>
             <td>Descripcion B</td>
@@ -74,13 +75,13 @@
             <td>Categoria B</td>
             <td>
                 <button class="btn btn-danger mt-3">
-                    <a href="actualizarProductoAdmin.html" class="nav-link" >Modificar</a>
+                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
                 </button>
             </td>
         </tr>
 
         <tr>
-            <td><img src="media/cheetos300g.webp" alt="Producto A" class="img-thumbnail"></td>
+            <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
             <td>prod-3</td>
             <td>Producto C</td>
             <td>Descripcion C</td>
@@ -90,7 +91,7 @@
             <td>Categoria C</td>
             <td>
                 <button class="btn btn-danger mt-3">
-                    <a href="actualizarProductoAdmin.html" class="nav-link" >Modificar</a>
+                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
                 </button>
             </td>
             

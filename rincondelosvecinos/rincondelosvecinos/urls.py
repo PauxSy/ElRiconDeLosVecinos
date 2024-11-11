@@ -19,7 +19,9 @@ urlpatterns = [
     path('actualizarproducto/', views.vista_actualizarproducto, name='actualizarproducto'),
     path('deshabilitarproducto/', views.vista_deshabilitarproducto, name='deshabilitarproducto'),
     path('actualizarstock/', views.vista_actualizarstock, name='actualizarstock'),
+    
     path('panelpromociones/', views.vista_panelpromociones, name='panelpromociones'),
+
     path('registrovendedor/', views.vista_registrovendedor, name='registrovendedor'),
     path('registrobodeguero/', views.vista_registrobodeguero, name='registrobodeguero'),
     path('dashboard/', views.vista_dashboard, name='dashboard'),

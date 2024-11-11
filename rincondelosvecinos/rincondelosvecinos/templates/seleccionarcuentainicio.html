@@ -1,3 +1,7 @@
+
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +13,7 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'estilos.css' %}">
 </head>
-<body class="bg-navbar-custom">
+<body >
 
     <!-- NavBar -->
     {% include "formatos/navbaruser.html" %}
@@ -22,15 +26,14 @@
 
                 <!-- Botón Cliente -->
                 <div class="col-md-6 col-lg-3 mb-3">
-                    <a href="{% url 'iniciouser' %}"  class="btn btn-primary">
+                    <a href="{% url 'iniciouser' %}" class="btn btn-primary">
                         <i class="fas fa-user"></i> Cliente
                     </a>
                 </div>
 
                 <!-- Botón Vendedor -->
                 <div class="col-md-6 col-lg-3 mb-3">
-
-                    <a href="{% url 'iniciovendedor' %}"  class="btn btn-primary">
+                    <a href="{% url 'iniciovendedor' %}" class="btn btn-primary">
                         <i class="fas fa-store"></i> Vendedor
                     </a>
                 </div>
@@ -54,7 +57,7 @@
     </div>
     <!-- Footer -->
     {% endblock %}
-    {% include "formatos/footeruser.html"%}
+    {% include "formatos/footeruser.html" %}
 
 </body>
 </html>

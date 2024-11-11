@@ -20,7 +20,7 @@
                 <ul class="navbar-nav ms-auto">
     
                     <li class="nav-item">
-                        <a href="generarReportesAdmin.html" class="nav-link">Reportes</a>
+                        <a href="{% url 'reporteadmin' %}" class="nav-link">Reportes</a>
                     </li>
                     
                     <li class="nav-item dropdown">
@@ -28,14 +28,16 @@
                             Gestionar Productos
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownProductos">
-                            <li><a href="agregarProductoAdmin.html" class="dropdown-item">Agregar Productos</a></li>
-                            <li><a href="verinventario.html" class="dropdown-item">Actualizar Productos</a></li>
-                            <li><a href="deshabilitarProductoAdmin.html" class="dropdown-item">Deshabilitar Productos</a></li>
-                            <li><a href="actualizarStock.html" class="dropdown-item">Actualizar Stock</a></li>
+                            
+                            <li><a href="{% url 'agregarproducto' %}" class="dropdown-item">Agregar Productos</a></li>
+                            <li><a href="{% url 'inventario' %}" class="dropdown-item">Actualizar Productos</a></li>
+                            <li><a href="{% url 'deshabilitarproducto' %}" class="dropdown-item">Deshabilitar Productos</a></li>
+                            <li><a href="{% url 'actualizarstock' %}" class="dropdown-item">Actualizar Stock</a></li>
                         </ul>
                     </li>
+
                     <li class="nav-item">
-                        <a href="crearPromocionAdmin.html" class="nav-link">Promociones</a>
+                        <a href="{% url 'panelpromociones' %}" class="nav-link">Promociones</a>
                     </li>
     
                     <li class="nav-item">

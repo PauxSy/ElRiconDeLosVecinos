@@ -29,7 +29,9 @@
                         <i class="fas fa-trash-alt icon text-danger"></i>
                         <h5 class="card-title">Deshabilitar Producto</h5>
                         <p class="card-text">Desactivar productos del inventario</p>
-                        <a href="deshabilitarProductoAdmin.html" class="btn btn-danger">Deshabilitar</a>
+                        <a href="{% url 'deshabilitarproducto' %}" class="btn btn-danger">Deshabilitar</a>
+
+
                     </div>
                 </div>
             </div>
@@ -40,7 +42,7 @@
                         <i class="fas fa-clipboard icon text-info"></i>
                         <h5 class="card-title">Actualizar Stock</h5>
                         <p class="card-text">Gestiona el stock de los productos del inventario</p>
-                        <a href="actualizarStock.html" class="btn btn-info">Actualizar Stock</a>
+                        <a href="{% url 'actualizarstock' %}" class="btn btn-info">Actualizar Stock</a>
                     </div>
                 </div>
             </div>

@@ -11,6 +11,8 @@
 </head>
 <body>
  <!-- nav admin -->
+    {% include "formatos/navbarvendedor.html" %}
+    {% block content %}
 
     <!-- tabla para gestionar deshabilitar producots del catalogo -->
      <!-- la idea es posterior a esto implmentar JS para renderizar la info 
@@ -44,7 +46,7 @@
         </thead>
         <tbody>
             <tr>
-                <td><img src="media/lecheEntera1Lt.webp" alt="Producto A" class="img-thumbnail"></td>
+                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
                 <td>prod-1</td>
                 <td>Producto A</td>
                 <td>Descripcion A</td>
@@ -55,7 +57,7 @@
             </tr>
 
             <tr>
-                <td><img src="media/cafeTradicion170g.webp" alt="Producto A" class="img-thumbnail"></td>
+                <td><img src="{% static 'media/cafeTradicion170g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
                 <td>prod-2</td>
                 <td>Producto B</td>
                 <td>Descripcion B</td>
@@ -64,9 +66,9 @@
                 <td>21%</td>
                 <td>Categoria B</td>
             </tr>
-
+            
             <tr>
-                <td><img src="media/cheetos300g.webp" alt="Producto A" class="img-thumbnail"></td>
+                <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
                 <td>prod-3</td>
                 <td>Producto C</td>
                 <td>Descripcion C</td>

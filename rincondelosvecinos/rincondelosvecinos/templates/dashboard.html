@@ -26,7 +26,7 @@
                         <i class="fas fa-chart-line icon text-primary"></i>
                         <h5 class="card-title">Reportes</h5>
                         <p class="card-text">Genera y visualiza los reportes de las ventas</p>
-                        <a href="generarReportesAdmin.html" class="btn btn-primary">Ir a Reportes</a>
+                        <a href="{% url 'reporteadmin' %}" class="btn btn-primary">Ir a Reportes</a>
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                         <i class="fas fa-plus icon text-success"></i>
                         <h5 class="card-title">Agregar Producto</h5>
                         <p class="card-text">Añade nuevos productos al inventario</p>
-                        <a href="agregarProductoAdmin.html" class="btn btn-success">Agregar Producto</a>
+                        <a href="{% url 'agregarproducto' %}" class="btn btn-success">Agregar Producto</a>
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
                         <i class="fas fa-edit icon text-warning"></i>
                         <h5 class="card-title">Actualizar Productos</h5>
                         <p class="card-text">Modifica detalles de los productos existentes en el inventario</p>
-                        <a href="verinventario.html" class="btn btn-warning">Actualizar Productos</a>
+                        <a href="{% url 'inventario' %}" class="btn btn-warning">Actualizar Productos</a>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
                         <i class="fas fa-trash-alt icon text-danger"></i>
                         <h5 class="card-title">Deshabilitar Producto</h5>
                         <p class="card-text">Desactivar productos del inventario</p>
-                        <a href="deshabilitarProductoAdmin.html" class="btn btn-danger">Deshabilitar</a>
+                        <a href="{% url 'deshabilitarproducto' %}" class="btn btn-danger">Deshabilitar</a>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
                         <i class="fas fa-clipboard icon text-info"></i>
                         <h5 class="card-title">Actualizar Stock</h5>
                         <p class="card-text">Gestiona el stock de los productos del inventario</p>
-                        <a href="actualizarStock.html" class="btn btn-info">Actualizar Stock</a>
+                        <a href="{% url 'actualizarstock' %}" class="btn btn-info">Actualizar Stock</a>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
                         <i class="fas fa-tags icon text-secondary"></i>
                         <h5 class="card-title">Promociones</h5>
                         <p class="card-text">Crea y gestiona las promociones para los productos</p>
-                        <a href="crearPromocionAdmin.html" class="btn btn-secondary">Crear Promoción</a>
+                        <a href="{% url 'panelpromociones' %}" class="btn btn-secondary">Crear Promoción</a>
                 </div>
             </div>
         </div>
@@ -120,3 +120,6 @@
 </body>
 
 </html>
+
+
+

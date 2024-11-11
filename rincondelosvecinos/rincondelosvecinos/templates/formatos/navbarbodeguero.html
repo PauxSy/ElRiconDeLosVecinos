@@ -19,11 +19,11 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="deshabilitarProductoAdmin.html" class="nav-link">Deshabilitar Productos</a>
+                        <a href="{% url 'deshabilitarproducto' %}" class="nav-link">Deshabilitar Productos</a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="actualizarStock.html" class="nav-link">Actualizar Stock</a>
+                        <a href="{% url 'actualizarstock' %}"  class="nav-link">Actualizar Stock</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -31,7 +31,6 @@
                             <i class="fas fa-user-circle"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownPerfil">
-                            ++++++++++++añadir
                             <li><a href="#" class="dropdown-item">Mi Cuenta</a></li>
                             <li><a href="#" class="dropdown-item text-danger">Cerrar Sesión</a></li>
                         </ul>
@@ -42,3 +41,4 @@
     </nav>
 </body>
 </html>
+
