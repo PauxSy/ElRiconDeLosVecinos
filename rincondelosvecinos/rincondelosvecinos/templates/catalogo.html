@@ -25,66 +25,23 @@
     <div class="container mt-5">
         <div class="row">
             
-            <!-- Producto 1 -->
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <a href="catalogo.html">
-                        <img src="{% static 'media/lecheEntera1Lt.webp' %}" class="card-img-top" alt="Leche Entera 1LT">
-                    </a>
-                    <div class="card-body text-center">
-                        <h5 class="card-title"> {{ producto.nombre }}</h5> <!-- Nombre del producto desde la base de datos -->
-                        <p class="card-text">${{ producto.precio }} </p>
-                        <button class="btn btn-primary add-to-cart" data-product-id="1" data-price="1300" data-name="Leche Entera 1LT" data-image="media/lecheEntera1Lt.webp">Agregar al carrito</button>
-                        <a href="{% url 'detalleproducto' %}" class="btn btn-primary">Ver Detalle</a>
-                    </div>
+            {% for producto in productos %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                <!-- Enlace a la página de detalle del producto -->
+                <a href="{% url 'detalleproducto' producto.id %}">
+                    <img src="{{ producto.img_url }}" class="card-img-top" alt="{{ producto.nombre }}">
+                </a>
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ producto.nombre }}</h5> <!-- Nombre del producto -->
+                    <p class="card-text">${{ producto.precio }}</p> <!-- Precio del producto -->
+                    <button class="btn btn-primary add-to-cart" data-product-id="{{ producto.id }}" data-price="{{ producto.precio }}" data-name="{{ producto.nombre }}" data-image="{{ producto.img_url }}">Agregar al carrito</button>
+                    <!-- Enlace a la página de detalle con el ID del producto -->
+                    <a href="{% url 'detalleproducto' producto.id %}" class="btn btn-primary">Ver Detalle</a>
                 </div>
             </div>
-
-            <!-- Producto 2 con descuento 20% -->
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <img src="{% static 'media/panIdeal700G.webp' %}" class="card-img-top" alt="Pan Ideal 700g">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Pan Ideal 700g</h5>
-                        <p class="precio-original">$4300</p>
-                        <p class="precio-descuento">$3440</p>
-                        <p class="porcentaje-descuento">Descuento del 20%</p>
-                        <button class="btn btn-primary add-to-cart" data-product-id="2" data-price="3440" data-name="Pan Ideal 700g" data-image="media/panIdeal700G.webp">Agregar al carrito</button>
-                        <a href="{% url 'detalleproducto' %}" class="btn btn-primary">Ver Detalle</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 3 -->
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <img src="{% static 'media/fantaRetornable2LT.jpg' %}" class="card-img-top" alt="Fanta Retornable 2LT">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Fanta Retornable 2LT</h5>
-                        <p class="precio-original">$1,900</p>
-                        <p class="precio-descuento">$1,520</p>
-                        <p class="porcentaje-descuento">Descuento del 20%</p>
-                        <button class="btn btn-primary add-to-cart" data-product-id="3" data-price="1900" data-name="Fanta Retornable 2LT" data-image="media/fantaRetornable2LT.jpg">Agregar al carrito</button>
-                        <a href="{% url 'detalleproducto' %}" class="btn btn-primary">Ver Detalle</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Producto 4 con descuento 15% -->
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <img src="{% static 'media/cerealChocoKrispis.webp' %}" class="card-img-top" alt="Cereal Choco Krispis 500g">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Cereal Choco Krispis 500g</h5>
-                        <p class="precio-original">$2500</p>
-                        <p class="precio-descuento">$2125</p>
-                        <p class="porcentaje-descuento">Descuento del 15%</p>
-                        <button class="btn btn-primary add-to-cart" data-product-id="4" data-price="2125" data-name="Cereal Choco Krispis 500g" data-image="media/cerealChocoKrispis.webp">Agregar al carrito</button>
-                        <a href="{% url 'detalleproducto' %}" class="btn btn-primary">Ver Detalle</a>
-                    </div>
-                </div>
-            </div>
-
+        </div>
+        {% endfor %}
             
         </div>
     </div>

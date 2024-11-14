@@ -4,27 +4,19 @@ from django.shortcuts import get_object_or_404, render
 #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.http import JsonResponse
 from .models import Producto
-
-def vista_detalleproducto2(request, id):
+def vista_detalleproducto(request, id):
+    # Obtén el producto con el id proporcionado en la URL
     producto = get_object_or_404(Producto, id=id)
-    data = {
-        'nombre': producto.nombre,
-        'precio': producto.precio,
-        'descripcion': producto.descripcion
-    }
-    return JsonResponse(data)
-
-
+    
+    # Pasa el producto a la plantilla
+    return render(request, 'detalleProducto.html', {'producto': producto})
 # ---------------usuario----------------
 
 def vista_catalogo(request):
     productos = Producto.objects.all()
     return render(request, 'catalogo.html', {'productos': productos})
 
-def vista_detalleproducto(request):
-    product_id = request.GET.get('id')
-    producto = get_object_or_404(Producto, id=product_id)
-    return render(request, 'detalleproducto1.html', {'producto': producto})
+
 
 def vista_registrouser(request):
     return render(request,'registroUser.html')
