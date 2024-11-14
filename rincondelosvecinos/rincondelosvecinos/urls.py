@@ -11,6 +11,9 @@ urlpatterns = [
     path('perfiluser/', views.vista_perfiluser, name='perfiluser'),
     path('historialuser/', views.vista_historialuser, name='historialuser'),
 
+    path('detalleproducto2/<int:id>/', views.vista_detalleproducto2, name='detalleproducto2'), #prueba base de datos
+
+
     # ---------------Admin----------------
     path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),

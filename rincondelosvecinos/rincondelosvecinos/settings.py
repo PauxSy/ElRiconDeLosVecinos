@@ -1,68 +1,7 @@
-# from pathlib import Path
-# import os
-
-# BASE_DIR = Path(__file__).resolve().parent.parent
-
-# SECRET_KEY = 'django-insecure-4_xg*7l*j$3=6s&ipv7_6fqb_x9f8vppu=!2cznj(l!+(j3^os'
-# DEBUG = True
-# ALLOWED_HOSTS = []
-
-# INSTALLED_APPS = [
-#     'django.contrib.admin',
-#     'django.contrib.auth',
-#     'django.contrib.contenttypes',
-#     'django.contrib.sessions',
-#     'django.contrib.messages',
-#     'django.contrib.staticfiles',
-# ]
-
-# MIDDLEWARE = [
-#     'django.middleware.security.SecurityMiddleware',
-#     'django.contrib.sessions.middleware.SessionMiddleware',
-#     'django.middleware.common.CommonMiddleware',
-#     'django.middleware.csrf.CsrfViewMiddleware',
-#     'django.contrib.auth.middleware.AuthenticationMiddleware',
-#     'django.contrib.messages.middleware.MessageMiddleware',
-#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-# ]
-
-# ROOT_URLCONF = 'rincondelosvecinos.urls'
-
-# TEMPLATES = [
-#     {
-#         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-#         'DIRS': [BASE_DIR / 'rincondelosvecinos' / 'templates'],  # Ruta específica a la carpeta de plantillas
-#         'APP_DIRS': True,
-#         'OPTIONS': {
-#             'context_processors': [
-#                 'django.template.context_processors.debug',
-#                 'django.template.context_processors.request',
-#                 'django.contrib.auth.context_processors.auth',
-#                 'django.contrib.messages.context_processors.messages',
-#             ],
-#         },
-#     },
-# ]
-
-# WSGI_APPLICATION = 'rincondelosvecinos.wsgi.application'
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# LANGUAGE_CODE = 'en-us'
-# TIME_ZONE = 'UTC'
-# USE_I18N = True
-# USE_TZ = True
-# STATIC_URL = '/static/'
-# DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 from pathlib import Path
 import os
+
+from django.conf import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -77,7 +16,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Otros apps de tu proyecto
+    'rincondelosvecinos',  # Otros apps de tu proyecto
+    
 ]
 
 MIDDLEWARE = [
@@ -95,7 +35,7 @@ ROOT_URLCONF = 'rincondelosvecinos.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'rincondelosvecinos' / 'templates'],  # Ruta específica a la carpeta de plantillas
+        'DIRS': [BASE_DIR / 'rincondelosvecinos' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -110,10 +50,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rincondelosvecinos.wsgi.application'
 
+# Configuración de la base de datos RDS
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Tienda',
+        'USER': 'PauxSy',
+        'PASSWORD': 'nYsyHGzsjGmU3HNc4N6t',
+        'HOST': 'database-1.cfaqqaiswgff.us-east-2.rds.amazonaws.com',
+        'PORT': '3306'
     }
 }
 
@@ -122,17 +67,14 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Configuración de archivos estáticos
+# Configuración de archivos estáticos en local
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'rincondelosvecinos' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directorio para `collectstatic`
 
-
-
-# Configuración de archivos estáticos adicionales
-STATICFILES_DIRS = [
-    BASE_DIR / 'rincondelosvecinos' / 'static',  # Carpeta donde guardas archivos estáticos adicionales como "estilos.css"
-]
-
-# Esto puede ser útil si estás en producción
-# STATIC_ROOT = BASE_DIR / "staticfiles"  # Descomenta si deseas usar collectstatic para producción
+# Configuración de archivos media en local
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

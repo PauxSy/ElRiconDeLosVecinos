@@ -28,12 +28,12 @@
             <!-- Producto 1 -->
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
-                    <a href="producto1.html">
+                    <a href="catalogo.html">
                         <img src="{% static 'media/lecheEntera1Lt.webp' %}" class="card-img-top" alt="Leche Entera 1LT">
                     </a>
                     <div class="card-body text-center">
-                        <h5 class="card-title">Leche Entera 1LT</h5>
-                        <p class="card-text">$1300</p>
+                        <h5 class="card-title"> {{ producto.nombre }}</h5> <!-- Nombre del producto desde la base de datos -->
+                        <p class="card-text">${{ producto.precio }} </p>
                         <button class="btn btn-primary add-to-cart" data-product-id="1" data-price="1300" data-name="Leche Entera 1LT" data-image="media/lecheEntera1Lt.webp">Agregar al carrito</button>
                         <a href="{% url 'detalleproducto' %}" class="btn btn-primary">Ver Detalle</a>
                     </div>
