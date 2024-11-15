@@ -20,7 +20,8 @@
         <div class="row justify-content-center">
             <div class="col-md-5">
                 <h3 class="text-center">Iniciar sesión</h3>
-                <form action="" class="custom-form">
+                <form action="{% url 'iniciouser' %}" method="POST" class="custom-form">
+                    {% csrf_token %}
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su email">
@@ -32,9 +33,17 @@
                     <div class="text-center">
                         <button class="btn btn-inicio">Iniciar Sesión</button>
                         <br>
-                        <p><a href="#">¿olvido su contraseña?</a></p>
+                        <p><a href="{% url 'recuperarcontraseña' %}">¿olvido su contraseña?</a></p>
                     </div>
                 </form>
+                {% if messages %}
+                    <div class="alert alert-danger mt-3">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
             </div>
 
             <!-- Boton para llevarme a registrar user -->

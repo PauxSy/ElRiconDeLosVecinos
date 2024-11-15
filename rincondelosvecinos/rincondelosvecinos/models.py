@@ -36,6 +36,28 @@ class Promocion(models.Model):
         return f"Promoción de {self.producto.nombre}"
     
 
+class Usuario(models.Model):
+    rut = models.CharField(max_length=12, unique=True)
+    nombre = models.CharField(max_length=50)
+    primer_apellido = models.CharField(max_length=50)
+    segundo_apellido = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(max_length=100, unique=True)
+    contrasena = models.CharField(max_length=255)
+    direccion_particular = models.CharField(max_length=255)
+    direccion_facturacion = models.CharField(max_length=255)
+    telefono = models.CharField(max_length=15)
+
+
+    class Meta:
+        db_table = 'Usuarios'
+    
+    def __str__(self):
+        return f"{self.nombre} {self.primer_apellido}"
+    
+
+
+    
+
 
 
 
