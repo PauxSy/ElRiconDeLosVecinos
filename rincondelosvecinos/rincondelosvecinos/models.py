@@ -18,6 +18,28 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
+    def get_promocion(self):
+        # Este método devuelve la promoción activa si existe
+        return self.promocion_set.filter(estado='activa').first()  # Asegúrate de que el estado de la promoción sea "activa"
+
+
+class Promocion(models.Model):
+    descuento = models.DecimalField(max_digits=10, decimal_places=0)
+    preciodescuento = models.DecimalField(max_digits=10, decimal_places=0)
+    estado = models.CharField(max_length=10, choices=[('activa', 'inactiva')])
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'Promociones'
+
+    def __str__(self):
+        return f"Promoción de {self.producto.nombre}"
+    
+
+
+
+
+
     
 # prueba conexión a BD
 from django.db import connection
@@ -27,4 +49,8 @@ try:
     print("Conexión exitosa a la base de datos")
 except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
+
+
+
+
     

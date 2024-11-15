@@ -35,6 +35,13 @@
                 <div class="card-body text-center">
                     <h5 class="card-title">{{ producto.nombre }}</h5> <!-- Nombre del producto -->
                     <p class="card-text">${{ producto.precio }}</p> <!-- Precio del producto -->
+                    {% if producto.get_promocion %}
+                        <p class="promocion">
+                             -{{ producto.get_promocion.descuento }}%
+                        </p>
+                        <p>Precio con descuento: ${{ producto.get_promocion.preciodescuento }}</p>
+                    {% endif %}
+
                     <button class="btn btn-primary add-to-cart" data-product-id="{{ producto.id }}" data-price="{{ producto.precio }}" data-name="{{ producto.nombre }}" data-image="{{ producto.img_url }}">Agregar al carrito</button>
                     <!-- Enlace a la página de detalle con el ID del producto -->
                     <a href="{% url 'detalleproducto' producto.id %}" class="btn btn-primary">Ver Detalle</a>
