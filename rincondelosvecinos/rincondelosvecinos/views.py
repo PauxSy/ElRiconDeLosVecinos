@@ -2,17 +2,51 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate 
 from .models import Producto , Usuario
 # ----------------
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib import messages
 
 # -----------kkk------------------
+
+
+
+from django.core.mail import send_mail  # Importa la función para enviar correos
+from django.contrib import messages
+from django.shortcuts import render
+
+
+def vista_recuperarcontraseña(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')  # Obtén el correo electrónico del formulario
+        if email:
+            try:
+                # Enviar un correo simple
+                send_mail(
+                    'Recuperación de contraseña',
+                    'Hola, este es un mensaje de prueba para recuperar tu contraseña.',
+                    'tu_correo@gmail.com',  # Reemplaza con tu correo configurado en settings.py
+                    [email],
+                    fail_silently=False,  # Cambia a True si no quieres mostrar errores
+                )
+                messages.success(request, 'El correo se envió correctamente. Revisa tu bandeja de entrada.')
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo: {str(e)}')
+        else:
+            messages.error(request, 'Por favor, ingresa un correo válido.')
+    
+    return render(request,'recuperarcontraseña.html')
+
+
+
+
+
+
+
+# -----------kkk------------------
+
 def vista_iniciouser(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -31,31 +65,6 @@ def vista_iniciouser(request):
 
     return render(request, 'inicioSesioónUser.html')
 
-def vista_recuperarcontraseña(request):
-    return render(request,'recuperarcontraseña.html')
-
-# -----------kkk------------------
-
-def enviar_correo(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        try:
-            usuario = Usuario.objects.get(email=email)
-            current_site = get_current_site(request)
-            mail_subject = 'Recupera tu contraseña'
-            token = default_token_generator.make_token(usuario)
-            uid = urlsafe_base64_encode(force_bytes(usuario.pk))
-            link = f"http://{current_site.domain}/reset/{uid}/{token}/"
-            message = render_to_string('email_recuperacion.html', {
-                'user': usuario,
-                'link': link,
-            })
-            send_mail(mail_subject, message, 'tucorreo@gmail.com', [email])
-            messages.success(request, "Se ha enviado un enlace de recuperación a tu correo")
-        except Usuario.DoesNotExist:
-            messages.error(request, "No existe una cuenta con este correo")
-    
-    return render(request, 'cambiarcontraseña.html')
 
 
 
@@ -76,7 +85,7 @@ def reset_password(request, uidb64, token):
             usuario.save()
             messages.success(request, "Contraseña actualizada con éxito")
             return redirect('iniciouser')
-        return render(request, 'form_reset_password.html', {'usuario': usuario})
+        return render(request, 'reset_password.html', {'usuario': usuario})
     else:
         return HttpResponse('El enlace es inválido o ha expirado.')
 
