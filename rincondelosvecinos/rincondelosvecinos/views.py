@@ -3,42 +3,77 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.shortcuts import render, redirect
 from .models import Producto , Usuario
-# ----------------
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
-
-# -----------kkk------------------
-
-
-
-from django.core.mail import send_mail  # Importa la función para enviar correos
-from django.contrib import messages
+from django.core.mail import send_mail
 from django.shortcuts import render
+from django.contrib import messages
+from django.urls import reverse
+
+
+
 
 
 def vista_recuperarcontraseña(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')  # Obtén el correo electrónico del formulario
-        if email:
-            try:
-                # Enviar un correo simple
-                send_mail(
-                    'Recuperación de contraseña',
-                    'Hola, este es un mensaje de prueba para recuperar tu contraseña.',
-                    'tu_correo@gmail.com',  # Reemplaza con tu correo configurado en settings.py
-                    [email],
-                    fail_silently=False,  # Cambia a True si no quieres mostrar errores
-                )
-                messages.success(request, 'El correo se envió correctamente. Revisa tu bandeja de entrada.')
-            except Exception as e:
-                messages.error(request, f'Error al enviar el correo: {str(e)}')
-        else:
-            messages.error(request, 'Por favor, ingresa un correo válido.')
-    
-    return render(request,'recuperarcontraseña.html')
+    if request.method == "POST":
+        email = request.POST.get('email')
 
+        # Validar si el correo existe en la base de datos
+        try:
+            usuario = Usuario.objects.get(email=email)
+        except Usuario.DoesNotExist:
+            messages.error(request, "No existe un usuario registrado con ese correo.")
+            return render(request, 'recuperarcontraseña.html')
+
+        # Construir el enlace para restablecer contraseña
+        reset_link = request.build_absolute_uri(
+            reverse('reset_password', args=[usuario.id])
+        )
+
+        # Enviar el correo con el enlace
+        try:
+            send_mail(
+                subject="Recuperación de contraseña",
+                message=f"Hola, para restablecer tu contraseña haz clic en el siguiente enlace: {reset_link}",
+                from_email="tuemail@gmail.com",
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            messages.success(request, "El correo se envió correctamente. Revisa tu bandeja de entrada.")
+        except Exception as e:
+            messages.error(request, f"Error al enviar el correo: {str(e)}")
+    
+    return render(request, 'recuperarcontraseña.html')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .models import Usuario
+
+
+def reset_password(request, user_id):
+    if request.method == "POST":
+        nueva_contrasena = request.POST.get('nueva_contrasena')
+        confirmar_contrasena = request.POST.get('confirmar_contrasena')
+
+        if nueva_contrasena != confirmar_contrasena:
+            messages.error(request, "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
+            return render(request, 'reset_password.html', {'user_id': user_id})
+
+        try:
+            usuario = Usuario.objects.get(id=user_id)
+            usuario.contrasena = nueva_contrasena  # Guardar la contraseña sin encriptar
+            usuario.save()
+            messages.success(request, "Tu contraseña ha sido actualizada con éxito.")
+            return redirect('catalogo')
+        except Usuario.DoesNotExist:
+            messages.error(request, "El usuario no existe. Por favor, verifica tu información.")
+            return render(request, 'reset_password.html', {'user_id': user_id})
+
+    # Aquí asegúrate de pasar el user_id al contexto
+    return render(request, 'reset_password.html', {'user_id': user_id})
 
 
 
@@ -58,41 +93,15 @@ def vista_iniciouser(request):
             if usuario.contrasena == password:
                 # Inicio de sesión exitoso
                 messages.success(request, "Inicio de sesión exitoso")
+                return redirect('catalogo')  # Redirigir a la página de inicio
             else:
                 messages.error(request, "Contraseña incorrecta")
         except Usuario.DoesNotExist:
             messages.error(request, "El email no está registrado")
 
-    return render(request, 'inicioSesioónUser.html')
-
-
-
-
-from django.contrib.auth.tokens import default_token_generator
-from django.http import HttpResponse
-
-def reset_password(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        usuario = Usuario.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, Usuario.DoesNotExist):
-        usuario = None
-
-    if usuario is not None and default_token_generator.check_token(usuario, token):
-        if request.method == 'POST':
-            nueva_contrasena = request.POST['nueva_contrasena']
-            usuario.contrasena = nueva_contrasena
-            usuario.save()
-            messages.success(request, "Contraseña actualizada con éxito")
-            return redirect('iniciouser')
-        return render(request, 'reset_password.html', {'usuario': usuario})
-    else:
-        return HttpResponse('El enlace es inválido o ha expirado.')
+    return render(request, 'inicioSesioónUser.html')    
 
 # -----------kkk------------------
-
-
-
 
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL

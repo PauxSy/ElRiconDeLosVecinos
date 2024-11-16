@@ -6,15 +6,16 @@ from django.conf import settings
 
 urlpatterns = [
     # ---------------usuario----------------
-    path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
-
-
     path('', views.vista_catalogo, name='catalogo'), 
     path('producto/<int:id>/', views.vista_detalleproducto, name='detalleproducto'),
     path('registrouser/', views.vista_registrouser, name='registrouser'),
     path('iniciouser/', views.vista_iniciouser, name='iniciouser'),
+    path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
 
-    path('reset/<uidb64>/<token>/', views.reset_password, name='reset_password'),
+    path('reset_password/<int:user_id>/', views.reset_password, name='reset_password'),
+
+    
+
     path('perfiluser/', views.vista_perfiluser, name='perfiluser'),
     path('historialuser/', views.vista_historialuser, name='historialuser'),
 
