@@ -12,10 +12,6 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.urls import reverse
 
-
-
-
-
 def vista_recuperarcontraseña(request):
     if request.method == "POST":
         email = request.POST.get('email')
@@ -75,32 +71,7 @@ def reset_password(request, user_id):
     # Aquí asegúrate de pasar el user_id al contexto
     return render(request, 'reset_password.html', {'user_id': user_id})
 
-
-
-
-
-
 # -----------kkk------------------
-
-# def vista_iniciouser(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
-
-#         # Busca el usuario en la base de datos
-#         try:
-#             usuario = Usuario.objects.get(email=email)
-#             if usuario.contrasena == password:
-#                 # Inicio de sesión exitoso
-#                 messages.success(request, "Inicio de sesión exitoso")
-#                 return redirect('catalogo')  # Redirigir a la página de inicio
-#             else:
-#                 messages.error(request, "Contraseña incorrecta")
-#         except Usuario.DoesNotExist:
-#             messages.error(request, "El email no está registrado")
-
-#     return render(request, 'inicioSesioónUser.html')    
-
 
 def vista_iniciouser(request):
     if request.method == 'POST':
@@ -135,9 +106,17 @@ def vista_detalleproducto(request, id):
     return render(request, 'detalleProducto.html', {'producto': producto})
 
 
+# def vista_catalogo(request):
+#     productos = Producto.objects.all()
+#     return render(request, 'catalogo.html', {'productos': productos})
+
 def vista_catalogo(request):
-    productos = Producto.objects.all()
-    return render(request, 'catalogo.html', {'productos': productos})
+    query = request.GET.get('search', '')  # Obtener el término de búsqueda desde el formulario
+    if query:
+        productos = Producto.objects.filter(nombre__icontains=query)  # Filtra productos que contengan el término de búsqueda
+    else:
+        productos = Producto.objects.all()  # Si no hay búsqueda, muestra todos los productos
+    return render(request, 'catalogo.html', {'productos': productos, 'query': query})
 
 
 def vista_registrouser(request):
