@@ -14,10 +14,13 @@ urlpatterns = [
 
     path('reset_password/<int:user_id>/', views.reset_password, name='reset_password'),
 
-    
+    path('carrito/', views.carrito, name='carrito'),  # Ruta para la vista de mostrar el carrito
+    path('agregar_producto_carrito/<int:producto_id>/', views.agregar_producto_carrito, name='agregar_producto_carrito'),  # Ruta para agregar un producto al carrito
 
     path('perfiluser/', views.vista_perfiluser, name='perfiluser'),
     path('historialuser/', views.vista_historialuser, name='historialuser'),
+    path('carrito/', views.obtener_carrito, name='obtener_carrito'),
+    
 
     # ---------------Admin----------------
     path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),

@@ -50,161 +50,179 @@
         </div>
     </div>
 
-
-    <!-- vista del modal -->
+    {% comment %} revisar si es necesario mantener este modal  {% endcomment %}
 
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-top-right">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-navbar-custom">
-                    <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="product-name">Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Total</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cart-items">
-                            <!-- Aquí se cargan los productos del carrito -->
-                        </tbody>
-                    </table>
-                    <div class="text-end mt-3">
-                        <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
-                    <button type="button" class="btn btn-success">Finalizar compra</button>
-                </div>
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-navbar-custom">
+              <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
+            <div class="modal-body p-4">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th class="product-name">Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="cart-items">
+                  <!-- Aquí se cargan los productos del carrito -->
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
+              <button type="button" class="btn btn-success">Finalizar compra</button>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
+
     {% endblock %}
     {% include "formatos/footeruser.html"%}
+
     <!-- Footer -->
 
     <!-- Scripts -->
-    
     <script>
-        let cart = [];
-        const cartCountElement = document.getElementById('cart-count');
+        {% comment %} esta logica controla el boton de añadir producto al carrito modal {% endcomment %}
+        document.addEventListener("DOMContentLoaded", function () {
+            let cart = [];
     
-        function updateCartCount() {
-            const itemCount = cart.reduce((total, product) => total + product.quantity, 0);
-            cartCountElement.textContent = itemCount;
-        }
-    
-        function addToCart(productId, productName, productPrice, productImage) {
-            const existingProduct = cart.find(item => item.id === productId);
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-            } else {
-                cart.push({ id: productId, name: productName, price: productPrice, quantity: 1, image: productImage });
-            }
-            updateCartCount();
-            displayCart();
-        }
-    
-        function displayCart() {
-            const cartItemsElement = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartModal = document.getElementById('cartModal');
             const cartTotalElement = document.getElementById('cart-total');
-            cartItemsElement.innerHTML = '';
     
-            let total = 0;
+            // Función para actualizar el contador de productos en el carrito
+            function updateCartCount() {
+                const itemCount = cart.reduce((total, product) => total + product.quantity, 0);
+                cartCountElement.textContent = itemCount;
+            }
     
-            cart.forEach(product => {
-                const { id, name, price, quantity, image } = product;
-                const subtotal = price * quantity;
-                total += subtotal;
+            // Función para actualizar el total
+            function updateCartTotal() {
+                const total = cart.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+                cartTotalElement.textContent = `$${total.toFixed(2)}`;
+            }
     
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div class="product-info d-flex align-items-center">
-                            <img src="${image}" alt="${name}" width="50" height="50" class="me-2">
-                            <span>${name}</span>
-                        </div>
-                    </td>
-                    <td>$${price}</td>
-                    <td class="text-center">
-                        <div class="quantity-control"> <!-- Usa esta clase para el contenedor -->
-                            <button class="btn btn-quantity change-quantity me-2" data-product-id="${id}" data-action="decrease">-</button>
-                            <span class="quantity-number">${quantity}</span> <!-- Clase para centrar el número -->
-                            <button class="btn btn-quantity change-quantity ms-2" data-product-id="${id}" data-action="increase">+</button>
-                        </div>
-                    </td>
-                    </td>
-                    <td>$${subtotal}</td>
-                    <td><button class="btn btn-danger remove-from-cart" data-product-id="${id}">Eliminar</button></td>
-                `;
-                cartItemsElement.appendChild(row);
-            });
-            cartTotalElement.innerHTML = `<strong>Total: $${total}</strong>`;
-        }
-    
-        function removeFromCart(productId) {
-            const productIndex = cart.findIndex(item => item.id === productId);
-            if (productIndex !== -1) {
-                cart.splice(productIndex, 1);
+            // Función para agregar un producto al carrito
+            function addToCart(productId, productName, productPrice, productImage) {
+                const existingProduct = cart.find(item => item.id === productId);
+                if (existingProduct) {
+                    existingProduct.quantity += 1;
+                } else {
+                    cart.push({ id: productId, name: productName, price: productPrice, quantity: 1, image: productImage });
+                }
                 updateCartCount();
                 displayCart();
+                updateCartTotal();
             }
-        }
     
-        function changeQuantity(productId, action) {
-            const product = cart.find(item => item.id === productId);
-            if (product) {
-                if (action === 'increase') {
-                    product.quantity += 1;
-                } else if (action === 'decrease' && product.quantity > 1) {
-                    product.quantity -= 1;
-                }
+            // Función para mostrar los productos en el carrito
+            function displayCart() {
+                const cartItemsElement = document.getElementById('cart-items');
+                cartItemsElement.innerHTML = ''; // Limpiar contenido actual
+    
+                cart.forEach(product => {
+                    const { id, name, price, quantity, image } = product;
+                    const subtotal = price * quantity;
+    
+                    const productHtml = `
+                        <tr>
+                            <td>
+                                <img src="${image}" alt="${name}" class="img-thumbnail" width="50">
+                                <span>${name}</span>
+                            </td>
+                            <td>$${price}</td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary decrease" data-product-id="${id}">-</button>
+                                <span class="quantity">${quantity}</span>
+                                <button class="btn btn-sm btn-secondary increase" data-product-id="${id}">+</button>
+                            </td>
+                            <td>$${subtotal.toFixed(2)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger remove" data-product-id="${id}">Eliminar</button>
+                            </td>
+                        </tr>
+                    `;
+                    cartItemsElement.innerHTML += productHtml;
+                });
+            }
+    
+            // Evento que se dispara cuando el modal se abre
+            cartModal.addEventListener('show.bs.modal', function () {
                 displayCart();
-            }
-        }
+                updateCartTotal();
+            });
     
-        function emptyCart() {
-            cart = [];
-            updateCartCount();
-            displayCart();
-        }
+            // Añadir productos al carrito cuando se hace clic en los botones
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.target.getAttribute('data-product-id');
+                    const productName = e.target.getAttribute('data-name');
+                    const productPrice = parseFloat(e.target.getAttribute('data-price'));
+                    const productImage = e.target.getAttribute('data-image');
+                    addToCart(productId, productName, productPrice, productImage);
+                });
+            });
     
-        document.querySelectorAll('.add-to-cart').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const productId = parseInt(button.getAttribute('data-product-id'));
-                const productName = button.getAttribute('data-name');
-                const productPrice = parseFloat(button.getAttribute('data-price'));
-                const productImage = button.getAttribute('data-image');
-                addToCart(productId, productName, productPrice, productImage);
+            // Aumentar la cantidad de un producto
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('increase')) {
+                    const productId = e.target.getAttribute('data-product-id');
+                    const product = cart.find(item => item.id === productId);
+                    if (product) {
+                        product.quantity += 1;
+                        displayCart();
+                        updateCartTotal();
+                    }
+                }
+            });
+    
+            // Disminuir la cantidad de un producto
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('decrease')) {
+                    const productId = e.target.getAttribute('data-product-id');
+                    const product = cart.find(item => item.id === productId);
+                    if (product && product.quantity > 1) {
+                        product.quantity -= 1;
+                        displayCart();
+                        updateCartTotal();
+                    }
+                }
+            });
+    
+            // Eliminar un producto del carrito
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove')) {
+                    const productId = e.target.getAttribute('data-product-id');
+                    cart = cart.filter(item => item.id !== productId);
+                    displayCart();
+                    updateCartCount();
+                    updateCartTotal();
+                }
+            });
+    
+            // Vaciar el carrito
+            const emptyCartButton = document.getElementById('empty-cart');
+            emptyCartButton.addEventListener('click', () => {
+                cart = [];
+                displayCart();
+                updateCartCount();
+                updateCartTotal();
             });
         });
-    
-        document.getElementById('cart-items').addEventListener('click', (event) => {
-            if (event.target.classList.contains('remove-from-cart')) {
-                const productId = parseInt(event.target.getAttribute('data-product-id'));
-                removeFromCart(productId);
-            } else if (event.target.classList.contains('change-quantity')) {
-                const productId = parseInt(event.target.getAttribute('data-product-id'));
-                const action = event.target.getAttribute('data-action');
-                changeQuantity(productId, action);
-            }
-        });
-    
-        document.getElementById('empty-cart').addEventListener('click', emptyCart);
-    
-        document.getElementById('cart-toggle').addEventListener('click', displayCart);
-    
-        updateCartCount();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

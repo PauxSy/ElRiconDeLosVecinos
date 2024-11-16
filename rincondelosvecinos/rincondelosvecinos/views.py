@@ -16,6 +16,71 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from .models import Usuario
 
+#probando esta caga de carrito
+def carrito(request):
+    try:
+        cart = request.session.get('cart', [])
+        cart_items = []
+        total = 0
+
+        for item in cart:
+            producto = Producto.objects.get(id=item['id'])
+            subtotal = producto.precio * item['quantity']
+            total += subtotal
+
+            cart_items.append({
+                'id': producto.id,
+                'name': producto.nombre,
+                'price': producto.precio,
+                'quantity': item['quantity'],
+                'subtotal': subtotal,
+                'image': producto.img_url
+            })
+
+        return JsonResponse({
+            'cart_items': cart_items,
+            'total': total
+        })
+    except Exception as e:
+        print(f"Error al cargar el carrito: {e}")
+        return JsonResponse({'cart_items': [], 'total': 0})
+    
+    
+    # Vista para agregar productos al carrito
+def agregar_producto_carrito(request, producto_id):
+    cantidad = request.POST.get('cantidad', 1)  # Por defecto 1 unidad
+    producto = Producto.objects.get(id=producto_id)
+
+    # Obtener el carrito de la sesión (o crear uno vacío si no existe)
+    carrito = request.session.get('cart', [])
+
+    # Verificar si el producto ya está en el carrito
+    producto_en_carrito = next((item for item in carrito if item['id'] == producto.id), None)
+
+    if producto_en_carrito:
+        # Si el producto ya está, solo actualizamos la cantidad
+        producto_en_carrito['quantity'] += int(cantidad)
+    else:
+        # Si el producto no está, lo agregamos al carrito
+        carrito.append({
+            'id': producto.id,
+            'quantity': int(cantidad)
+        })
+
+    # Guardar el carrito actualizado en la sesión
+    request.session['cart'] = carrito
+    return redirect('carrito')  # Redirigir al carrito para mostrar los productos
+
+
+
+# views.py
+from django.http import JsonResponse
+
+def obtener_carrito(request):
+    carrito = request.session.get('carrito', [])
+    return JsonResponse({'cart_items': carrito})
+
+
 
 
 def vista_catalogo(request):
