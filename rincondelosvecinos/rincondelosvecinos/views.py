@@ -11,6 +11,43 @@ from django.core.mail import send_mail
 from django.shortcuts import render
 from django.contrib import messages
 from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .models import Usuario
+
+
+
+def vista_catalogo(request):
+    query = request.GET.get('search', '')  # Obtener el término de búsqueda desde el formulario
+    if query:
+        productos = Producto.objects.filter(nombre__icontains=query)  # Filtra productos que contengan el término de búsqueda
+    else:
+        productos = Producto.objects.all()  # Si no hay búsqueda, muestra todos los productos
+    return render(request, 'catalogo.html', {'productos': productos, 'query': query})
+
+def vista_iniciouser(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+
+        # Busca el usuario en la base de datos
+        try:
+            usuario = Usuario.objects.get(email=email)
+            if usuario.contrasena == password:
+                # Inicio de sesión exitoso
+                # Guarda el nombre y apellidos en la sesión
+                request.session['nombre_usuario'] = usuario.nombre
+                request.session['primer_apellido'] = usuario.primer_apellido
+
+                messages.success(request, "Inicio de sesión exitoso")
+                return redirect('catalogo')  # Redirigir a la página de inicio
+            else:
+                messages.error(request, "Contraseña incorrecta")
+        except Usuario.DoesNotExist:
+            messages.error(request, "El email no está registrado")
+
+    return render(request, 'inicioSesioónUser.html')
 
 def vista_recuperarcontraseña(request):
     if request.method == "POST":
@@ -43,12 +80,6 @@ def vista_recuperarcontraseña(request):
     
     return render(request, 'recuperarcontraseña.html')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Usuario
-
-
 def reset_password(request, user_id):
     if request.method == "POST":
         nueva_contrasena = request.POST.get('nueva_contrasena')
@@ -71,52 +102,12 @@ def reset_password(request, user_id):
     # Aquí asegúrate de pasar el user_id al contexto
     return render(request, 'reset_password.html', {'user_id': user_id})
 
-# -----------kkk------------------
-
-def vista_iniciouser(request):
-    if request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
-
-        # Busca el usuario en la base de datos
-        try:
-            usuario = Usuario.objects.get(email=email)
-            if usuario.contrasena == password:
-                # Inicio de sesión exitoso
-                # Guarda el nombre y apellidos en la sesión
-                request.session['nombre_usuario'] = usuario.nombre
-                request.session['primer_apellido'] = usuario.primer_apellido
-
-                messages.success(request, "Inicio de sesión exitoso")
-                return redirect('catalogo')  # Redirigir a la página de inicio
-            else:
-                messages.error(request, "Contraseña incorrecta")
-        except Usuario.DoesNotExist:
-            messages.error(request, "El email no está registrado")
-
-    return render(request, 'inicioSesioónUser.html')
-
-# -----------kkk------------------
-
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL
     producto = get_object_or_404(Producto, id=id)
     
     # Pasa el producto a la plantilla
     return render(request, 'detalleProducto.html', {'producto': producto})
-
-
-# def vista_catalogo(request):
-#     productos = Producto.objects.all()
-#     return render(request, 'catalogo.html', {'productos': productos})
-
-def vista_catalogo(request):
-    query = request.GET.get('search', '')  # Obtener el término de búsqueda desde el formulario
-    if query:
-        productos = Producto.objects.filter(nombre__icontains=query)  # Filtra productos que contengan el término de búsqueda
-    else:
-        productos = Producto.objects.all()  # Si no hay búsqueda, muestra todos los productos
-    return render(request, 'catalogo.html', {'productos': productos, 'query': query})
 
 
 def vista_registrouser(request):
@@ -129,8 +120,80 @@ def vista_historialuser(request):
     return render(request,'historialCompraUser.html')
 
 # ---------------Admin---------------- 
+# from django.shortcuts import render, redirect
+# from django.contrib import messages
+# from django.contrib.auth.hashers import check_password  # Para comparar contraseñas cifradas
+# from .models import Administrador  # Importa tu modelo Administrador
+
+# def vista_inicioadmin(request):
+#     if request.method == 'POST':
+#         rut = request.POST.get('rut')
+#         contrasena = request.POST.get('password')
+
+#         # Validación del formato del RUT
+#         if not validar_rut(rut):
+#             messages.error(request, 'El RUT ingresado no es válido.')
+#             return render(request, 'inicioAdmin.html')
+
+#         try:
+#             # Consulta para encontrar al administrador por RUT
+#             admin = Administrador.objects.get(rut=rut)
+
+#             # Verificar la contraseña
+#             if check_password(contrasena, admin.contrasena):
+#                 # Redirige al dashboard si es válido
+#                 return redirect('dashboard')
+#             else:
+#                 messages.error(request, 'La contraseña es incorrecta.')
+#         except Administrador.DoesNotExist:
+#             messages.error(request, 'El RUT ingresado no está registrado.')
+
+#     return render(request, 'inicioAdmin.html')
+
+# def validar_rut(rut):
+#     """Valida el formato del RUT chileno. Ejemplo válido: 21270263-3"""
+#     import re
+#     pattern = r'^\d{1,8}-[0-9kK]$'
+#     return re.match(pattern, rut) is not None
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Administrador
+
 def vista_inicioadmin(request):
-    return render(request,'inicioAdmin.html')
+    if request.method == 'POST':
+        rut = request.POST.get('rut')
+        contrasena = request.POST.get('password')
+
+        # Validación del formato del RUT
+        if not validar_rut(rut):
+            messages.error(request, 'El RUT ingresado no es válido.')
+        try:
+            # Consulta para encontrar al administrador por RUT
+            admin = Administrador.objects.get(rut=rut)
+
+            # Comparación directa de la contraseña
+            if contrasena == admin.contrasena:
+                return redirect('dashboard')  # Redirige al dashboard si todo es correcto
+            else:
+                messages.error(request, 'La contraseña ingresada es incorrecta.')
+        except Administrador.DoesNotExist:
+            messages.error(request, 'No está registrado.')
+
+    return render(request, 'inicioAdmin.html')
+
+
+def validar_rut(rut):
+    """
+    Valida el formato del RUT chileno. Ejemplo válido: 21270263-3
+    """
+    import re
+    pattern = r'^\d{1,8}-[0-9kK]$'
+    return re.match(pattern, rut) is not None
+
+
+
+
 
 def vista_reporteadmin(request):
     return render(request,'generarReportesAdmin.html')
