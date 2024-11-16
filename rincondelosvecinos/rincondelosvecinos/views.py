@@ -82,6 +82,26 @@ def reset_password(request, user_id):
 
 # -----------kkk------------------
 
+# def vista_iniciouser(request):
+#     if request.method == 'POST':
+#         email = request.POST['email']
+#         password = request.POST['password']
+
+#         # Busca el usuario en la base de datos
+#         try:
+#             usuario = Usuario.objects.get(email=email)
+#             if usuario.contrasena == password:
+#                 # Inicio de sesión exitoso
+#                 messages.success(request, "Inicio de sesión exitoso")
+#                 return redirect('catalogo')  # Redirigir a la página de inicio
+#             else:
+#                 messages.error(request, "Contraseña incorrecta")
+#         except Usuario.DoesNotExist:
+#             messages.error(request, "El email no está registrado")
+
+#     return render(request, 'inicioSesioónUser.html')    
+
+
 def vista_iniciouser(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -92,6 +112,10 @@ def vista_iniciouser(request):
             usuario = Usuario.objects.get(email=email)
             if usuario.contrasena == password:
                 # Inicio de sesión exitoso
+                # Guarda el nombre y apellidos en la sesión
+                request.session['nombre_usuario'] = usuario.nombre
+                request.session['primer_apellido'] = usuario.primer_apellido
+
                 messages.success(request, "Inicio de sesión exitoso")
                 return redirect('catalogo')  # Redirigir a la página de inicio
             else:
@@ -99,7 +123,7 @@ def vista_iniciouser(request):
         except Usuario.DoesNotExist:
             messages.error(request, "El email no está registrado")
 
-    return render(request, 'inicioSesioónUser.html')    
+    return render(request, 'inicioSesioónUser.html')
 
 # -----------kkk------------------
 
