@@ -81,6 +81,7 @@ def obtener_carrito(request):
     return JsonResponse({'cart_items': carrito})
 
 
+    
 
 
 def vista_catalogo(request):
@@ -90,6 +91,13 @@ def vista_catalogo(request):
     else:
         productos = Producto.objects.all()  # Si no hay búsqueda, muestra todos los productos
     return render(request, 'catalogo.html', {'productos': productos, 'query': query})
+
+def vista_detalleproducto(request, id):
+    # Obtén el producto con el id proporcionado en la URL
+    producto = get_object_or_404(Producto, id=id)
+    
+    # Pasa el producto a la plantilla
+    return render(request, 'detalleProducto.html', {'producto': producto})
 
 def vista_iniciouser(request):
     if request.method == 'POST':
@@ -167,12 +175,6 @@ def reset_password(request, user_id):
     # Aquí asegúrate de pasar el user_id al contexto
     return render(request, 'reset_password.html', {'user_id': user_id})
 
-def vista_detalleproducto(request, id):
-    # Obtén el producto con el id proporcionado en la URL
-    producto = get_object_or_404(Producto, id=id)
-    
-    # Pasa el producto a la plantilla
-    return render(request, 'detalleProducto.html', {'producto': producto})
 
 
 def vista_registrouser(request):
