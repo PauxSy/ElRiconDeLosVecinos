@@ -16,6 +16,18 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from .models import Usuario
 
+
+#probando cerrar sesion del User
+
+
+def cerrar_sesion(request):
+    # Limpia la sesión
+    request.session.flush()
+    # Crea un mensaje de éxito
+    messages.success(request, "Has cerrado sesión exitosamente.")
+    return redirect('catalogo')  # Redirige al catálogo
+
+
 #probando esta caga de carrito
 def carrito(request):
     try:

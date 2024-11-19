@@ -21,6 +21,7 @@ urlpatterns = [
     path('historialuser/', views.vista_historialuser, name='historialuser'),
     path('carrito/', views.obtener_carrito, name='obtener_carrito'),
     
+    path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
 
     # ---------------Admin----------------
     path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
