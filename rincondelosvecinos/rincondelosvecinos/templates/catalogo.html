@@ -32,14 +32,38 @@
                     </a>
                     <div class="card-body text-center">
                         <h5 class="card-title">{{ producto.nombre }}</h5>
-                        <p class="card-text">${{ producto.precio }}</p>
-                        {% if producto.get_promocion %}
-                            <p class="promocion">
-                                 -{{ producto.get_promocion.descuento }}%
-                            </p>
-                            <p>Precio con descuento: ${{ producto.get_promocion.preciodescuento }}</p>
-                        {% endif %}
-                        <button class="btn btn-primary add-to-cart" data-product-id="{{ producto.id }}" data-price="{{ producto.precio }}" data-name="{{ producto.nombre }}" data-image="{{ producto.img_url }}">Agregar al carrito</button>
+                        <div class="product-price">
+                            <div class="price-details">
+                                {% if producto.get_promocion and producto.get_promocion.estado == 'activa' %}
+                                    <div>
+                                        <span class="text-decoration-line-through">${{ producto.precio|floatformat:0 }}</span><br>
+                                        <span>-{{ producto.get_promocion.descuento }}%</span><br>
+                                        <span>${{ producto.get_promocion.preciodescuento|floatformat:0 }}</span>
+                                    </div>
+                                {% else %}
+                                    <div>
+                                        <span>${{ producto.precio|floatformat:0 }}</span><br>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+
+                        <button 
+                        class="btn btn-primary add-to-cart" 
+                        data-product-id="{{ producto.id }}" 
+                        data-price="{{ producto.precio }}" 
+                        data-name="{{ producto.nombre }}" 
+                        data-image="{{ producto.img_url }}" 
+                        data-descuento="{{ producto.get_promocion.descuento|default:0 }}" 
+                        data-preciodescuento="{{ producto.get_promocion.preciodescuento|default:producto.precio }}" 
+                        data-estado="{{ producto.get_promocion.estado|default:'inactiva' }}" 
+                        data-stock="{{ producto.stock }}">
+                        Agregar al carrito
+                        </button>
+
+
+
                         <a href="{% url 'detalleproducto' producto.id %}" class="btn btn-primary">Ver Detalle</a>
                     </div>
                 </div>
@@ -50,179 +74,214 @@
         </div>
     </div>
 
-    {% comment %} revisar si es necesario mantener este modal  {% endcomment %}
-
+    <!-- Modal de Carrito -->
     <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-top-right">
-          <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-navbar-custom">
-              <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-navbar-custom">
+                    <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="product-name">Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                            <!-- Aquí se cargan los productos del carrito -->
+                        </tbody>
+                    </table>
+                    <div class="text-end mt-3">
+                        <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
+                    <button type="button" class="btn btn-success">Finalizar compra</button>
+                </div>
             </div>
-            <div class="modal-body p-4">
-              <table class="table table-hover align-middle">
-                <thead class="table-light">
-                  <tr>
-                    <th class="product-name">Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody id="cart-items">
-                  <!-- Aquí se cargan los productos del carrito -->
-                </tbody>
-              </table>
-              <div class="text-end mt-3">
-                <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
-              </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
-              <button type="button" class="btn btn-success">Finalizar compra</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 
     {% endblock %}
-    {% include "formatos/footeruser.html"%}
-
-    <!-- Footer -->
+    {% include "formatos/footeruser.html" %}
 
     <!-- Scripts -->
-    <script>
-        {% comment %} esta logica controla el boton de añadir producto al carrito modal {% endcomment %}
-        document.addEventListener("DOMContentLoaded", function () {
-            let cart = [];
-    
-            const cartCountElement = document.getElementById('cart-count');
-            const cartModal = document.getElementById('cartModal');
-            const cartTotalElement = document.getElementById('cart-total');
-    
-            // Función para actualizar el contador de productos en el carrito
-            function updateCartCount() {
-                const itemCount = cart.reduce((total, product) => total + product.quantity, 0);
-                cartCountElement.textContent = itemCount;
-            }
-    
-            // Función para actualizar el total
-            function updateCartTotal() {
-                const total = cart.reduce((sum, product) => sum + (product.price * product.quantity), 0);
-                cartTotalElement.textContent = `$${total.toFixed(2)}`;
-            }
-    
-            // Función para agregar un producto al carrito
-            function addToCart(productId, productName, productPrice, productImage) {
-                const existingProduct = cart.find(item => item.id === productId);
-                if (existingProduct) {
-                    existingProduct.quantity += 1;
-                } else {
-                    cart.push({ id: productId, name: productName, price: productPrice, quantity: 1, image: productImage });
-                }
-                updateCartCount();
-                displayCart();
-                updateCartTotal();
-            }
-    
-            // Función para mostrar los productos en el carrito
-            function displayCart() {
-                const cartItemsElement = document.getElementById('cart-items');
-                cartItemsElement.innerHTML = ''; // Limpiar contenido actual
-    
-                cart.forEach(product => {
-                    const { id, name, price, quantity, image } = product;
-                    const subtotal = price * quantity;
-    
-                    const productHtml = `
-                        <tr>
-                            <td>
-                                <img src="${image}" alt="${name}" class="img-thumbnail" width="50">
-                                <span>${name}</span>
-                            </td>
-                            <td>$${price}</td>
-                            <td>
-                                <button class="btn btn-sm btn-secondary decrease" data-product-id="${id}">-</button>
-                                <span class="quantity">${quantity}</span>
-                                <button class="btn btn-sm btn-secondary increase" data-product-id="${id}">+</button>
-                            </td>
-                            <td>$${subtotal.toFixed(2)}</td>
-                            <td>
-                                <button class="btn btn-sm btn-danger remove" data-product-id="${id}">Eliminar</button>
-                            </td>
-                        </tr>
-                    `;
-                    cartItemsElement.innerHTML += productHtml;
-                });
-            }
-    
-            // Evento que se dispara cuando el modal se abre
-            cartModal.addEventListener('show.bs.modal', function () {
-                displayCart();
-                updateCartTotal();
-            });
-    
-            // Añadir productos al carrito cuando se hace clic en los botones
-            const addToCartButtons = document.querySelectorAll('.add-to-cart');
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = e.target.getAttribute('data-product-id');
-                    const productName = e.target.getAttribute('data-name');
-                    const productPrice = parseFloat(e.target.getAttribute('data-price'));
-                    const productImage = e.target.getAttribute('data-image');
-                    addToCart(productId, productName, productPrice, productImage);
-                });
-            });
-    
-            // Aumentar la cantidad de un producto
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('increase')) {
-                    const productId = e.target.getAttribute('data-product-id');
-                    const product = cart.find(item => item.id === productId);
-                    if (product) {
-                        product.quantity += 1;
-                        displayCart();
-                        updateCartTotal();
-                    }
-                }
-            });
-    
-            // Disminuir la cantidad de un producto
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('decrease')) {
-                    const productId = e.target.getAttribute('data-product-id');
-                    const product = cart.find(item => item.id === productId);
-                    if (product && product.quantity > 1) {
-                        product.quantity -= 1;
-                        displayCart();
-                        updateCartTotal();
-                    }
-                }
-            });
-    
-            // Eliminar un producto del carrito
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove')) {
-                    const productId = e.target.getAttribute('data-product-id');
-                    cart = cart.filter(item => item.id !== productId);
-                    displayCart();
-                    updateCartCount();
-                    updateCartTotal();
-                }
-            });
-    
-            // Vaciar el carrito
-            const emptyCartButton = document.getElementById('empty-cart');
-            emptyCartButton.addEventListener('click', () => {
-                cart = [];
-                displayCart();
-                updateCartCount();
-                updateCartTotal();
-            });
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    let cart = JSON.parse(localStorage.getItem('cart')) || []; // Cargar carrito desde localStorage
+    const sessionId = sessionStorage.getItem('session_id') || generateSessionId(); // Obtener session_id o generar uno nuevo
+    const userId = sessionStorage.getItem('user_id') || null; // Obtener id_useriniciado si existe (si no está logueado será null)
+    const cartId = sessionStorage.getItem('cart_id') || generateCartId(); // Obtener id_carrito o generar uno nuevo
+
+    const cartCountElement = document.getElementById('cart-count');
+    const cartModal = document.getElementById('cartModal');
+    const cartTotalElement = document.getElementById('cart-total');
+
+    // Generar un session_id único si no existe
+    function generateSessionId() {
+        const sessionId = 'session-' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('session_id', sessionId); // Guardar en sessionStorage
+        return sessionId;
+    }
+
+    // Generar un id único para el carrito
+    function generateCartId() {
+        const cartId = 'cart-' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('cart_id', cartId); // Guardar en sessionStorage
+        return cartId;
+    }
+
+    // Actualizar el contador de productos en el carrito
+    function updateCartCount() {
+        const itemCount = cart.reduce((total, product) => total + product.quantity, 0);
+        cartCountElement.textContent = itemCount;
+    }
+
+    // Actualizar el total del carrito
+    function updateCartTotal() {
+        const total = cart.reduce((sum, product) => sum + (product.priceWithDiscount * product.quantity), 0);
+        cartTotalElement.textContent = `$${Math.round(total)}`;
+    }
+
+    // Mostrar los productos del carrito
+    function displayCart() {
+        const cartItemsElement = document.getElementById('cart-items');
+        cartItemsElement.innerHTML = '';
+
+        cart.forEach(product => {
+            const { id, name, price, priceWithDiscount, quantity, image, discount, promoStatus, stock } = product;
+            const subtotal = priceWithDiscount * quantity;
+
+            let priceHtml = promoStatus === 'activa' ? ` 
+                <div>
+                    <span class="text-decoration-line-through">$${Math.round(price)}</span><br>
+                    <span>-${discount}%</span><br>
+                    <span>$${Math.round(priceWithDiscount)}</span>
+                </div>
+            ` : `<span>$${Math.round(price)}</span>`;
+
+            const productHtml = `
+                <tr>
+                    <td>
+                        <img src="${image}" alt="${name}" class="img-thumbnail" width="50">
+                        <span>${name}</span>
+                    </td>
+                    <td>${priceHtml}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary decrease" data-product-id="${id}" ${quantity <= 1 ? 'disabled' : ''}>-</button>
+                        <span class="quantity">${quantity}</span>
+                        <button class="btn btn-sm btn-secondary increase" data-product-id="${id}" ${quantity >= stock ? 'disabled' : ''}>+</button>
+                    </td>
+                    <td>$${Math.round(subtotal)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger remove" data-product-id="${id}">Eliminar</button>
+                    </td>
+                </tr>
+            `;
+            cartItemsElement.innerHTML += productHtml;
         });
+    }
+
+    // Añadir productos al carrito
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productId = e.target.getAttribute('data-product-id');
+            const productName = e.target.getAttribute('data-name');
+            const productPrice = parseFloat(e.target.getAttribute('data-price'));
+            const productImage = e.target.getAttribute('data-image');
+            const discount = parseFloat(e.target.getAttribute('data-descuento'));
+            const priceWithDiscount = parseFloat(e.target.getAttribute('data-preciodescuento'));
+            const promoStatus = e.target.getAttribute('data-estado');
+            const stock = parseInt(e.target.getAttribute('data-stock'));
+
+            // Verifica si el producto ya está en el carrito
+            const existingProduct = cart.find(item => item.id === productId);
+            if (existingProduct) {
+                alert('Este producto ya está en tu carrito.');
+            } else {
+                // Añadir el producto al carrito con los campos extras
+                cart.push({
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    priceWithDiscount,
+                    discount,
+                    quantity: 1,
+                    image: productImage,
+                    promoStatus,
+                    stock,
+                    session_id: sessionId,
+                    id_carrito: cartId,
+                    id_useriniciado: userId
+                });
+
+                // Guardar el carrito actualizado en localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+
+                updateCartCount();
+                displayCart();
+                updateCartTotal();
+            }
+        });
+    });
+
+    // Vaciar el carrito
+    document.getElementById('empty-cart').addEventListener('click', function () {
+        cart = [];
+        localStorage.removeItem('cart'); // Eliminar el carrito del localStorage
+        updateCartCount();
+        displayCart();
+        updateCartTotal();
+    });
+
+    // Eliminar productos del carrito
+    document.body.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove')) {
+            const productId = e.target.getAttribute('data-product-id');
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart)); // Actualizar el carrito en localStorage
+            updateCartCount();
+            displayCart();
+            updateCartTotal();
+        }
+});
+
+    // Aumentar o disminuir cantidades
+    document.body.addEventListener('click', function (e) {
+        const productId = e.target.getAttribute('data-product-id');
+        const product = cart.find(item => item.id === productId);
+
+        if (e.target.classList.contains('increase') && product.quantity < product.stock) {
+            product.quantity += 1;
+        } else if (e.target.classList.contains('decrease') && product.quantity > 1) {
+            product.quantity -= 1;
+        }
+
+        // Actualizar carrito en localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        displayCart();
+        updateCartTotal();
+    });
+
+    // Mostrar el carrito cargado
+    updateCartCount();
+    displayCart();
+    updateCartTotal();
+});
+    
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+

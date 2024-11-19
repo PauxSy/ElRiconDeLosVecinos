@@ -85,12 +85,14 @@ def obtener_carrito(request):
 
 
 def vista_catalogo(request):
-    query = request.GET.get('search', '')  # Obtener el término de búsqueda desde el formulario
+    query = request.GET.get('search', '')  
     if query:
-        productos = Producto.objects.filter(nombre__icontains=query)  # Filtra productos que contengan el término de búsqueda
+        productos = Producto.objects.filter(nombre__icontains=query) 
     else:
-        productos = Producto.objects.all()  # Si no hay búsqueda, muestra todos los productos
+        productos = Producto.objects.all()  
     return render(request, 'catalogo.html', {'productos': productos, 'query': query})
+
+
 
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL
@@ -98,6 +100,8 @@ def vista_detalleproducto(request, id):
     
     # Pasa el producto a la plantilla
     return render(request, 'detalleProducto.html', {'producto': producto})
+
+
 
 def vista_iniciouser(request):
     if request.method == 'POST':
