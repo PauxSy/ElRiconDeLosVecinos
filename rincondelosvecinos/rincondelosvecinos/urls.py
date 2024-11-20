@@ -5,26 +5,26 @@ from django.conf import settings
 
 
 urlpatterns = [
+    
+
+    path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
+    path('iniciouser/', views.vista_iniciouser, name='iniciouser'),
+   
+    path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
+    path('reset_password/<str:user_id>/', views.reset_password, name='reset_password'),
+
     # ---------------usuario----------------
     path('', views.vista_catalogo, name='catalogo'), 
     path('producto/<int:id>/', views.vista_detalleproducto, name='detalleproducto'),
     path('registrouser/', views.vista_registrouser, name='registrouser'),
-    path('iniciouser/', views.vista_iniciouser, name='iniciouser'),
-    path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
-
-    path('reset_password/<int:user_id>/', views.reset_password, name='reset_password'),
-
     path('carrito/', views.carrito, name='carrito'),  # Ruta para la vista de mostrar el carrito
     path('agregar_producto_carrito/<int:producto_id>/', views.agregar_producto_carrito, name='agregar_producto_carrito'),  # Ruta para agregar un producto al carrito
-
+    path('carrito/', views.obtener_carrito, name='obtener_carrito'),
     path('perfiluser/', views.vista_perfiluser, name='perfiluser'),
     path('historialuser/', views.vista_historialuser, name='historialuser'),
-    path('carrito/', views.obtener_carrito, name='obtener_carrito'),
-    
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
 
     # ---------------Admin----------------
-    path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),
     path('agregarproducto/', views.vista_agregarproductoadmin, name='agregarproducto'),
     path('inventario/', views.vista_inventario, name='inventario'),
