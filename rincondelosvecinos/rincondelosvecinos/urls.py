@@ -6,10 +6,7 @@ from django.conf import settings
 
 urlpatterns = [
     
-
-    path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
     path('iniciouser/', views.vista_iniciouser, name='iniciouser'),
-   
     path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
     path('reset_password/<str:user_id>/', views.reset_password, name='reset_password'),
 
@@ -26,6 +23,7 @@ urlpatterns = [
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
 
     # ---------------Admin----------------
+    path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),
     path('agregarproducto/', views.vista_agregarproductoadmin, name='agregarproducto'),
     path('inventario/', views.vista_inventario, name='inventario'),
@@ -36,6 +34,7 @@ urlpatterns = [
     path('registrovendedor/', views.vista_registrovendedor, name='registrovendedor'),
     path('registrobodeguero/', views.vista_registrobodeguero, name='registrobodeguero'),
     path('dashboard/', views.vista_dashboard, name='dashboard'),
+    path('elegircuentaacrear/', views.vista_elegircuentaacrear, name='elegircuentaacrear'),
 
     # ---------------vendedor----------------
     path('iniciovendedor/', views.vista_iniciovendedor, name='iniciovendedor'),
@@ -47,7 +46,6 @@ urlpatterns = [
 
     # --------------vistas añadidas extras---------------
     path('seleccionarcuentainicio/', views.vista_seleccionarcuentainicio, name='seleccionarcuentainicio'),
-    path('elegircuentaacrear/', views.vista_elegircuentaacrear, name='elegircuentaacrear'),
 ]
 
 # Si usas archivos estáticos en desarrollo
