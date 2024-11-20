@@ -67,7 +67,7 @@ class Administrador(models.Model):
         return f"{self.rut} - {self.email}"
     
 
-    
+
 # prueba conexión a BD
 from django.db import connection
 
@@ -76,7 +76,6 @@ try:
     print("Conexión exitosa a la base de datos")
 except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
-
 
 
 

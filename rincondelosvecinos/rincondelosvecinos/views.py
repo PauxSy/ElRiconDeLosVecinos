@@ -12,7 +12,6 @@ from django.urls import reverse
 
 
 
-
 def vista_iniciouser(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -348,3 +347,47 @@ def reset_password(request, user_id):
 
     # Renderizar la plantilla con el ID en el contexto
     return render(request, 'reset_password.html', {'user_id': user_id})
+
+#-------------- Registrar Usuario ---------------------#
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .models import Usuario
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .models import Usuario  # Puedes dejar la importación de modelos fuera
+
+def registrar_usuario(request):
+    from .forms import UsuarioForm  # Mueve la importación aquí para evitar el conflicto
+    if request.method == "POST":
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.contrasena = make_password(form.cleaned_data["contrasena"])
+            usuario.save()
+            messages.success(request, "Usuario registrado exitosamente.")
+            return redirect("catalogo")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Error en {field}: {error}")
+            messages.error(request, "Error en los datos ingresados. Revisa los campos.")
+    else:
+        form = UsuarioForm()
+    return render(request, "registroUser.html", {"form": form})
+
+def validar_campo_unico(request):
+    campo = request.GET.get("campo")
+    valor = request.GET.get("valor")
+
+    # Verificación para cada campo único
+    if campo == "rut" and Usuario.objects.filter(rut=valor).exists():
+        return JsonResponse({"existe": True, "mensaje": "Este RUT ya está registrado."})
+    elif campo == "email" and Usuario.objects.filter(email=valor).exists():
+        return JsonResponse({"existe": True, "mensaje": "Este correo electrónico ya está registrado."})
+    elif campo == "telefono" and Usuario.objects.filter(telefono=valor).exists():
+        return JsonResponse({"existe": True, "mensaje": "Este número de teléfono ya está registrado."})
+
+    return JsonResponse({"existe": False})

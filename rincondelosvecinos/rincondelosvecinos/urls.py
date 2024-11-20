@@ -16,7 +16,8 @@ urlpatterns = [
     # ---------------usuario----------------
     path('', views.vista_catalogo, name='catalogo'), 
     path('producto/<int:id>/', views.vista_detalleproducto, name='detalleproducto'),
-    path('registrouser/', views.vista_registrouser, name='registrouser'),
+    path('registrouser/', views.registrar_usuario, name='registrouser'),
+    path("validar_campo_unico/", views.validar_campo_unico, name="validar_campo_unico"),
     path('carrito/', views.carrito, name='carrito'),  # Ruta para la vista de mostrar el carrito
     path('agregar_producto_carrito/<int:producto_id>/', views.agregar_producto_carrito, name='agregar_producto_carrito'),  # Ruta para agregar un producto al carrito
     path('carrito/', views.obtener_carrito, name='obtener_carrito'),

@@ -380,6 +380,7 @@
     color: #b0b3b8; 
 }
 
+
 .admin h2 {
     color: #ffffff; 
 }
@@ -499,4 +500,9 @@ modal y por alguna razón se descuadro todo al trabajar con django */
 /* Si es necesario, ajusta el ancho de la tabla para que ocupe todo el contenedor */
 .table {
     width: 100%;
+}
+
+.custom-form input::placeholder,
+.custom-form textarea::placeholder {
+    color: #b6b6b6a5; 
 }
