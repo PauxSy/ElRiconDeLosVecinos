@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime, timedelta
 
 class Producto(models.Model):
     # El campo 'id' es la clave primaria (PK) y Django la crea automáticamente, así que no es necesario declararla explícitamente
@@ -12,6 +13,7 @@ class Producto(models.Model):
     categoria = models.CharField(max_length=50)    # Categoría del producto, varchar(50)
     admin_id = models.IntegerField()               # ID del administrador, entero
     
+    
     class Meta:
         db_table = 'Productos'  # Este es el nombre exacto de la tabla en la base de datos
    
@@ -21,6 +23,8 @@ class Producto(models.Model):
     def get_promocion(self):
         # Este método devuelve la promoción activa si existe
         return self.promocion_set.filter(estado='activa').first()  # Asegúrate de que el estado de la promoción sea "activa"
+    
+   
 
 
 class Promocion(models.Model):
@@ -46,6 +50,12 @@ class Usuario(models.Model):
     direccion_particular = models.CharField(max_length=255)
     direccion_facturacion = models.CharField(max_length=255)
     telefono = models.CharField(max_length=15)
+    
+    
+    # Campos para control de intentos
+    intentos_fallidos = models.IntegerField(default=0)
+   
+    
 
 
     class Meta:
@@ -53,6 +63,24 @@ class Usuario(models.Model):
     
     def __str__(self):
         return f"{self.nombre} {self.primer_apellido}"
+    
+    
+    def esta_bloqueado(self):
+        """Verificar si el usuario está bloqueado."""
+        if self.bloqueado_hasta and datetime.now() < self.bloqueado_hasta:
+            return True
+        return False
+
+    def bloquear(self, minutos=5):
+        """Bloquear al usuario por un período de tiempo determinado."""
+        self.bloqueado_hasta = datetime.now() + timedelta(minutes=minutos)
+        self.save()
+
+    def reiniciar_intentos(self):
+        """Reiniciar los intentos fallidos y desbloquear al usuario."""
+        self.intentos_fallidos = 0
+        self.bloqueado_hasta = None
+        self.save()
 
 class Administrador(models.Model):
     id = models.AutoField(primary_key=True)  

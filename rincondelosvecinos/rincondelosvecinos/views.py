@@ -11,11 +11,37 @@ from django.contrib import messages
 from django.urls import reverse
 
 
+from datetime import datetime, timedelta
+
 def vista_iniciouser(request):
     # Verificar si ya hay una sesión activa
     if request.session.get('nombre_usuario') and request.session.get('primer_apellido'):
         messages.error(request, "Ya tienes una sesión iniciada. Por favor, cierra sesión antes de intentar iniciar una nueva sesión.")
-        return redirect('catalogo')  # Redirigir a la página principal o cualquier otra página
+        return redirect('catalogo')
+
+    # Número máximo de intentos permitidos y tiempo de bloqueo (en minutos)
+    LIMITE_INTENTOS = 2
+    TIEMPO_BLOQUEO = 1  # En minutos
+
+    # Inicializar el contador de intentos fallidos y el tiempo de bloqueo si no existen
+    if 'login_attempts' not in request.session:
+        request.session['login_attempts'] = 0
+    if 'bloqueado_hasta' not in request.session:
+        request.session['bloqueado_hasta'] = None
+
+    # Verificar si el usuario está bloqueado
+    bloqueado_hasta = request.session.get('bloqueado_hasta')
+    if bloqueado_hasta:
+        # Convertir el tiempo de bloqueo a objeto datetime
+        bloqueado_hasta = datetime.strptime(bloqueado_hasta, '%Y-%m-%d %H:%M:%S')
+        if datetime.now() < bloqueado_hasta:
+            tiempo_restante = (bloqueado_hasta - datetime.now()).seconds // 60
+            messages.error(request, f"Has sido bloqueado temporalmente. Intenta de nuevo en {tiempo_restante} minutos.")
+            return render(request, 'inicioSesioónUser.html')
+        else:
+            # Desbloquear al usuario si el tiempo ha pasado
+            request.session['bloqueado_hasta'] = None
+            request.session['login_attempts'] = 0
 
     if request.method == 'POST':
         email = request.POST['email']
@@ -26,18 +52,33 @@ def vista_iniciouser(request):
             usuario = Usuario.objects.get(email=email)
             if usuario.contrasena == password:
                 # Inicio de sesión exitoso
-                # Guarda el nombre y apellidos en la sesión
+                # Reiniciar el contador de intentos fallidos y desbloquear
+                request.session['login_attempts'] = 0
+                request.session['bloqueado_hasta'] = None
+
+                # Guardar datos del usuario en la sesión
                 request.session['nombre_usuario'] = usuario.nombre
                 request.session['primer_apellido'] = usuario.primer_apellido
 
                 messages.success(request, "Inicio de sesión exitoso")
-                return redirect('catalogo')  # Redirigir a la página de inicio
+                return redirect('catalogo')
             else:
+                # Incrementar el contador de intentos fallidos
+                request.session['login_attempts'] += 1
                 messages.error(request, "Contraseña incorrecta")
         except Usuario.DoesNotExist:
+            # Incrementar el contador de intentos fallidos
+            request.session['login_attempts'] += 1
             messages.error(request, "El email no está registrado")
 
+        # Bloquear al usuario si supera el límite de intentos
+        if request.session['login_attempts'] >= LIMITE_INTENTOS:
+            bloqueado_hasta = datetime.now() + timedelta(minutes=TIEMPO_BLOQUEO)
+            request.session['bloqueado_hasta'] = bloqueado_hasta.strftime('%Y-%m-%d %H:%M:%S')
+            messages.error(request, f"Has superado el número de intentos permitidos. Estarás bloqueado durante {TIEMPO_BLOQUEO} minutos.")
+
     return render(request, 'inicioSesioónUser.html')
+
 
 
 #------version original 
