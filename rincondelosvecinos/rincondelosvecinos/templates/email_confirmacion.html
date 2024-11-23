@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirma tu cuenta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .header h1 {
+            color: #007bff;
+        }
+        .content {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .content p {
+            margin: 15px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Confirma tu cuenta</h1>
+        </div>
+        <div class="content">
+            <p>¡Hola, <strong>{{ nombre_usuario }}</strong>!</p>
+            <p>Gracias por registrarte en <strong>El Rincón de los Vecinos</strong>. Estamos emocionados de tenerte con nosotros.</p>
+            <p>Para activar tu cuenta y comenzar a explorar todo lo que ofrecemos, haz clic en el botón a continuación:</p>
+            <a href="{{ activation_link }}" class="cta-button">Confirmar mi cuenta</a>
+            <p>Si no solicitaste esta cuenta, puedes ignorar este mensaje. Tu cuenta no será activada a menos que confirmes este enlace.</p>
+        </div>
+        <div class="footer">
+            <p>El Rincón de los Vecinos © 2024. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

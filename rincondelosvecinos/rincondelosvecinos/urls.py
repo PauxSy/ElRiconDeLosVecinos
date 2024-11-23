@@ -7,7 +7,7 @@ from django.conf import settings
 urlpatterns = [
     
     path('iniciouser/', views.vista_iniciouser, name='iniciouser'),
-    path('recuperarcontraseña/', views.vista_recuperarcontraseña, name='recuperarcontraseña'),
+    path('recuperarcontrasena/', views.vista_recuperarcontrasena, name='recuperarcontrasena'),
     path('reset_password/<str:user_id>/', views.reset_password, name='reset_password'),
 
     # ---------------usuario----------------
@@ -21,6 +21,8 @@ urlpatterns = [
     path('perfiluser/', views.vista_perfiluser, name='perfiluser'),
     path('historialuser/', views.vista_historialuser, name='historialuser'),
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
+    path('activar/<uidb64>/<token>/', views.activar_cuenta, name='activar_cuenta'),
+
 
     # ---------------Admin----------------
     path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),

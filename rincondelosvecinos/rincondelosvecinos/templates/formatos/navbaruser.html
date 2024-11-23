@@ -24,9 +24,18 @@
                     <li class="nav-item">
                         <a href="{% url 'catalogo' %}" class="nav-link">Productos</a>
                     </li>
+                    {% if not request.user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="{% url 'seleccionarcuentainicio' %}" class="nav-link">Iniciar sesión</a>
+                        <a href="{% url 'iniciouser' %}" class="nav-link">Iniciar sesión</a>
                     </li>
+                    {% endif %}
+                    <p>
+                        {% if request.user.is_authenticated %}
+                            Usuario autenticado.
+                        {% else %}
+                            Usuario no autenticado.
+                        {% endif %}
+                    </p>
                     <li class="nav-item">
                         <a href="{% url 'registrouser' %}" class="nav-link">Registro</a>
                     </li>

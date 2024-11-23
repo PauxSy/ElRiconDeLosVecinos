@@ -22,7 +22,7 @@
                 <h3 class="text-center">Recuperar Contraseña</h3>
                 <p class="text-center">Ingrese su correo electrónico para recibir un enlace de recuperación</p>
 
-                <form action="{% url 'recuperarcontraseña' %}" method="POST"class="custom-form">
+                <form action="{% url 'recuperarcontrasena' %}" method="POST"class="custom-form">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>

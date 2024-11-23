@@ -1,84 +1,110 @@
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
-from django.utils.http import urlsafe_base64_decode
 from django.shortcuts import render, redirect
-from django.utils.encoding import force_str
+
+from rincondelosvecinos.forms import UsuarioForm
 from .models import Producto , Usuario,Administrador
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
-
-
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
 from datetime import datetime, timedelta
+import os
+import hashlib
+from django.utils.timezone import now, timedelta
+from django.core.mail import EmailMultiAlternatives
+
 
 def vista_iniciouser(request):
-    # Verificar si ya hay una sesión activa
-    if request.session.get('nombre_usuario') and request.session.get('primer_apellido'):
-        messages.error(request, "Ya tienes una sesión iniciada. Por favor, cierra sesión antes de intentar iniciar una nueva sesión.")
-        return redirect('catalogo')
-
-    # Número máximo de intentos permitidos y tiempo de bloqueo (en minutos)
-    LIMITE_INTENTOS = 2
-    TIEMPO_BLOQUEO = 1  # En minutos
-
-    # Inicializar el contador de intentos fallidos y el tiempo de bloqueo si no existen
-    if 'login_attempts' not in request.session:
-        request.session['login_attempts'] = 0
-    if 'bloqueado_hasta' not in request.session:
-        request.session['bloqueado_hasta'] = None
-
-    # Verificar si el usuario está bloqueado
-    bloqueado_hasta = request.session.get('bloqueado_hasta')
-    if bloqueado_hasta:
-        # Convertir el tiempo de bloqueo a objeto datetime
-        bloqueado_hasta = datetime.strptime(bloqueado_hasta, '%Y-%m-%d %H:%M:%S')
-        if datetime.now() < bloqueado_hasta:
-            tiempo_restante = (bloqueado_hasta - datetime.now()).seconds // 60
-            messages.error(request, f"Has sido bloqueado temporalmente. Intenta de nuevo en {tiempo_restante} minutos.")
-            return render(request, 'inicioSesioónUser.html')
-        else:
-            # Desbloquear al usuario si el tiempo ha pasado
-            request.session['bloqueado_hasta'] = None
-            request.session['login_attempts'] = 0
-
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
 
-        # Busca el usuario en la base de datos
         try:
             usuario = Usuario.objects.get(email=email)
-            if usuario.contrasena == password:
-                # Inicio de sesión exitoso
-                # Reiniciar el contador de intentos fallidos y desbloquear
-                request.session['login_attempts'] = 0
-                request.session['bloqueado_hasta'] = None
 
-                # Guardar datos del usuario en la sesión
+            # Verificar si la cuenta está bloqueada
+            if usuario.bloqueado:
+                messages.error(request, "Tu cuenta está bloqueada. Por favor, restablece tu contraseña para desbloquearla.")
+                return redirect('recuperarcontrasena')
+
+            # Verificar si la cuenta no está activa (no confirmada)
+            if not usuario.is_active:
+                if usuario.fecha_token and now() - usuario.fecha_token > timedelta(hours=23):
+                    # Reenviar correo de confirmación si han pasado más de 23 horas
+                    uid = urlsafe_base64_encode(force_bytes(usuario.id))
+                    token = default_token_generator.make_token(usuario)
+                    activation_link = request.build_absolute_uri(
+                        reverse('activar_cuenta', kwargs={'uidb64': uid, 'token': token})
+                    )
+
+                    # Enviar correo de confirmación
+                    email_subject = "Confirma tu cuenta en El Rincón de los Vecinos"
+                    email_body = render_to_string('email_confirmacion.html', {
+                        'nombre_usuario': usuario.nombre,
+                        'activation_link': activation_link,
+                    })
+                    email = EmailMultiAlternatives(
+                        subject=email_subject,
+                        body=email_body,
+                        from_email="tuemail@gmail.com",
+                        to=[usuario.email],
+                    )
+                    email.attach_alternative(email_body, "text/html")
+                    email.send()
+
+                    # Actualizar la fecha del token en la base de datos
+                    usuario.fecha_token = now()
+                    usuario.save()
+
+                    messages.info(request, "Te hemos enviado un nuevo correo de confirmación. Revisa tu bandeja de entrada.")
+                else:
+                    # Recordar que debe confirmar su cuenta si han pasado menos de 23 horas
+                    messages.warning(request, "Debes confirmar tu cuenta. Revisa el correo que te enviamos para activarla.")
+                return redirect('iniciouser')
+
+            # Verificar la contraseña
+            if usuario.contrasena == encriptar_con_salt(password, usuario.salt):
+                # Reiniciar intentos fallidos
+                usuario.intentos_fallidos = 0
+                usuario.bloqueado = False
+                usuario.last_login = now()  # Actualizar el último inicio de sesión
+                usuario.save()
+
                 request.session['nombre_usuario'] = usuario.nombre
                 request.session['primer_apellido'] = usuario.primer_apellido
-
+                request.session['email'] = usuario.email                
                 messages.success(request, "Inicio de sesión exitoso")
                 return redirect('catalogo')
+
             else:
-                # Incrementar el contador de intentos fallidos
-                request.session['login_attempts'] += 1
+                # Incrementar intentos fallidos y bloquear si es necesario
+                usuario.intentos_fallidos += 1
+                if usuario.intentos_fallidos >= 3:
+                    usuario.bloqueado = True
+                usuario.save()
                 messages.error(request, "Contraseña incorrecta")
         except Usuario.DoesNotExist:
-            # Incrementar el contador de intentos fallidos
-            request.session['login_attempts'] += 1
             messages.error(request, "El email no está registrado")
 
-        # Bloquear al usuario si supera el límite de intentos
-        if request.session['login_attempts'] >= LIMITE_INTENTOS:
-            bloqueado_hasta = datetime.now() + timedelta(minutes=TIEMPO_BLOQUEO)
-            request.session['bloqueado_hasta'] = bloqueado_hasta.strftime('%Y-%m-%d %H:%M:%S')
-            messages.error(request, f"Has superado el número de intentos permitidos. Estarás bloqueado durante {TIEMPO_BLOQUEO} minutos.")
+    return render(request, 'inicioSesionUser.html')
 
-    return render(request, 'inicioSesioónUser.html')
+def has_perm(self, perm, obj=None):
+        """Permitir permisos básicos."""
+        return True
 
+def has_module_perms(self, app_label):
+        """Permitir acceso a los módulos de la app."""
+        return True
+
+@property
+def is_staff(self):
+        """Definir si el usuario es parte del staff."""
+        return False
 
 
 #------version original 
@@ -103,58 +129,67 @@ def vista_iniciouser(request):
 #         except Usuario.DoesNotExist:
 #             messages.error(request, "El email no está registrado")
 
-#     return render(request, 'inicioSesioónUser.html')
+#     return render(request, 'inicioSesionUser.html')
 
 
 
-def vista_recuperarcontraseña(request):
-    # Validar si ya hay una sesión activa
-    if request.session.get('nombre_usuario') and request.session.get('primer_apellido'):
+def vista_recuperarcontrasena(request):
+    # Verificar si el usuario ya está autenticado
+    if request.session.get("nombre_usuario") and request.session.get("primer_apellido"):
         messages.error(request, "Ya tienes una sesión iniciada. Por favor, cierra sesión antes de recuperar la contraseña.")
-        return redirect('catalogo')  # Redirigir al catálogo u otra página adecuada
+        return redirect("catalogo")
 
     if request.method == "POST":
-        email = request.POST.get('email')
+        email = request.POST.get("email")
+        if not email:
+            messages.error(request, "Por favor, ingresa un correo electrónico.")
+            return render(request, "recuperarcontrasena.html")
 
-        # Validar si el correo existe en la base de datos de Usuario o Administrador
+        # Buscar el usuario o administrador con el correo proporcionado
         usuario = Usuario.objects.filter(email=email).first()
         administrador = Administrador.objects.filter(email=email).first()
 
         if not usuario and not administrador:
-            messages.error(request, "No existe un usuario registrado con ese correo.")
-            return render(request, 'recuperarcontraseña.html')
+            messages.error(request, "No existe una cuenta asociada a este correo.")
+            return render(request, "recuperarcontrasena.html")
 
-        # Seleccionar el usuario o administrador y generar un enlace diferenciado
+        # Generar un enlace de restablecimiento para usuario o administrador
         if usuario:
-            reset_link = request.build_absolute_uri(reverse('reset_password', args=[f"usuario_{usuario.id}"]))
+            user_type = "usuario"
+            user_id = usuario.id
         else:
-            reset_link = request.build_absolute_uri(reverse('reset_password', args=[f"admin_{administrador.id}"]))
+            user_type = "admin"
+            user_id = administrador.id
 
-        # Enviar el correo con el enlace de recuperación
+        reset_link = request.build_absolute_uri(
+            reverse("reset_password", args=[f"{user_type}_{user_id}"])
+        )
+
+        # Enviar el correo de recuperación
         try:
             send_mail(
                 subject="Recuperación de contraseña",
                 message=f"Hola, para restablecer tu contraseña haz clic en el siguiente enlace: {reset_link}",
-                from_email="tuemail@gmail.com",
+                from_email="elrincondelosvecinoschile@gmail.com",  # Cambia por tu correo
                 recipient_list=[email],
                 fail_silently=False,
             )
-            messages.success(request, "El correo se envió correctamente. Revisa tu bandeja de entrada.")
+            messages.success(request, "El correo de recuperación fue enviado exitosamente. Revisa tu bandeja de entrada.")
         except Exception as e:
-            messages.error(request, f"Error al enviar el correo: {str(e)}")
+            messages.error(request, f"Hubo un error al enviar el correo: {str(e)}")
 
-    return render(request, "recuperarcontraseña.html")
+    return render(request, "recuperarcontrasena.html")
 
 
 def reset_password(request, user_id):
     if request.method == "POST":
-        nueva_contrasena = request.POST.get('nueva_contrasena')
-        confirmar_contrasena = request.POST.get('confirmar_contrasena')
+        nueva_contrasena = request.POST.get("nueva_contrasena")
+        confirmar_contrasena = request.POST.get("confirmar_contrasena")
 
         # Validar si las contraseñas coinciden
         if nueva_contrasena != confirmar_contrasena:
             messages.error(request, "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
-            return render(request, 'reset_password.html', {'user_id': user_id})
+            return render(request, "reset_password.html", {"user_id": user_id})
 
         # Diferenciar entre usuario y administrador según el prefijo del ID
         if user_id.startswith("usuario_"):
@@ -169,17 +204,26 @@ def reset_password(request, user_id):
         # Validar si existe el usuario o administrador correspondiente
         if not usuario_obj:
             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
-            return render(request, 'reset_password.html', {'user_id': user_id})
+            return render(request, "reset_password.html", {"user_id": user_id})
 
-        # Actualizar la contraseña
-        usuario_obj.contrasena = nueva_contrasena  # Guardar la contraseña sin encriptar
+        # Generar un nuevo salt y encriptar la nueva contraseña
+        salt = os.urandom(8).hex()
+        nueva_contrasena_encriptada = hashlib.sha256((nueva_contrasena + salt).encode("utf-8")).hexdigest()
+
+        # Actualizar la contraseña y desbloquear la cuenta si estaba bloqueada
+        usuario_obj.contrasena = nueva_contrasena_encriptada
+        usuario_obj.salt = salt
+        if hasattr(usuario_obj, "intentos_fallidos"):
+            usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
+            usuario_obj.bloqueado = False  # Desbloquear la cuenta
+
         usuario_obj.save()
 
-        messages.success(request, "Tu contraseña ha sido actualizada con éxito.")
-        return redirect('catalogo')
+        messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
+        return redirect("catalogo")
 
     # Renderizar la plantilla con el ID en el contexto
-    return render(request, 'reset_password.html', {'user_id': user_id})
+    return render(request, "reset_password.html", {"user_id": user_id})
 
 
 
@@ -272,8 +316,35 @@ def vista_registrouser(request):
     return render(request,'registroUser.html')
 
 def vista_perfiluser(request):
-    return render(request,'perfilUser.html')
+    # Verificar si el usuario está autenticado
+    if not request.session.get('email'):
+        messages.error(request, "Debes iniciar sesión para acceder a tu perfil.")
+        return redirect('iniciouser')
 
+    # Obtener el usuario autenticado usando el email de la sesión
+    email = request.session['email']
+    usuario = Usuario.objects.get(email=email)
+
+    if request.method == 'POST':
+        # Actualizar los campos con los datos enviados desde el formulario
+        usuario.nombre = request.POST.get('nombre', usuario.nombre)
+        usuario.primer_apellido = request.POST.get('primer_apellido', usuario.primer_apellido)
+        usuario.segundo_apellido = request.POST.get('segundo_apellido', usuario.segundo_apellido)
+        usuario.email = request.POST.get('email', usuario.email)
+        usuario.telefono = request.POST.get('telefono', usuario.telefono)
+        usuario.direccion_particular = request.POST.get('direccion_particular', usuario.direccion_particular)
+        usuario.direccion_facturacion = request.POST.get('direccion_facturacion', usuario.direccion_facturacion)
+
+        # Guardar los cambios en la base de datos
+        usuario.save()
+        messages.success(request, "Tus datos se han actualizado exitosamente.")
+        print({usuario.nombre})
+        print({usuario.primer_apellido})
+
+        return redirect('perfiluser')
+
+    # Renderizar el formulario con los datos actuales del usuario
+    return render(request, 'perfilUser.html', {'usuario': usuario})
 def vista_historialuser(request):
     return render(request,'historialCompraUser.html')
 
@@ -418,15 +489,59 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from .models import Usuario  # Puedes dejar la importación de modelos fuera
 
+# Generar un salt aleatorio
+def generar_salt():
+    return os.urandom(8).hex()
+
+
+# Encriptar la contraseña usando el salt
+def encriptar_con_salt(password, salt):
+    password_bytes = (password + salt).encode('utf-8')
+    return hashlib.sha256(password_bytes).hexdigest()
+
+
 def registrar_usuario(request):
-    from .forms import UsuarioForm  # Mueve la importación aquí para evitar el conflicto
     if request.method == "POST":
         form = UsuarioForm(request.POST)
         if form.is_valid():
             usuario = form.save(commit=False)
-            usuario.contrasena = make_password(form.cleaned_data["contrasena"])
+
+            # Generar un salt único
+            salt = generar_salt()
+            usuario.salt = salt
+
+            # Encriptar la contraseña con el salt
+            usuario.contrasena = encriptar_con_salt(form.cleaned_data["contrasena"], salt)
+
+            # Poner el usuario como inactivo hasta que confirme
+            usuario.is_active = False
             usuario.save()
-            messages.success(request, "Usuario registrado exitosamente.")
+
+            # Generar el token de activación
+            uid = urlsafe_base64_encode(force_bytes(usuario.id))
+            token = default_token_generator.make_token(usuario)
+
+            # Crear enlace de activación
+            activation_link = request.build_absolute_uri(
+                reverse('activar_cuenta', kwargs={'uidb64': uid, 'token': token})
+            )
+
+            # Enviar el correo de activación
+            email_subject = "Confirma tu cuenta en El Rincón de los Vecinos"
+            email_body = render_to_string('email_confirmacion.html', {
+                'nombre_usuario': usuario.nombre,
+                'activation_link': activation_link
+            })
+            email = EmailMultiAlternatives(
+                subject=email_subject,
+                body=email_body,
+                from_email="tuemail@gmail.com",  # Cambia por tu dirección
+                to=[usuario.email],
+            )
+            email.attach_alternative(email_body, "text/html")
+            email.send()
+
+            messages.success(request, "Te hemos enviado un correo para confirmar tu cuenta. Revisa tu bandeja de entrada.")
             return redirect("catalogo")
         else:
             for field, errors in form.errors.items():
@@ -436,6 +551,23 @@ def registrar_usuario(request):
     else:
         form = UsuarioForm()
     return render(request, "registroUser.html", {"form": form})
+
+
+def activar_cuenta(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        usuario = Usuario.objects.get(id=uid)
+    except (Usuario.DoesNotExist, ValueError, TypeError):
+        usuario = None
+
+    if usuario and default_token_generator.check_token(usuario, token):
+        usuario.is_active = True
+        usuario.save()
+        messages.success(request, "¡Tu cuenta ha sido activada con éxito! Ahora puedes iniciar sesión.")
+        return redirect("iniciouser")
+    else:
+        messages.error(request, "El enlace de activación no es válido o ha expirado.")
+        return render(request, "activation_invalid.html")
 
 def validar_campo_unico(request):
     campo = request.GET.get("campo")

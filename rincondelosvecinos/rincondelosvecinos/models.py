@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 class Producto(models.Model):
     # El campo 'id' es la clave primaria (PK) y Django la crea automáticamente, así que no es necesario declararla explícitamente
@@ -50,12 +51,16 @@ class Usuario(models.Model):
     direccion_particular = models.CharField(max_length=255)
     direccion_facturacion = models.CharField(max_length=255)
     telefono = models.CharField(max_length=15)
-    
-    
+    salt = models.CharField(max_length=16, blank=True, null=True)  # Salt para encriptar contraseñas
+    is_active = models.BooleanField(default=False)  # Usuario inactivo hasta confirmar
+    bloqueado = models.BooleanField(default=False)  # Indica si la cuenta está bloqueada
+    intentos_fallidos = models.IntegerField(default=0)  # Número de intentos fallidos
+    fecha_registro = models.DateTimeField(default=now, editable=False)  # Fecha y hora de registro
     # Campos para control de intentos
-    intentos_fallidos = models.IntegerField(default=0)
-   
-    
+    last_login = models.DateTimeField(blank=True, null=True)  # Campo para el último inicio de sesión
+
+    USERNAME_FIELD = 'email'  # Define que el email será el identificador único
+    REQUIRED_FIELDS = ['rut', 'contrasena']  
 
 
     class Meta:
@@ -64,6 +69,23 @@ class Usuario(models.Model):
     def __str__(self):
         return f"{self.nombre} {self.primer_apellido}"
     
+
+    # Métodos requeridos por Django
+    @property
+    def is_anonymous(self):
+        """Si el usuario es anónimo."""
+        return False
+
+    @property
+    def is_authenticated(self):
+        """Si el usuario está autenticado."""
+        return True
+    
+    def get_email_field_name(self):
+        return 'email'
+    
+    def password(self):
+        return 'contrasena'
     
     def esta_bloqueado(self):
         """Verificar si el usuario está bloqueado."""
@@ -71,10 +93,6 @@ class Usuario(models.Model):
             return True
         return False
 
-    def bloquear(self, minutos=5):
-        """Bloquear al usuario por un período de tiempo determinado."""
-        self.bloqueado_hasta = datetime.now() + timedelta(minutes=minutos)
-        self.save()
 
     def reiniciar_intentos(self):
         """Reiniciar los intentos fallidos y desbloquear al usuario."""
