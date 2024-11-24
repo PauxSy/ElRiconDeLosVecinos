@@ -75,6 +75,7 @@ def vista_iniciouser(request):
                 usuario.last_login = now()  # Actualizar el último inicio de sesión
                 usuario.save()
 
+                request.session['usuario_autenticado'] = True
                 request.session['nombre_usuario'] = usuario.nombre
                 request.session['primer_apellido'] = usuario.primer_apellido
                 request.session['email'] = usuario.email                
@@ -294,8 +295,15 @@ def vista_catalogo(request):
     if query:
         productos = Producto.objects.filter(nombre__icontains=query) 
     else:
-        productos = Producto.objects.all()  
-    return render(request, 'catalogo.html', {'productos': productos, 'query': query})
+        productos = Producto.objects.all()
+        
+    usuario_autenticado = request.session.get('email') is not None
+
+    return render(request, 'catalogo.html', {
+        'productos': productos,
+        'query': query,
+        'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
+    })
 
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL

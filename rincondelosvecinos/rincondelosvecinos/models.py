@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime, timedelta
 from django.utils.timezone import now
+from django.contrib.auth.hashers import make_password
 
 class Producto(models.Model):
     # El campo 'id' es la clave primaria (PK) y Django la crea automáticamente, así que no es necesario declararla explícitamente
@@ -111,6 +112,25 @@ class Administrador(models.Model):
 
     def __str__(self):
         return f"{self.rut} - {self.email}"
+    
+    def save(self, *args, **kwargs):
+       # Encripta la contraseña antes de guardar
+        if not self.pk:  # Solo si es una creación, no en una actualización
+            self.contrasena = make_password(self.contrasena)
+        super().save(*args, **kwargs)
+
+    def crear_admin():
+        rut = input("Ingrese el RUT del administrador: ")
+        email = input("Ingrese el correo electrónico del administrador: ")
+        contrasena = input("Ingrese la contraseña del administrador: ")
+
+    # Crea el objeto Administrador y guarda en la base de datos
+        administrador = Administrador(rut=rut, email=email, contrasena=contrasena)
+        administrador.save()  # Esto automáticamente encriptará la contraseña por el método save()
+        print(f"Administrador creado: {administrador}")
+
+    if __name__ == "__main__":
+        crear_admin()
     
 
 

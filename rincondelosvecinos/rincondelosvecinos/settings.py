@@ -100,3 +100,8 @@ SESSION_SAVE_EVERY_REQUEST = True
 AUTHENTICATION_BACKENDS = [
     'rincondelosvecinos.backends.EmailBackend',
 ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # 2 semanas
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

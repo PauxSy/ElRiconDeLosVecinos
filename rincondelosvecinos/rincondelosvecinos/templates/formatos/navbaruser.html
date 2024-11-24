@@ -14,7 +14,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
         <div class="container-fluid">
-            <a href="#" class="navbar-brand">El Rincón de los Vecinos</a>
+            <a href="{% url 'catalogo' %}" class="navbar-brand">El Rincón de los Vecinos</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -23,22 +23,14 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a href="{% url 'catalogo' %}" class="nav-link">Productos</a>
-                    </li>
-                    {% if not request.user.is_authenticated %}
-                    <li class="nav-item">
-                        <a href="{% url 'iniciouser' %}" class="nav-link">Iniciar sesión</a>
-                    </li>
+                        {% if not request.session.usuario_autenticado %}
+                        <li class="nav-item">
+                            <a href="{% url 'iniciouser' %}" class="nav-link">Iniciar sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'registrouser' %}" class="nav-link">Registro</a>
+                        </li>
                     {% endif %}
-                    <p>
-                        {% if request.user.is_authenticated %}
-                            Usuario autenticado.
-                        {% else %}
-                            Usuario no autenticado.
-                        {% endif %}
-                    </p>
-                    <li class="nav-item">
-                        <a href="{% url 'registrouser' %}" class="nav-link">Registro</a>
-                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link" id="cart-toggle" data-bs-toggle="modal" data-bs-target="#cartModal">
                             <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="badge bg-danger">0</span>
@@ -50,12 +42,14 @@
                             {% if request.session.nombre_usuario and request.session.primer_apellido %}<span>Bienvenido, {{ request.session.nombre_usuario }} {{ request.session.primer_apellido }}</span>{% else %}<span>Bienvenido, Invitado</span>{% endif %}
                             <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="30" height="30" class="rounded-circle ms-2">
                         </a>
+                        {% if request.session.usuario_autenticado %}
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'perfiluser' %}">Ver Perfil</a></li>
                             <li><a class="dropdown-item" href="{% url 'historialuser' %}">Historial De Compras</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
-
+                        {%endif%}
+                        <p></p>
                         </ul>
                     </li>
                 </ul>
