@@ -29,6 +29,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rincondelosvecinos.cart_middleware.CartMiddleware',
+
 ]
 
 ROOT_URLCONF = 'rincondelosvecinos.urls'
@@ -101,7 +103,7 @@ AUTHENTICATION_BACKENDS = [
     'rincondelosvecinos.backends.EmailBackend',
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_AGE = 1209600  # 2 semanas
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False

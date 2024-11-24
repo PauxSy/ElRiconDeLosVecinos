@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar con Mercado Pago</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://sdk.mercadopago.com/js/v2"></script> <!-- SDK de Mercado Pago -->
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Finalizar Compra</h1>
+        <div class="card shadow-sm p-4">
+            <h3>Resumen del pedido</h3>
+            <ul>
+                <li>Producto: Curso de Desarrollo Web</li>
+                <li>Cantidad: 1</li>
+                <li>Total: <strong>$20.000</strong></li>
+            </ul>
+
+            <button id="btnPagar" class="btn btn-primary w-100 mt-4">Pagar con Mercado Pago</button>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar Mercado Pago con tu Public Key
+        const mp = new MercadoPago("TEST-f2823eb1-c558-448f-82e4-d64540aa9e82", {
+            locale: "es-AR" // Cambia según tu país (es-MX, es-CL, etc.)
+        });
+
+        // Crear preferencia desde tu servidor
+        document.getElementById('btnPagar').addEventListener('click', function () {
+            fetch('/crear-preferencia/', { // Ruta para tu backend que crea la preferencia
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' // Solo si usas Django
+                },
+                body: JSON.stringify({
+                    title: "Curso de Desarrollo Web",
+                    unit_price: 20000,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Inicializa el Checkout de Mercado Pago
+                mp.checkout({
+                    preference: {
+                        id: data.preference_id // ID de la preferencia retornada desde tu backend
+                    },
+                    autoOpen: true // Abre automáticamente el Checkout
+                });
+            })
+            .catch(error => console.error('Error al crear la preferencia:', error));
+        });
+    </script>
+</body>
+</html>

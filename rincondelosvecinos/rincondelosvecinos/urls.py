@@ -22,6 +22,7 @@ urlpatterns = [
     path('historialuser/', views.vista_historialuser, name='historialuser'),
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('activar/<uidb64>/<token>/', views.activar_cuenta, name='activar_cuenta'),
+    path('finalizarcompra/', views.finalizar_compra, name='finalizarcompra'),
 
 
     # ---------------Admin----------------

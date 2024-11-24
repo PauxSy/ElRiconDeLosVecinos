@@ -305,6 +305,9 @@ def vista_catalogo(request):
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
 
+def finalizar_compra(request):
+    return render(request,'pago_mercadopago.html')
+
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL
     producto = get_object_or_404(Producto, id=id)
@@ -314,6 +317,8 @@ def vista_detalleproducto(request, id):
 
 def cerrar_sesion(request):
     # Limpia la sesión
+    if 'cart' in request.session:
+       del request.session['cart']  # Elimina el contenido del carrito
     request.session.flush()
     # Crea un mensaje de éxito
     messages.success(request, "Has cerrado sesión exitosamente.")
@@ -322,6 +327,7 @@ def cerrar_sesion(request):
 
 def vista_registrouser(request):
     return render(request,'registroUser.html')
+
 
 def vista_perfiluser(request):
     # Verificar si el usuario está autenticado

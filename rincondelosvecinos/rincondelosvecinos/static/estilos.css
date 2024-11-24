@@ -506,3 +506,10 @@ modal y por alguna razón se descuadro todo al trabajar con django */
 .custom-form textarea::placeholder {
     color: #b6b6b6a5; 
 }
+
+#alerta {
+    max-width: 700px; /* Limitar el ancho de la alerta */
+    white-space: nowrap; /* Evitar saltos de línea */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Cortar texto si es demasiado largo */
+}

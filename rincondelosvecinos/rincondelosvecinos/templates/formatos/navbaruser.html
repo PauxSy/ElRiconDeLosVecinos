@@ -107,20 +107,39 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
-                    <button type="button" class="btn btn-success">Finalizar compra</button>
-                </div>
+                    {% if request.session.usuario_autenticado %}
+                    <a class="btn btn-success" href="{% url 'finalizarcompra' %}">Finalizar compra</a>
+                {% else %}
+                    <button type="button" class="btn btn-success" id="finalizarCompra">Finalizar compra</button>
+                    <div id="alerta" class="alert alert-warning alert-dismissible fade show" role="alert" style="display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); z-index: 1050;">
+                        Debes iniciar sesión para poder finalizar tu compra.
+                    </div>
+                {% endif %}                </div>
             </div>
         </div>
     </div>
 
     <script>
+        document.getElementById('finalizarCompra').addEventListener('click', function () {
+            const alerta = document.getElementById('alerta');
+            // Mostrar la alerta
+            alerta.style.display = 'block';
+        
+            // Redirigir al usuario después de 4 segundos
+            setTimeout(function () {
+                window.location.href = "{% url 'iniciouser' %}";
+            }, 1500);
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
             var toastList = toastElList.map(function (toastEl) {
-                return new bootstrap.Toast(toastEl, { delay: 3000 }); // 3 segundos de duración
+                return new bootstrap.Toast(toastEl, { delay: 1000 }); // 3 segundos de duración
             });
             toastList.forEach(toast => toast.show());
         });
+
+        
     </script>
     
     
