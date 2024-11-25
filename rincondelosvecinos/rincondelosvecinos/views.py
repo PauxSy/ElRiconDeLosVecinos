@@ -1,15 +1,14 @@
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
-
 from rincondelosvecinos.forms import UsuarioForm
 from .models import Producto , Usuario,Administrador
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from datetime import datetime, timedelta
@@ -19,14 +18,18 @@ from django.utils.timezone import now, timedelta
 from django.core.mail import EmailMultiAlternatives
 
 
+
+
 def vista_iniciouser(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
 
-        try:
-            usuario = Usuario.objects.get(email=email)
+        # Buscar en Usuarios y Administradores
+        usuario = Usuario.objects.filter(email=email).first()
+        admin = Administrador.objects.filter(email=email).first()
 
+        if usuario:
             # Verificar si la cuenta está bloqueada
             if usuario.bloqueado:
                 messages.error(request, "Tu cuenta está bloqueada. Por favor, restablece tu contraseña para desbloquearla.")
@@ -75,13 +78,14 @@ def vista_iniciouser(request):
                 usuario.last_login = now()  # Actualizar el último inicio de sesión
                 usuario.save()
 
+                # Configurar la sesión
                 request.session['usuario_autenticado'] = True
                 request.session['nombre_usuario'] = usuario.nombre
                 request.session['primer_apellido'] = usuario.primer_apellido
-                request.session['email'] = usuario.email                
+                request.session['email'] = usuario.email
+
                 messages.success(request, "Inicio de sesión exitoso")
                 return redirect('catalogo')
-
             else:
                 # Incrementar intentos fallidos y bloquear si es necesario
                 usuario.intentos_fallidos += 1
@@ -89,10 +93,37 @@ def vista_iniciouser(request):
                     usuario.bloqueado = True
                 usuario.save()
                 messages.error(request, "Contraseña incorrecta")
-        except Usuario.DoesNotExist:
+                return redirect('iniciouser')
+
+        elif admin:
+            # Verificar la contraseña para el administrador
+            if admin.contrasena == encriptar_con_salt(password, admin.salt):
+                # Configurar la sesión
+                request.session['admin_autenticado'] = True
+                request.session['email'] = admin.email
+                request.session['is_admin'] = True
+
+                messages.success(request, "Inicio de sesión exitoso como administrador")
+                return redirect('dashboard')  # Página del administrador
+            else:
+                messages.error(request, "Contraseña incorrecta para administrador")
+                return redirect('iniciouser')
+
+        else:
             messages.error(request, "El email no está registrado")
+            return redirect('iniciouser')
 
     return render(request, 'inicioSesionUser.html')
+
+
+def tu_vista_admin(request):
+    admin_menu_items = [
+        {"label": "Ver Perfil", "url_name": "perfiluser"},
+        {"label": "Inventario", "url_name": "historialuser"},
+        {"label": "Personal", "url_name": "historialuser"},
+        {"label": "Promociones", "url_name": "historialuser"},
+    ]
+    return render(request, "tu_plantilla.html", {"admin_menu_items": admin_menu_items})
 
 def has_perm(self, perm, obj=None):
         """Permitir permisos básicos."""
@@ -108,29 +139,6 @@ def is_staff(self):
         return False
 
 
-#------version original 
-# def vista_iniciouser(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
-
-#         # Busca el usuario en la base de datos
-#         try:
-#             usuario = Usuario.objects.get(email=email)
-#             if usuario.contrasena == password:
-#                 # Inicio de sesión exitoso
-#                 # Guarda el nombre y apellidos en la sesión
-#                 request.session['nombre_usuario'] = usuario.nombre
-#                 request.session['primer_apellido'] = usuario.primer_apellido
-
-#                 messages.success(request, "Inicio de sesión exitoso")
-#                 return redirect('catalogo')  # Redirigir a la página de inicio
-#             else:
-#                 messages.error(request, "Contraseña incorrecta")
-#         except Usuario.DoesNotExist:
-#             messages.error(request, "El email no está registrado")
-
-#     return render(request, 'inicioSesionUser.html')
 
 
 
@@ -227,10 +235,6 @@ def reset_password(request, user_id):
     return render(request, "reset_password.html", {"user_id": user_id})
 
 
-
-
-
-
 #--------FUNCIONALIDADES CARRITO----------------
 def carrito(request):
     try:
@@ -314,6 +318,8 @@ def vista_detalleproducto(request, id):
 
 def cerrar_sesion(request):
     # Limpia la sesión
+    if 'cart' in request.session:
+       del request.session['cart']  # Elimina el contenido del carrito
     request.session.flush()
     # Crea un mensaje de éxito
     messages.success(request, "Has cerrado sesión exitosamente.")
@@ -439,63 +445,14 @@ def vista_panelbodeguero(request):
 
 #--------------vistas_añadidas_extras_---------------
 
-#para que puedan seleccionar su tipo de cuenta antes de iniciar sesión en catalogo
-# (aun no añadida a catalogo 
-# porque pau esta trabajando en ella)
-
-def vista_seleccionarcuentainicio(request):
-    return render(request,'seleccionarcuentainicio.html')
 
 
+def finalizar_compra(request):
+    return render(request,'resumen_compra.html')
 
-
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from django.contrib.auth.hashers import check_password  # Para comparar contraseñas cifradas
-# from .models import Administrador  # Importa tu modelo Administrador
-
-# def vista_inicioadmin(request):
-#     if request.method == 'POST':
-#         rut = request.POST.get('rut')
-#         contrasena = request.POST.get('password')
-
-#         # Validación del formato del RUT
-#         if not validar_rut(rut):
-#             messages.error(request, 'El RUT ingresado no es válido.')
-#             return render(request, 'inicioAdmin.html')
-
-#         try:
-#             # Consulta para encontrar al administrador por RUT
-#             admin = Administrador.objects.get(rut=rut)
-
-#             # Verificar la contraseña
-#             if check_password(contrasena, admin.contrasena):
-#                 # Redirige al dashboard si es válido
-#                 return redirect('dashboard')
-#             else:
-#                 messages.error(request, 'La contraseña es incorrecta.')
-#         except Administrador.DoesNotExist:
-#             messages.error(request, 'El RUT ingresado no está registrado.')
-
-#     return render(request, 'inicioAdmin.html')
-
-# def validar_rut(rut):
-#     """Valida el formato del RUT chileno. Ejemplo válido: 21270263-3"""
-#     import re
-#     pattern = r'^\d{1,8}-[0-9kK]$'
-#     return re.match(pattern, rut) is not None
 
 
 #-------------- Registrar Usuario ---------------------#
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Usuario
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Usuario  # Puedes dejar la importación de modelos fuera
 
 # Generar un salt aleatorio
 def generar_salt():
@@ -507,6 +464,28 @@ def encriptar_con_salt(password, salt):
     password_bytes = (password + salt).encode('utf-8')
     return hashlib.sha256(password_bytes).hexdigest()
 
+def crear_administrador():
+    print("=== Crear Administrador ===")
+    
+    rut = input("Ingrese el RUT del administrador (formato: 7515612-K): ").strip()
+    email = input("Ingrese el correo electrónico del administrador: ").strip()
+    contrasena = input("Ingrese la contraseña: ").strip()
+
+    # Generar salt y hash de la contraseña
+    salt = generar_salt()
+    hashed_password = encriptar_con_salt(contrasena, salt)
+
+    # Crear administrador y guardar en la base de datos
+    admin = Administrador(
+        rut=rut,
+        email=email,
+        contrasena=hashed_password,
+        salt=salt
+    )
+    admin.save()
+
+    print(f"Administrador creado exitosamente:\nRUT: {rut}\nEmail: {email}")
+    print(f"Salt generado: {salt} (se guarda automáticamente en la base de datos)")
 
 def registrar_usuario(request):
     if request.method == "POST":

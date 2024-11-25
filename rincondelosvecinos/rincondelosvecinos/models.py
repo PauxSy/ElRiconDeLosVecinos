@@ -59,7 +59,7 @@ class Usuario(models.Model):
     fecha_registro = models.DateTimeField(default=now, editable=False)  # Fecha y hora de registro
     # Campos para control de intentos
     last_login = models.DateTimeField(blank=True, null=True)  # Campo para el último inicio de sesión
-
+    fecha_token = models.DateTimeField(blank=True, null=True, default=now)  # Fecha de último token enviado
     USERNAME_FIELD = 'email'  # Define que el email será el identificador único
     REQUIRED_FIELDS = ['rut', 'contrasena']  
 
@@ -99,13 +99,14 @@ class Usuario(models.Model):
         """Reiniciar los intentos fallidos y desbloquear al usuario."""
         self.intentos_fallidos = 0
         self.bloqueado_hasta = None
-        self.save()
+        self.save() 
 
 class Administrador(models.Model):
-    id = models.AutoField(primary_key=True)  
-    rut = models.CharField(max_length=12, unique=True)  # RUT único
-    email = models.EmailField(max_length=100, unique=True)  # Email único y validado como dirección de correo
-    contrasena = models.CharField(max_length=255)  # Contraseña (considera usar hashed passwords en la práctica)
+    id = models.AutoField(primary_key=True)
+    rut = models.CharField(max_length=12, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    contrasena = models.CharField(max_length=255)
+    salt = models.CharField(max_length=16)  # Nuevo campo para el salt
 
     class Meta:
         db_table = 'Administrador'
@@ -113,25 +114,7 @@ class Administrador(models.Model):
     def __str__(self):
         return f"{self.rut} - {self.email}"
     
-    def save(self, *args, **kwargs):
-       # Encripta la contraseña antes de guardar
-        if not self.pk:  # Solo si es una creación, no en una actualización
-            self.contrasena = make_password(self.contrasena)
-        super().save(*args, **kwargs)
-
-    def crear_admin():
-        rut = input("Ingrese el RUT del administrador: ")
-        email = input("Ingrese el correo electrónico del administrador: ")
-        contrasena = input("Ingrese la contraseña del administrador: ")
-
-    # Crea el objeto Administrador y guarda en la base de datos
-        administrador = Administrador(rut=rut, email=email, contrasena=contrasena)
-        administrador.save()  # Esto automáticamente encriptará la contraseña por el método save()
-        print(f"Administrador creado: {administrador}")
-
-    if __name__ == "__main__":
-        crear_admin()
-    
+  
 
 
 # prueba conexión a BD
