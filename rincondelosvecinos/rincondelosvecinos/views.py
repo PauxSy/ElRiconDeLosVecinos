@@ -1,15 +1,14 @@
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
-
 from rincondelosvecinos.forms import UsuarioForm
 from .models import Producto , Usuario,Administrador
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from datetime import datetime, timedelta
@@ -17,6 +16,8 @@ import os
 import hashlib
 from django.utils.timezone import now, timedelta
 from django.core.mail import EmailMultiAlternatives
+
+
 
 
 def vista_iniciouser(request):
@@ -139,31 +140,6 @@ def is_staff(self):
 
 
 
-#creacion cuentas admin
-#------version original 
-# def vista_iniciouser(request):
-#     if request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
-
-#         # Busca el usuario en la base de datos
-#         try:
-#             usuario = Usuario.objects.get(email=email)
-#             if usuario.contrasena == password:
-#                 # Inicio de sesión exitoso
-#                 # Guarda el nombre y apellidos en la sesión
-#                 request.session['nombre_usuario'] = usuario.nombre
-#                 request.session['primer_apellido'] = usuario.primer_apellido
-
-#                 messages.success(request, "Inicio de sesión exitoso")
-#                 return redirect('catalogo')  # Redirigir a la página de inicio
-#             else:
-#                 messages.error(request, "Contraseña incorrecta")
-#         except Usuario.DoesNotExist:
-#             messages.error(request, "El email no está registrado")
-
-#     return render(request, 'inicioSesionUser.html')
-
 
 
 def vista_recuperarcontrasena(request):
@@ -257,10 +233,6 @@ def reset_password(request, user_id):
 
     # Renderizar la plantilla con el ID en el contexto
     return render(request, "reset_password.html", {"user_id": user_id})
-
-
-
-
 
 
 #--------FUNCIONALIDADES CARRITO----------------
@@ -473,64 +445,14 @@ def vista_panelbodeguero(request):
 
 #--------------vistas_añadidas_extras_---------------
 
-#para que puedan seleccionar su tipo de cuenta antes de iniciar sesión en catalogo
-# (aun no añadida a catalogo 
-# porque pau esta trabajando en ella)
 
-def vista_seleccionarcuentainicio(request):
-    return render(request,'seleccionarcuentainicio.html')
 
 def finalizar_compra(request):
     return render(request,'resumen_compra.html')
 
 
-# from django.shortcuts import render, redirect
-# from django.contrib import messages
-# from django.contrib.auth.hashers import check_password  # Para comparar contraseñas cifradas
-# from .models import Administrador  # Importa tu modelo Administrador
-
-# def vista_inicioadmin(request):
-#     if request.method == 'POST':
-#         rut = request.POST.get('rut')
-#         contrasena = request.POST.get('password')
-
-#         # Validación del formato del RUT
-#         if not validar_rut(rut):
-#             messages.error(request, 'El RUT ingresado no es válido.')
-#             return render(request, 'inicioAdmin.html')
-
-#         try:
-#             # Consulta para encontrar al administrador por RUT
-#             admin = Administrador.objects.get(rut=rut)
-
-#             # Verificar la contraseña
-#             if check_password(contrasena, admin.contrasena):
-#                 # Redirige al dashboard si es válido
-#                 return redirect('dashboard')
-#             else:
-#                 messages.error(request, 'La contraseña es incorrecta.')
-#         except Administrador.DoesNotExist:
-#             messages.error(request, 'El RUT ingresado no está registrado.')
-
-#     return render(request, 'inicioAdmin.html')
-
-# def validar_rut(rut):
-#     """Valida el formato del RUT chileno. Ejemplo válido: 21270263-3"""
-#     import re
-#     pattern = r'^\d{1,8}-[0-9kK]$'
-#     return re.match(pattern, rut) is not None
-
 
 #-------------- Registrar Usuario ---------------------#
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Usuario
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.hashers import make_password
-from .models import Usuario  # Puedes dejar la importación de modelos fuera
 
 # Generar un salt aleatorio
 def generar_salt():

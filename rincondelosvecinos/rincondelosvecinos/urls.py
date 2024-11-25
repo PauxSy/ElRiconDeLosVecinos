@@ -48,7 +48,7 @@ urlpatterns = [
     path('panelbodeguero/', views.vista_panelbodeguero, name='panelbodeguero'),
 
     # --------------vistas añadidas extras---------------
-    path('seleccionarcuentainicio/', views.vista_seleccionarcuentainicio, name='seleccionarcuentainicio'),
+
 ]
 
 # Si usas archivos estáticos en desarrollo
