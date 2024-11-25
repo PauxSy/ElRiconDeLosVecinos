@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     {% load static %}
     <link rel="stylesheet" href="{% static 'estilos.css' %}">
+    <style>
+        /* Asegura que los botones tengan una separación uniforme */
+        .product-button {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Alineación uniforme de los botones */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <!-- NavBar -->
@@ -47,24 +61,23 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
 
-                        <button 
-                        class="btn btn-primary add-to-cart" 
-                        data-product-id="{{ producto.id }}" 
-                        data-price="{{ producto.precio }}" 
-                        data-name="{{ producto.nombre }}" 
-                        data-image="{{ producto.img_url }}" 
-                        data-descuento="{{ producto.get_promocion.descuento|default:0 }}" 
-                        data-preciodescuento="{{ producto.get_promocion.preciodescuento|default:producto.precio }}" 
-                        data-estado="{{ producto.get_promocion.estado|default:'inactiva' }}" 
-                        data-stock="{{ producto.stock }}">
-                        Agregar al carrito
-                        </button>
+                        <div class="button-container">
+                            <button 
+                                class="btn btn-primary add-to-cart product-button" 
+                                data-product-id="{{ producto.id }}" 
+                                data-price="{{ producto.precio }}" 
+                                data-name="{{ producto.nombre }}" 
+                                data-image="{{ producto.img_url }}" 
+                                data-descuento="{{ producto.get_promocion.descuento|default:0 }}" 
+                                data-preciodescuento="{{ producto.get_promocion.preciodescuento|default:producto.precio }}" 
+                                data-estado="{{ producto.get_promocion.estado|default:'inactiva' }}" 
+                                data-stock="{{ producto.stock }}">
+                                Agregar al carrito
+                            </button>
 
-
-
-                        <a href="{% url 'detalleproducto' producto.id %}" class="btn btn-primary">Ver Detalle</a>
+                            <a href="{% url 'detalleproducto' producto.id %}" class="btn btn-primary product-button">Ver Detalle</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,7 +125,6 @@
 
     {% endblock %}
     {% include "formatos/footeruser.html" %}
-
     <!-- Scripts -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
