@@ -23,7 +23,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a href="{% url 'catalogo' %}" class="nav-link">Productos</a>
-                        {% if not request.session.usuario_autenticado %}
+                        {% if not request.session.admin_autenticado and not request.session.usuario_autenticado %}
                         <li class="nav-item">
                             <a href="{% url 'iniciouser' %}" class="nav-link">Iniciar sesión</a>
                         </li>
@@ -39,8 +39,22 @@
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if request.session.nombre_usuario and request.session.primer_apellido %}<span>Bienvenido, {{ request.session.nombre_usuario }} {{ request.session.primer_apellido }}</span>{% else %}<span>Bienvenido, Invitado</span>{% endif %}
-                            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="30" height="30" class="rounded-circle ms-2">
+                        {% if request.session.admin_autenticado %}
+                            <span>Administrador</span><img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="25" height="25" class="rounded-circle ms-2">
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item fw-bold">Panel de Administración</a></li>
+                                <li><a class="dropdown-item" href="{% url 'perfiluser' %}">Ver Perfil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'historialuser' %}">Inventario</a></li>
+                                <li><a class="dropdown-item" href="{% url 'historialuser' %}">Personal</a></li>                            
+                                <li><a class="dropdown-item" href="{% url 'historialuser' %}">Promociones</a></li>                               
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+                            </ul>                        
+                        {% elif request.session.nombre_usuario and request.session.primer_apellido %}
+                            <span>Bienvenido, {{ request.session.nombre_usuario }} {{ request.session.primer_apellido }}</span><img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="30" height="30" class="rounded-circle ms-2">
+                        {% else %}
+                            <span>Bienvenido, Invitado</span><img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="perfil" width="25" height="25" class="rounded-circle ms-2">
+                        {% endif %}
                         </a>
                         {% if request.session.usuario_autenticado %}
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -48,9 +62,9 @@
                             <li><a class="dropdown-item" href="{% url 'historialuser' %}">Historial De Compras</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+                        </ul>
                         {%endif%}
                         <p></p>
-                        </ul>
                     </li>
                 </ul>
             </div>

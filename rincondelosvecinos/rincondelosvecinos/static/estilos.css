@@ -513,3 +513,9 @@ modal y por alguna razón se descuadro todo al trabajar con django */
     overflow: hidden;
     text-overflow: ellipsis; /* Cortar texto si es demasiado largo */
 }
+
+.dropdown-menu {
+    margin-top: 0; /* Reduce el espacio superior */
+    padding-top: 0; /* Reduce el espacio superior */
+
+}

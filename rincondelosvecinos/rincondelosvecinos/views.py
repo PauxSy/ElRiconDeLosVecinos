@@ -24,9 +24,11 @@ def vista_iniciouser(request):
         email = request.POST['email']
         password = request.POST['password']
 
-        try:
-            usuario = Usuario.objects.get(email=email)
+        # Buscar en Usuarios y Administradores
+        usuario = Usuario.objects.filter(email=email).first()
+        admin = Administrador.objects.filter(email=email).first()
 
+        if usuario:
             # Verificar si la cuenta está bloqueada
             if usuario.bloqueado:
                 messages.error(request, "Tu cuenta está bloqueada. Por favor, restablece tu contraseña para desbloquearla.")
@@ -75,13 +77,14 @@ def vista_iniciouser(request):
                 usuario.last_login = now()  # Actualizar el último inicio de sesión
                 usuario.save()
 
+                # Configurar la sesión
                 request.session['usuario_autenticado'] = True
                 request.session['nombre_usuario'] = usuario.nombre
                 request.session['primer_apellido'] = usuario.primer_apellido
-                request.session['email'] = usuario.email                
+                request.session['email'] = usuario.email
+
                 messages.success(request, "Inicio de sesión exitoso")
                 return redirect('catalogo')
-
             else:
                 # Incrementar intentos fallidos y bloquear si es necesario
                 usuario.intentos_fallidos += 1
@@ -89,10 +92,37 @@ def vista_iniciouser(request):
                     usuario.bloqueado = True
                 usuario.save()
                 messages.error(request, "Contraseña incorrecta")
-        except Usuario.DoesNotExist:
+                return redirect('iniciouser')
+
+        elif admin:
+            # Verificar la contraseña para el administrador
+            if admin.contrasena == encriptar_con_salt(password, admin.salt):
+                # Configurar la sesión
+                request.session['admin_autenticado'] = True
+                request.session['email'] = admin.email
+                request.session['is_admin'] = True
+
+                messages.success(request, "Inicio de sesión exitoso como administrador")
+                return redirect('dashboard')  # Página del administrador
+            else:
+                messages.error(request, "Contraseña incorrecta para administrador")
+                return redirect('iniciouser')
+
+        else:
             messages.error(request, "El email no está registrado")
+            return redirect('iniciouser')
 
     return render(request, 'inicioSesionUser.html')
+
+
+def tu_vista_admin(request):
+    admin_menu_items = [
+        {"label": "Ver Perfil", "url_name": "perfiluser"},
+        {"label": "Inventario", "url_name": "historialuser"},
+        {"label": "Personal", "url_name": "historialuser"},
+        {"label": "Promociones", "url_name": "historialuser"},
+    ]
+    return render(request, "tu_plantilla.html", {"admin_menu_items": admin_menu_items})
 
 def has_perm(self, perm, obj=None):
         """Permitir permisos básicos."""
@@ -108,6 +138,8 @@ def is_staff(self):
         return False
 
 
+
+#creacion cuentas admin
 #------version original 
 # def vista_iniciouser(request):
 #     if request.method == 'POST':
@@ -305,9 +337,6 @@ def vista_catalogo(request):
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
 
-def finalizar_compra(request):
-    return render(request,'pago_mercadopago.html')
-
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL
     producto = get_object_or_404(Producto, id=id)
@@ -327,7 +356,6 @@ def cerrar_sesion(request):
 
 def vista_registrouser(request):
     return render(request,'registroUser.html')
-
 
 def vista_perfiluser(request):
     # Verificar si el usuario está autenticado
@@ -452,7 +480,8 @@ def vista_panelbodeguero(request):
 def vista_seleccionarcuentainicio(request):
     return render(request,'seleccionarcuentainicio.html')
 
-
+def finalizar_compra(request):
+    return render(request,'resumen_compra.html')
 
 
 # from django.shortcuts import render, redirect
@@ -513,6 +542,28 @@ def encriptar_con_salt(password, salt):
     password_bytes = (password + salt).encode('utf-8')
     return hashlib.sha256(password_bytes).hexdigest()
 
+def crear_administrador():
+    print("=== Crear Administrador ===")
+    
+    rut = input("Ingrese el RUT del administrador (formato: 7515612-K): ").strip()
+    email = input("Ingrese el correo electrónico del administrador: ").strip()
+    contrasena = input("Ingrese la contraseña: ").strip()
+
+    # Generar salt y hash de la contraseña
+    salt = generar_salt()
+    hashed_password = encriptar_con_salt(contrasena, salt)
+
+    # Crear administrador y guardar en la base de datos
+    admin = Administrador(
+        rut=rut,
+        email=email,
+        contrasena=hashed_password,
+        salt=salt
+    )
+    admin.save()
+
+    print(f"Administrador creado exitosamente:\nRUT: {rut}\nEmail: {email}")
+    print(f"Salt generado: {salt} (se guarda automáticamente en la base de datos)")
 
 def registrar_usuario(request):
     if request.method == "POST":
