@@ -256,38 +256,33 @@ def carrito(request):
                 'image': producto.img_url
             })
 
-        return JsonResponse({
-            'cart_items': cart_items,
-            'total': total
-        })
+        return render(request, 'carrito.html', {'cart_items': cart_items, 'total': total})
     except Exception as e:
         print(f"Error al cargar el carrito: {e}")
-        return JsonResponse({'cart_items': [], 'total': 0})
+        return render(request, 'carrito.html', {'cart_items': [], 'total': 0})
+
     
 def agregar_producto_carrito(request, producto_id):
-    cantidad = request.POST.get('cantidad', 1)  # Por defecto 1 unidad
+    cantidad = request.POST.get('cantidad', 1)
     producto = Producto.objects.get(id=producto_id)
 
-    # Obtener el carrito de la sesión (o crear uno vacío si no existe)
+    # Obtener el carrito de la sesión
     carrito = request.session.get('cart', [])
 
     # Verificar si el producto ya está en el carrito
     producto_en_carrito = next((item for item in carrito if item['id'] == producto.id), None)
 
     if producto_en_carrito:
-        # Si el producto ya está, solo actualizamos la cantidad
         producto_en_carrito['quantity'] += int(cantidad)
     else:
-        # Si el producto no está, lo agregamos al carrito
         carrito.append({
             'id': producto.id,
             'quantity': int(cantidad)
         })
 
-    # Guardar el carrito actualizado en la sesión
+    # Guardar el carrito en la sesión
     request.session['cart'] = carrito
-    return redirect('carrito')  # Redirigir al carrito para mostrar los productos
-
+    return redirect('carrito')
 
 def obtener_carrito(request):
     carrito = request.session.get('carrito', [])
@@ -448,7 +443,29 @@ def vista_panelbodeguero(request):
 
 
 def finalizar_compra(request):
-    return render(request,'resumen_compra.html')
+    try:
+        cart = request.session.get('cart', [])
+        cart_items = []
+        total = 0
+
+        for item in cart:
+            producto = Producto.objects.get(id=item['id'])
+            subtotal = producto.precio * item['quantity']
+            total += subtotal
+
+            cart_items.append({
+                'id': producto.id,
+                'name': producto.nombre,
+                'price': producto.precio,
+                'quantity': item['quantity'],
+                'subtotal': subtotal,
+                'image': producto.img_url
+            })
+
+        return render(request, 'resumen_compra.html', {'cart_items': cart_items, 'total': total})
+    except Exception as e:
+        print(f"Error al cargar el resumen de la compra: {e}")
+        return render(request, 'resumen_compra.html', {'cart_items': [], 'total': 0})
 
 
 

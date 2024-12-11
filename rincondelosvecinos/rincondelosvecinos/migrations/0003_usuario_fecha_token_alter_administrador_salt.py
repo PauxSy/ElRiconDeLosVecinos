@@ -11,11 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='usuario',
-            name='fecha_token',
-            field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
-        ),
+        # migrations.AddField(
+        #     model_name='usuario',
+        #     name='fecha_token',
+        #     field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
+        # ),
         migrations.AlterField(
             model_name='administrador',
             name='salt',
