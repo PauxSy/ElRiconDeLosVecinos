@@ -8,26 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <script src="https://sdk.mercadopago.com/js/v2"></script> <!-- SDK de Mercado Pago -->
-    
-    
 </head>
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card shadow-sm p-4">
-                    <h1 class="text-center mb-4">Finalizar Compra</h1>
-                    <h3>Resumen del pedido</h3>
-                    <ul id="cart-items-list" class="list-group mb-4">
-                        <!-- Aquí se agregarán los productos dinámicamente con JavaScript -->
-                    </ul>
-                    <h4 id="total" class="text-end mb-4">Total: <strong>$0</strong></h4>
-                    <button id="btnPagar" class="btn btn-primary w-100 mt-3">Pagar con Mercado Pago</button>
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-header text-center bg-success text-white py-3">
+                        <h1 class="m-0">Finalizar Compra</h1>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="text-success">Resumen del Pedido</h3>
+                        <ul id="cart-items-list" class="list-group list-unstyled mb-4">
+                            <!-- Aquí se agregarán los productos dinámicamente con JavaScript -->
+                        </ul>
+                        <h4 id="total" class="mb-4 text-success">Total: <strong>$0</strong></h4>
+                    </div>
+                    <div class="card-footer text-center bg-success">
+                        <button id="btnPagar" class="btn btn-light w-100">Pagar con Mercado Pago</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
 
     <script>
         // Cargar productos desde el carrito
@@ -46,6 +49,7 @@
 
                     // Crear el elemento de lista con los datos del producto
                     const li = document.createElement('li');
+                    li.classList.add('mb-4');  // Clase para agregar margen inferior (2 saltos de línea)
                     li.innerHTML = `
                         <strong>${item.name}</strong><br>
                         Cantidad: ${item.quantity}<br>
