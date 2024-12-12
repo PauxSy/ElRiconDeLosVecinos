@@ -18,10 +18,18 @@
     <div class="container mt-5">
         <h2 class="form-title">Agregar Producto al Inventario</h2>
 
+        
+        
+
         <form id="form-producto" class="custom-form">
             <!-- de momento añadí un campo id de manera manual  -->
             <!-- Evaluar como gestionaremos el tema del ID , si implementar algo que genere de manera autoincremental el id o generalo de manera
             manual y luego hacer validaciones para que este no se repita -->
+
+                <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualModal">
+                    <i class="fas fa-info-circle"></i> Ver Manual de Usuario
+                </button>
+          
             <div class="mb-3">
                 <label for="idProducto" class="form-label">ID del Producto</label>
                 <input type="text" class="form-control" id="idProducto" required>
@@ -74,6 +82,38 @@
                 <button type="submit" class="btn btn-custom">Crear</button>
             </div>
         </form>
+    </div>
+
+    <div class="modal fade" id="manualModal" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso - Agregar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Bienvenido al Manual de Agregar Producto</h4>
+                    <p>Este manual le guiará a través de las funcionalidades para agregar un producto al inventario.</p>
+                    <h5>1. ID del Producto</h5>
+                    <p>Ingrese un identificador único para el producto. Asegúrese de que no exista un ID duplicado.</p>
+                    <h5>2. Imagen del Producto</h5>
+                    <p>Proporcione la URL de la imagen del producto. Esta imagen debe estar disponible en línea.</p>
+                    <h5>3. Nombre del Producto</h5>
+                    <p>Escriba el nombre del producto. Asegúrese de que solo contenga letras.</p>
+                    <h5>4. Descripción del Producto</h5>
+                    <p>Ingrese una descripción breve del producto. Solo debe contener letras y números.</p>
+                    <h5>5. Precio y Stock</h5>
+                    <p>Ingrese el precio del producto y la cantidad disponible en el inventario.</p>
+                    <h5>6. IVA del Producto (%)</h5>
+                    <p>Ingrese el porcentaje de IVA aplicable al producto. Por ejemplo, 19 para un IVA del 19%.</p>
+                    <h5>7. Categoría del Producto</h5>
+                    <p>Seleccione la categoría a la que pertenece el producto. Asegúrese de que la categoría esté predefinida en el sistema.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->

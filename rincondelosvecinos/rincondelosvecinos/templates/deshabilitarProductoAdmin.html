@@ -19,11 +19,24 @@
      y tambien hacer validaciones de momento deje esto con css y html pero 
      se puede optimizar con JS -->
 
+    
+
      <div class="container mt-5">
         <h2 class="text-center">Deshabilitar productos del inventario</h2>
         <br><br>
+
+         <!-- Botón para mostrar el manual -->
+    
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+            <i class="fas fa-info-circle"></i> Manual de Usuario
+        </button>
+    
+
+
         <h5>Seleccione los productos que desea deshabilitar del catálogo:<h5>
         <br>
+
+        
         
     <div class="container mt-3">
         <form class="d-flex" role="search">
@@ -34,6 +47,7 @@
 
 
         <table class="table table-bordered">
+            
             <thead class="table-dark">
             <tr>
                 <th><input type="checkbox"></th>
@@ -90,6 +104,44 @@
     </div>
    
      </div>
+
+
+     <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="deshabilitarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deshabilitarModalLabel">Manual de Uso - Deshabilitar Productos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Bienvenido al Manual para Deshabilitar Productos</h4>
+                    <p>Este manual le guiará a través del proceso para deshabilitar productos del catálogo.</p>
+                    
+                    <h5>1. Selección de Productos</h5>
+                    <p>Marque las casillas de los productos que desea deshabilitar en la tabla de gestión del catálogo.</p>
+                    
+                    <h5>2. Confirmación de Selección</h5>
+                    <p>Revise que todos los productos seleccionados sean correctos antes de proceder.</p>
+                    
+                    <h5>3. Deshabilitar Productos</h5>
+                    <p>Haga clic en el botón <strong>"Deshabilitar Productos seleccionados"</strong> para confirmar la acción. Los productos deshabilitados no estarán visibles para los usuarios finales.</p>
+                    
+                    <h5>4. Verificación</h5>
+                    <p>Después de deshabilitar, verifique que los productos ya no aparezcan en el catálogo público.</p>
+                    
+                    <h5>Nota:</h5>
+                    <p>Los productos deshabilitados permanecen en el sistema y pueden ser habilitados nuevamente en cualquier momento.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+     
     <!-- Footer -->
     {% endblock %}
     {% include "formatos/footeradmin.html"%}

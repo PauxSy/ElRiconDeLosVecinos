@@ -372,3 +372,10 @@
     }
 }
 
+
+/* Ajustar el tamaño de los botones dentro del contenedor específico */
+.dash .btn {
+    width: 200px;  /* Ajusta el tamaño según lo necesites */
+    height: 50px;  /* Ajusta la altura si es necesario */
+    font-size: 16px;  /* Ajusta el tamaño de la fuente */
+}

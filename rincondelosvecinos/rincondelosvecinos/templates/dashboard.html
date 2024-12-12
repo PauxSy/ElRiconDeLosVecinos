@@ -15,97 +15,164 @@
     <!-- nav admin -->
     {% include "formatos/navbaradmin.html" %}
     {% block content %}
-    
-    <!-- presentación general , le puse cualquier corazon ;) -->
+
+    <!-- presentación general -->
     <div class="container mt-4 dash">
         <h2 class="text-center mb-4">Panel de Gestión Admin</h2>
-        <div class="row custom-row">
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+        <div class="row g-4">
+
+            <!-- Tarjeta Reportes -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-chart-line icon text-primary"></i>
                         <h5 class="card-title">Reportes</h5>
                         <p class="card-text">Genera y visualiza los reportes de las ventas</p>
-                        <a href="{% url 'reporteadmin' %}" class="btn btn-primary">Ir a Reportes</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'reporteadmin' %}" class="btn btn-primary">Ir a Reportes</a>
+
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Agregar Producto -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-plus icon text-success"></i>
                         <h5 class="card-title">Agregar Producto</h5>
                         <p class="card-text">Añade nuevos productos al inventario</p>
-                        <a href="{% url 'agregarproducto' %}" class="btn btn-success">Agregar Producto</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'agregarproducto' %}" class="btn btn-success">Agregar Producto</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Actualizar Productos -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-edit icon text-warning"></i>
                         <h5 class="card-title">Actualizar Productos</h5>
                         <p class="card-text">Modifica detalles de los productos existentes en el inventario</p>
-                        <a href="{% url 'inventario' %}" class="btn btn-warning">Actualizar Productos</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'inventario' %}" class="btn btn-warning">Actualizar Productos</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Deshabilitar Producto -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-trash-alt icon text-danger"></i>
                         <h5 class="card-title">Deshabilitar Producto</h5>
                         <p class="card-text">Desactivar productos del inventario</p>
-                        <a href="{% url 'deshabilitarproducto' %}" class="btn btn-danger">Deshabilitar</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'deshabilitarproducto' %}" class="btn btn-danger">Deshabilitar</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Actualizar Stock -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-clipboard icon text-info"></i>
                         <h5 class="card-title">Actualizar Stock</h5>
                         <p class="card-text">Gestiona el stock de los productos del inventario</p>
-                        <a href="{% url 'actualizarstock' %}" class="btn btn-info">Actualizar Stock</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'actualizarstock' %}" class="btn btn-info">Actualizar Stock</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Promociones -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-tags icon text-secondary"></i>
                         <h5 class="card-title">Promociones</h5>
                         <p class="card-text">Crea y gestiona las promociones para los productos</p>
-                        <a href="{% url 'panelpromociones' %}" class="btn btn-secondary">Crear Promoción</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'panelpromociones' %}" class="btn btn-secondary">Crear Promoción</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Crear Cuentas -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-user-plus icon text-success"></i>
                         <h5 class="card-title">Crear Cuentas</h5>
                         <p class="card-text">Crea cuentas nuevas para los vendedores</p>
-                        <a href="{% url 'elegircuentaacrear' %}" class="btn btn-success">Crear Cuenta</a>
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="{% url 'elegircuentaacrear' %}" class="btn btn-success">Crear Cuenta</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
+            <!-- Tarjeta Mi Cuenta -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <i class="fas fa-user-circle icon text-dark"></i>
                         <h5 class="card-title">Mi Cuenta</h5>
                         <p class="card-text">Accede a tu perfil y gestiona tu información</p>
-                        <!-- ++++++++++++++++++++++++++-->
-                        <a href="#" class="btn btn-dark">Ver Mi Cuenta</a>
-                        <!-- +++++++++++++++++++++++++ -->
+                        <div class="d-flex justify-content-center mt-auto">
+                            <a href="#" class="btn btn-dark">Ver Mi Cuenta</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container mt-5 text-center">
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualModal">
+            <i class="fas fa-info-circle"></i> Ver Manual de Usuario
+        </button>
+    </div>
+
+    <!-- Modal del Manual -->
+    <div class="modal fade" id="manualModal" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso - Panel de Gestión Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <h4>Bienvenido al Panel de Gestión Admin</h4>
+                    <p>Este manual le guiará a través de las funcionalidades del panel de administración.</p>
+                    <h5>1. Reportes</h5>
+                    <p>Desde esta sección, puede generar y visualizar los reportes de ventas. Haga clic en "Ir a Reportes" para acceder a ellos.</p>
+                    <h5>2. Agregar Producto</h5>
+                    <p>Utilice esta opción para añadir nuevos productos al inventario. Haga clic en "Agregar Producto" para ingresar los detalles del nuevo producto.</p>
+                    <h5>3. Actualizar Productos</h5>
+                    <p>Desde aquí, puede modificar los detalles de los productos existentes en el inventario. Haga clic en "Actualizar Productos" para realizar cambios.</p>
+                    <h5>4. Deshabilitar Producto</h5>
+                    <p>Si necesita desactivar un producto del inventario, puede hacerlo desde esta opción. Haga clic en "Deshabilitar" para proceder.</p>
+                    <h5>5. Actualizar Stock</h5>
+                    <p>Utilice esta opción para gestionar el stock de los productos. Puede agregar o quitar unidades según sea necesario.</p>
+                    <h5>6. Promociones</h5>
+                    <p>Desde aquí, puede crear y gestionar las promociones de los productos. Haga clic en "Crear Promoción" para agregar nuevas ofertas.</p>
+                    <h5>7. Crear Cuentas</h5>
+                    <p>Si necesita crear cuentas nuevas para los vendedores, acceda a esta sección y haga clic en "Crear Cuenta" para añadir una nueva cuenta.</p>
+                    <h5>8. Mi Cuenta</h5>
+                    <p>Acceda a su perfil y gestione su información desde esta sección. Puede modificar su cuenta personal aquí.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -120,6 +187,3 @@
 </body>
 
 </html>
-
-
-
