@@ -74,37 +74,37 @@
         </div>
     </div>
 
-    <!-- Modal de Carrito -->
-    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-top-right">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-navbar-custom">
-                    <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <!-- Botón para mostrar el manual -->
+    <div class="container mt-5 text-center">
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+            <i class="fas fa-info-circle"></i> Manual de Usuario
+        </button>
+    </div>
+
+    <!-- Modal del Manual -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body p-4">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="product-name">Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Total</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cart-items">
-                            <!-- Aquí se cargan los productos del carrito -->
-                        </tbody>
-                    </table>
-                    <div class="text-end mt-3">
-                        <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
-                    </div>
+                <div class="modal-body">
+                    <h4>Bienvenido al Catálogo de Productos</h4>
+                    <p>Este manual le guiará a través de las funcionalidades de nuestro catálogo de productos.</p>
+                    <h5>1. Buscar Productos</h5>
+                    <p>Utilice el campo de búsqueda en la parte superior de la página para encontrar productos por nombre.</p>
+                    <h5>2. Ver Detalle del Producto</h5>
+                    <p>Haga clic en cualquier producto para ver más detalles sobre el mismo.</p>
+                    <h5>3. Agregar al Carrito</h5>
+                    <p>Para agregar un producto al carrito, haga clic en el botón "Agregar al carrito". El producto se añadirá a su carrito de compras.</p>
+                    <h5>4. Visualizar Carrito</h5>
+                    <p>Puede ver su carrito de compras en cualquier momento haciendo clic en el ícono del carrito en la parte superior de la página.</p>
+                    <h5>5. Finalizar Compra</h5>
+                    <p>Una vez que haya agregado todos los productos que desea, puede proceder a la compra desde el modal del carrito.</p>
                 </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-outline-danger" id="empty-cart">Vaciar carrito</button>
-                    <button type="button" class="btn btn-success">Finalizar compra</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>

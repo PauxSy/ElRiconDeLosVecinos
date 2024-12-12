@@ -13,15 +13,19 @@
     <!-- NavBar -->
     {% include "formatos/navbaruser.html" %}
     {% block content %}
- 
 
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <form action="{% url 'registrouser' %}" method="POST" class="custom-form" id="formularioRegistro">
-                    {% csrf_token %}                    {% csrf_token %}
+                    {% csrf_token %}
                     <h2 class="form-title">Registro de Usuario</h2>
-            
+                    
+                    <!-- Button to open the modal -->
+                    <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+                        <i class="fas fa-info-circle"></i> Manual de Usuario
+                    </button>
+
                     <div class="mb-3">
                         <label for="rutCliente" class="form-label">Rut</label>
                         <input type="text" class="form-control" id="rutCliente" name="rut" placeholder="12345678-9">
@@ -34,55 +38,55 @@
                         <input type="text" class="form-control" id="nombreCliente" name="nombre" placeholder="Juanito">
                         <p id="errorNombre" style="color:red; display:none;">El nombre debe tener al menos 3 letras y solo contener letras.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="apellido1Cliente" class="form-label">Primer Apellido</label>
                         <input type="text" id="apellido1Cliente" class="form-control" name="primer_apellido" placeholder="Pérez">
                         <p id="errorApellido1" style="color:red; display:none;">El apellido debe tener al menos 3 letras y solo contener letras.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="apellido2Cliente" class="form-label">Segundo Apellido</label>
                         <input type="text" id="apellido2Cliente" class="form-control" name="segundo_apellido" placeholder="González">
                         <p id="errorApellido2" style="color:red; display:none;">El apellido debe tener al menos 3 letras y solo contener letras.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="emailCliente" class="form-label">Email</label>
                         <input type="text" id="emailCliente" class="form-control" name="email" placeholder="juanito@gmail.com">
                         <p id="errorEmail" style="color:red; display:none;">Por favor, ingresa un correo electrónico válido.</p>
                         <p id="errorEmail2" style="color:red; display:none;">El correo ingresado ya se encuentra registrado en otra cuenta.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="passCliente" class="form-label">Password</label>
                         <input type="password" id="passCliente" class="form-control" name="contrasena" placeholder="Password">
                         <p id="errorPassword" style="color:red; display:none;">La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="confirmPassCliente" class="form-label">Confirme Password</label>
                         <input type="password" id="confirmPassCliente" class="form-control" name="confirm_contrasena" placeholder="Confirme su contraseña">
                         <p id="errorConfirmPassword" style="color:red; display:none;">Las contraseñas no coinciden.</p>
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="particularCliente" class="form-label">Dirección Particular</label>
                         <input type="text" class="form-control" id="particularCliente" name="direccion_particular" placeholder="Calle Falsa 123, La Florida">
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="facturacionCliente" class="form-label">Dirección de facturación</label>
                         <input type="text" id="facturacionCliente" class="form-control" name="direccion_facturacion" placeholder="Calle Falsa 123, La Florida">
                     </div>
-            
+
                     <div class="mb-3">
                         <label for="telefonoCliente" class="form-label">Número de Teléfono</label>
                         <input type="text" id="telefonoCliente" class="form-control" name="telefono" placeholder="987654321">
                         <p id="errorTelefono" style="color:red; display:none;">El teléfono debe tener exactamente 9 dígitos.</p>
                         <p id="errorTelefono2" style="color:red; display:none;">El teléfono ingresado ya se encuentra registrado en otra cuenta.</p>
                     </div>
-            
+
                     <div class="text-center">
                         <input type="submit" class="btn btn-custom btn-lg" value="Registrar">
                         <p class="warnings" id="warnings"></p>
@@ -91,8 +95,43 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Manual de Usuario -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualUsuarioLabel">Manual de Usuario - Registro De Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6><strong>Rut:</strong></h6>
+                    <p>Ingrese su RUT sin puntos y con el guión. Asegúrese de incluir el dígito verificador al final (Ej: 12345678-9).</p>
+
+                    <h6><strong>Nombre y Apellidos:</strong></h6>
+                    <p>El nombre y los apellidos deben contener solo letras y tener al menos 3 caracteres.</p>
+
+                    <h6><strong>Email:</strong></h6>
+                    <p>Ingrese un correo electrónico válido. Asegúrese de que no esté registrado en otro usuario.</p>
+
+                    <h6><strong>Contraseña:</strong></h6>
+                    <p>La contraseña debe tener al menos 6 caracteres, incluir letras, números y caracteres especiales.</p>
+
+                    <h6><strong>Teléfono:</strong></h6>
+                    <p>Ingrese su número de teléfono con 9 dígitos (Ej: 987654321).</p>
+
+                    <h6><strong>Dirección Particular y de Facturación:</strong></h6>
+                    <p>Proporcione las direcciones correctas, una para correspondencia y otra para facturación.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% endblock %}
-    {% include "formatos/footeruser.html"%}
+    {% include "formatos/footeruser.html" %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'userregistry.js' %}"></script>
