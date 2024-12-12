@@ -18,6 +18,11 @@
 
     <div class="container mt-5 compra-resumen">
         <h2 class="text-center mb-4">Historial de Compras</h2>
+
+        <!-- Button to open the modal -->
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+            <i class="fas fa-info-circle"></i> Manual de Usuario
+        </button>
         
         <div class="row">
             <!-- Tarjeta de Compra 1 -->
@@ -160,6 +165,32 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Manual de Usuario -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualUsuarioLabel">Manual de Usuario - Historial de Compras</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                
+                <!-- Cuerpo del Modal -->
+                <div class="modal-body">
+                    <p><strong>Visualización del historial:</strong> El historial muestra una lista de compras con detalles como número de pedido, fecha de retiro (cuando usted debe retirar el pedido), estado, y desglose de productos.</p>
+                    <p><strong>Detalles de cada compra:</strong> Dentro de cada tarjeta de compra, puede ver los productos adquiridos, las cantidades, precios unitarios, descuentos aplicados y el total final.</p>
+                    <p><strong>Estados:</strong> Los pedidos tienen estados como "Retirado" o "Pendiente de retiro" para indicar su situación.</p>
+                </div>
+                
+                <!-- Pie del Modal -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    
                 </div>
             </div>
         </div>

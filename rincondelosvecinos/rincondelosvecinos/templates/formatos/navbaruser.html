@@ -77,6 +77,7 @@
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-navbar-custom">
                     <h5 class="modal-title" id="cartModalLabel">Tu carrito de compras</h5>
+                    
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -95,7 +96,7 @@
                         </tbody>
                     </table>
                     <div class="text-end mt-3">
-                        <h5><span id="cart-total" class="fw-bold">$0.00</span></h5>
+                        <h5>Total a pagar<span id="cart-total" class="fw-bold"> $0.00</span></h5>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -110,6 +111,12 @@
                     </div>
                     {% endif %}
                 </div>
+
+                <div class="alert alert-info m-3 p-3 border border-primary rounded shadow-sm">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span>Si tiene alguna duda sobre el uso del carrito de compras, por favor consulte el manual de usuario ubicado en la parte inferior del catálogo.</span>
+                </div>
+
             </div>
         </div>
     </div>

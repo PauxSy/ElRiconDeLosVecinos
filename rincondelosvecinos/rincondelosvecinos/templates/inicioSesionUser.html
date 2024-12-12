@@ -15,11 +15,21 @@
     {% include "formatos/navbaruser.html" %}
     {% block content %}
 
+
+ 
+
     <!-- Form de inicio de sesión -->
     <div class="containter mt-5">
         <div class="row justify-content-center">
             <div class="col-md-5">
                 <h3 class="text-center">Iniciar sesión</h3>
+
+                <!-- Button to open the modal -->
+                <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+                    <i class="fas fa-info-circle"></i> Manual de Usuario
+                </button>
+
+
                 <form action="{% url 'iniciouser' %}" method="POST" class="custom-form">
                     {% csrf_token %}
                     <div class="mb-3">
@@ -61,6 +71,38 @@
         
         </div>
     </div>
+
+    <!-- Modal Manual de Usuario -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualUsuarioLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Encabezado del Modal -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualUsuarioLabel">Manual de Usuario - Inicio de Sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                
+                <!-- Cuerpo del Modal -->
+                <div class="modal-body">
+                    <!-- Sección de Datos de Inicio de Sesión -->
+                    <h6><strong>Datos necesarios para iniciar sesión</strong></h6>
+                    <p>Debe ingresar su correo electrónico registrado y la contraseña asociada a su cuenta.</p>
+                    
+                    <!-- Sección de Olvido de Contraseña -->
+                    <h6><strong>¿Olvidó su contraseña?</strong></h6>
+                    <p>Si olvidó su contraseña, puede restablecerla seleccionando la opción <em>"¿Olvidó su contraseña?"</em>. A continuación, deberá ingresar su correo electrónico registrado y seguir las instrucciones enviadas a su bandeja de entrada.</p>
+                </div>
+                
+                <!-- Pie del Modal -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <!-- Ejemplo de botón adicional -->
+                    <!-- <button type="button" class="btn btn-primary">Leer más</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Footer -->
     {% endblock %}
