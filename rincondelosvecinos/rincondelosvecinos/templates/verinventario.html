@@ -22,6 +22,9 @@
      <div class="container mt-5">
         <h2 class="text-center">Modificar información de productos </h2>
         <br><br>
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+            <i class="fas fa-info-circle"></i> Manual de Usuario
+        </button>
         <h5>Seleccione el producto que desea Modificar<h5>
         <br>
         
@@ -34,76 +37,127 @@
 
     <table class="table table-bordered">
         <thead class="table-dark">
-        <tr>
-            <th>Imagen</th>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Stock</th>
-            <th>Precio</th>
-            <th>IVA</th>
-            <th>Categoría</th>
-            <th>Modificar</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
+            <tr>
+                <th>Imagen</th>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Stock</th>
+                <th>Precio</th>
+                <th>IVA</th>
+                <th>Categoría</th>
+                <th>Modificar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
 
-            <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-            <td>prod-1</td>
-            <td>Producto A</td>
-            <td>Descripcion A</td>
-            <td>10</td>
-            <td>100</td>
-            <td>21%</td>
-            <td>Categoria A</td>
-            <td>
-                <button class="btn btn-danger mt-3">
-                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                </button>
-            </td>
-        </tr>
+                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-1</td>
+                <td>Producto A</td>
+                <td>Descripcion A</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria A</td>
+                <td>
+                    <button class="btn btn-danger mt-3">
+                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
+                    </button>
+                </td>
+            </tr>
 
-        <tr>
-            <td><img src="{% static 'media/cafeTradicion170g.webp' %}"alt="Producto A" class="img-thumbnail"></td>
-            <td>prod-2</td>
-            <td>Producto B</td>
-            <td>Descripcion B</td>
-            <td>10</td>
-            <td>100</td>
-            <td>21%</td>
-            <td>Categoria B</td>
-            <td>
-                <button class="btn btn-danger mt-3">
-                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                </button>
-            </td>
-        </tr>
+            <tr>
+                <td><img src="{% static 'media/cafeTradicion170g.webp' %}"alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-2</td>
+                <td>Producto B</td>
+                <td>Descripcion B</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria B</td>
+                <td>
+                    <button class="btn btn-danger mt-3">
+                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
+                    </button>
+                </td>
+            </tr>
 
-        <tr>
-            <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-            <td>prod-3</td>
-            <td>Producto C</td>
-            <td>Descripcion C</td>
-            <td>10</td>
-            <td>100</td>
-            <td>21%</td>
-            <td>Categoria C</td>
-            <td>
-                <button class="btn btn-danger mt-3">
-                    <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                </button>
-            </td>
+            <tr>
+                <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-3</td>
+                <td>Producto C</td>
+                <td>Descripcion C</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria C</td>
+                <td>
+                    <button class="btn btn-danger mt-3">
+                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
+                    </button>
+                </td>
+                
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- Modal del Manual -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <h4>Bienvenido al Manual de Modificar Producto</h4>
+                    <p>Este manual le guiará a través de las funcionalidades para Modificar los datos de un producto en el inventario.</p>
+                    
+                    <h5>1. Modificar Producto</h5>
+                    <p>Para editar un producto existente, primero debe hacer clic en el botón "Modificar" al lado del producto deseado en la lista de productos. Esto lo llevará al formulario para editar el producto.</p>
+                    
+                    <h5>2. ID del Producto</h5>
+                    <p>Una vez dentro del formulario de edición, ingrese el ID del producto. Asegúrese de que el ID sea único para este producto. Si está editando un producto existente, el ID será prellenado.</p>
             
-        </tr>
-    </tbody>
-</table>
-   
+                    <h5>3. Imagen del Producto</h5>
+                    <p>Ingrese la URL de la imagen del producto. Puede cambiarla si está editando el producto. Asegúrese de que la URL sea válida.</p>
+            
+                    <h5>4. Nombre del Producto</h5>
+                    <p>Si desea modificar el nombre, haga clic sobre el campo correspondiente y edite el nombre del producto. Recuerde que solo puede contener letras.</p>
+            
+                    <h5>5. Descripción del Producto</h5>
+                    <p>Modifique la descripción del producto, si es necesario. Esta descripción solo puede contener letras y números.</p>
+            
+                    <h5>6. Stock del Producto</h5>
+                    <p>Asegúrese de modificar el stock si es necesario. El stock debe ser un número positivo.</p>
+            
+                    <h5>7. Precio del Producto</h5>
+                    <p>Puede cambiar el precio del producto según sea necesario. El precio debe ser un número positivo.</p>
+            
+                    <h5>8. IVA del Producto (%)</h5>
+                    <p>Si se requiere, puede modificar el porcentaje de IVA del producto. Asegúrese de que el porcentaje sea válido (entre 0 y 100).</p>
+            
+                    <h5>9. Categoría del Producto</h5>
+                    <p>Si es necesario cambiar la categoría del producto, modifique este campo. La categoría solo puede contener letras.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Footer -->
     {% endblock %}
     {% include "formatos/footeradmin.html"%}
 
     <!-- Scripts -->
+     <!-- Bootstrap JS (incluye Popper.js para el funcionamiento del modal) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

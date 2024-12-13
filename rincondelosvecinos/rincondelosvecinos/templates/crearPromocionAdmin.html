@@ -16,8 +16,13 @@
 
     <div class="containter mt-5">
         <h2 class="text-center">Panel de Promociones</h2>
-
+        <br>
         <div class="container mt-3">
+
+            <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+                <i class="fas fa-info-circle"></i> Manual de Usuario
+            </button>
+
             <form  class="d-flex" id="formBuscarProducto" role="search">
                 <input type="text" class="form-control me-2" id="buscarProducto" placeholder="Puede buscar el producto por Nombre o ID" aria-label="Buscar">
                 <button class="btn btn-success" type="submit">Buscar</button>
@@ -65,6 +70,50 @@
             <button class="btn btn-success" id="btnAplicarCambios">Aplicar Cambios</button>
         </div>
     </div>
+
+
+    <!-- Modal del Manual -->
+    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <h4>Bienvenido al Manual para Crear una Promocion de Producto</h4>
+                    <p>Este manual le guiará a través de las funcionalidades necesarias para crear una promoción para un producto en el inventario.</p>
+             
+                    <h5>1. Procedimiento para Modificar Promociones</h5>
+                    <ol>
+                        <li>Utilice la barra de búsqueda para encontrar el producto que desea modificar.Ingresando el nombre del producto en el campo correspondiente.</li>
+                        <li>Presione el botón <strong>"Buscar"</strong> para filtrar los resultados.</li>
+                        <li>Una vez localizado el producto en la tabla, identifique la fila correspondiente.</li>
+                        <li>En la columna <strong>"% Descuento"</strong>, introduzca el porcentaje de descuento que desea aplicar.</li>
+                        <li>Para que la promoción sea válida, asegúrese de cambiar el estado del producto en la columna <strong>"Estado"</strong>. Seleccione <strong>"Activa"</strong> para habilitarla o <strong>"Inactiva"</strong> para deshabilitarla, según lo que necesite.</li>
+                        <li>Finalmente, haga clic en el botón <strong>"Aplicar Cambios"</strong> para guardar y confirmar las modificaciones realizadas.</li>
+                    </ol>
+
+
+                    <h5>2. Notas Adicionales</h5>
+                    <ul>
+                        <li>Los cálculos de descuento se realizan automáticamente una vez se introduce un nuevo valor en la columna "% Descuento".</li>
+                        <li>Asegúrese de hacer clic en "Aplicar Cambios" para que las modificaciones queden guardadas.</li>
+                    </ul>
+                
+            
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     {% endblock %}
     {% include "formatos/footeradmin.html"%}
 

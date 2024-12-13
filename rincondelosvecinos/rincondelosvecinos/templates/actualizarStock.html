@@ -22,6 +22,9 @@
     <div class="container mt-5">
         <h2 class="text-center">Gestión de Inventario - Actualización de Stock</h2>
         <br><br>
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
+            <i class="fas fa-info-circle"></i> Manual de Usuario
+        </button>
         <h5>Seleccione los productos que desea actualizar su stock:</h5>
         <br>
     
@@ -73,6 +76,55 @@
     <div class="text-center">
         <button class="btn btn-danger mt-3">Actualizar Stock</button>
     </div>
+
+
+        <!-- Modal del Manual -->
+        <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+    
+                    <div class="modal-body">
+                        <h4>Bienvenido al Manual de Modificar el Stock de Producto</h4>
+                        <p>Este manual le guiará a través de las funcionalidades para Modificar el stock de un producto en el inventario.</p>
+            
+                        <h5>Pasos para Actualizar el Stock</h5>
+                        <p>
+                            <strong>1. Buscar un Producto:</strong>
+                            <ul>
+                                <li>Ingrese el nombre del producto en el campo de búsqueda.</li>
+                                <li>Presione el botón "Buscar".</li>
+                                <li>Verifique que el producto aparezca en la tabla de resultados.</li>
+                            </ul>
+                        </p>
+
+                        <p>
+                            <strong>2. Modificar la Cantidad de Stock:</strong>
+                            <ul>
+                                <li>Localice el producto deseado en la tabla.</li>
+                                <li>Introduzca la nueva cantidad en el campo "Nueva Cantidad" o utilice las flechas para incrementar o disminuir el valor.</li>
+                            </ul>
+                        </p>
+
+                        <p>
+                            <strong>3. Guardar Cambios:</strong>
+                            <ul>
+                                <li>Haga clic en el botón "Actualizar Stock".</li>
+                                <li>Los cambios se procesarán y el sistema actualizará los valores de stock.</li>
+                            </ul>
+                        </p>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
     
     <!-- Footer -->
     {% endblock %}

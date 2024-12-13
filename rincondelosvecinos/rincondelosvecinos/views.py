@@ -444,30 +444,27 @@ def vista_panelpromociones(request):
         
     return render(request,'crearPromocionAdmin.html',{'productos': productos})
 
-def vista_registrovendedor(request):
-    return render(request,'RegistroVendedor.html')
+def vista_registroEmpleado(request):
+    return render(request,'RegistroVendedor_Bodeguero.html')
 
-def vista_registrobodeguero(request):
-    return render(request,'Registrobodeguero.html')
 
 def vista_dashboard(request):
     return render(request,'dashboard.html')
 
-def vista_elegircuentaacrear(request):
-    return render(request,'elegircuentaacrear.html')
+
+def vista_perfiladmin(request):
+    return render(request,'perfiladmin.html')
+
+
+
+
 
 # ---------------vendedor---------------- 
-def vista_iniciovendedor(request):
-    return render(request,'inicioVendedor.html')
-
 def vista_panelvendedor(request):
     return render(request,'panelvendedor.html')
 
 
 # ---------------bodeguero---------------- 
-def vista_iniciobodeguero(request):
-    return render(request,'inicioBodeguero.html')
-
 def vista_panelbodeguero(request):
     return render(request,'panelBodeguero.html')
 

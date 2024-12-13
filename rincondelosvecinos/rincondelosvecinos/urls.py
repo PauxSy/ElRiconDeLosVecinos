@@ -26,7 +26,6 @@ urlpatterns = [
 
 
     # ---------------Admin----------------
-    path('inicioadmin/', views.vista_inicioadmin, name='inicioadmin'),
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),
     path('agregarproducto/', views.vista_agregarproductoadmin, name='agregarproducto'),
     path('inventario/', views.vista_inventario, name='inventario'),
@@ -34,17 +33,17 @@ urlpatterns = [
     path('deshabilitarproducto/', views.vista_deshabilitarproducto, name='deshabilitarproducto'),
     path('actualizarstock/', views.vista_actualizarstock, name='actualizarstock'),
     path('panelpromociones/', views.vista_panelpromociones, name='panelpromociones'),
-    path('registrovendedor/', views.vista_registrovendedor, name='registrovendedor'),
-    path('registrobodeguero/', views.vista_registrobodeguero, name='registrobodeguero'),
+    path('registroEmpleado/', views.vista_registroEmpleado, name='registroEmpleado'),
     path('dashboard/', views.vista_dashboard, name='dashboard'),
-    path('elegircuentaacrear/', views.vista_elegircuentaacrear, name='elegircuentaacrear'),
+
+    path('perfiladmin/', views.vista_perfiladmin, name='perfiladmin'),
 
     # ---------------vendedor----------------
-    path('iniciovendedor/', views.vista_iniciovendedor, name='iniciovendedor'),
+
     path('panelvendedor/', views.vista_panelvendedor, name='panelvendedor'),
 
     # ---------------bodeguero----------------
-    path('iniciobodeguero/', views.vista_iniciobodeguero, name='iniciobodeguero'),
+  
     path('panelbodeguero/', views.vista_panelbodeguero, name='panelbodeguero'),
 
     # --------------vistas añadidas extras---------------
