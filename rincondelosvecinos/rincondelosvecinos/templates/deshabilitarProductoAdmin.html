@@ -38,12 +38,13 @@
 
         
         
-    <div class="container mt-3">
-        <form class="d-flex" role="search">
-            <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" aria-label="Buscar">
-            <button class="btn btn-danger" type="submit">Buscar</button>
-        </form>
-    </div>
+        <div class="container mt-3">
+            <form class="d-flex" role="search" method="GET" action="{% url 'deshabilitarproducto' %}">
+                <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" aria-label="Buscar" name="search" value="{{ request.GET.search }}">
+                <button class="btn btn-danger" type="submit">Buscar</button>
+            </form>
+        </div>
+        
 
 
         <table class="table table-bordered">
@@ -130,8 +131,23 @@
     {% endblock %}
     {% include "formatos/footeradmin.html"%}
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectAllCheckbox = document.querySelector('thead input[type="checkbox"]');
+            const productCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        
+            selectAllCheckbox.addEventListener('change', (event) => {
+                productCheckboxes.forEach(checkbox => {
+                    checkbox.checked = event.target.checked;
+                });
+            });
+        });
+        
+    </script>
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 
 </body>
 </html>

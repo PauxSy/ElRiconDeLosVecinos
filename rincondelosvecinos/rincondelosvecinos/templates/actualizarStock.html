@@ -14,11 +14,6 @@
     {% include "formatos/navbaradmin.html" %}
     {% block content %}
 
-    <!-- todo esto es solo la parte visual , hay que ver como sincronizar la info con la BD 
-    adiconalmente hay que tirar JS para controlar los colores , el estado y tambien js me 
-    permite controlar el comportamiente para seleccionar todos los elementos por medio del 
-    primer checkbox -->
-    
     <div class="container mt-5">
         <h2 class="text-center">Gestión de Inventario - Actualización de Stock</h2>
         <br><br>
@@ -27,56 +22,66 @@
         </button>
         <h5>Seleccione los productos que desea actualizar su stock:</h5>
         <br>
-    
+
+        <!-- Formulario de búsqueda -->
         <div class="container mt-3">
-            <form class="d-flex" role="search">
-                <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" aria-label="Buscar">
+            <form class="d-flex" role="search" method="GET" action="{% url 'actualizarstock' %}">
+                <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" name="query" aria-label="Buscar">
                 <button class="btn btn-danger" type="submit">Buscar</button>
             </form>
         </div>
-    </div>
 
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>Imagen</th>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Categoria</th>
-                <th>Status</th>
-                <th>Stock</th>
-                <th>Nueva Cantidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td><img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="img-thumbnail"></td>
-                <td>{{ producto.id }}</td>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.precio }}</td>
-                <td>{{ producto.categoria }}</td>
-                <td>
-                    {% if producto.stock > 0 %}
-                        Disponible
-                    {% else %}
-                        Sin Stock
-                    {% endif %}
-                </td>
-                <td>{{ producto.stock }}</td>
-                <td>
-                    <input type="number" class="form-control stock-input" min="0" name="producto_{{ producto.id }}" value="{{ producto.stock }}">
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    <div class="text-center">
-        <button class="btn btn-danger mt-3">Actualizar Stock</button>
-    </div>
+        <!-- Tabla con checkbox -->
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        <input type="checkbox" id="selectAll" onclick="selectAllCheckboxes()"> <!-- Checkbox de cabecera -->
+                    </th>
+                    <th>Imagen</th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th>Stock</th>
+                    <th>Nueva Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="productCheckbox"> <!-- Checkbox por cada item -->
+                    </td>
+                    <td><img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="img-thumbnail"></td>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.precio }}</td>
+                    <td>{{ producto.categoria }}</td>
+                    <td>
+                        {% if producto.stock > 0 %}
+                            Disponible
+                        {% else %}
+                            Sin Stock
+                        {% endif %}
+                    </td>
+                    <td>{{ producto.stock }}</td>
+                    <td>
+                        <input type="number" class="form-control stock-input" min="0" name="producto_{{ producto.id }}" value="{{ producto.stock }}">
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center">No se encontraron productos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
+        <div class="text-center">
+            <button class="btn btn-danger mt-3">Actualizar Stock</button>
+        </div>
 
         <!-- Modal del Manual -->
         <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
@@ -86,11 +91,11 @@
                         <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-    
+
                     <div class="modal-body">
                         <h4>Bienvenido al Manual de Modificar el Stock de Producto</h4>
                         <p>Este manual le guiará a través de las funcionalidades para Modificar el stock de un producto en el inventario.</p>
-            
+
                         <h5>Pasos para Actualizar el Stock</h5>
                         <p>
                             <strong>1. Buscar un Producto:</strong>
@@ -116,22 +121,34 @@
                                 <li>Los cambios se procesarán y el sistema actualizará los valores de stock.</li>
                             </ul>
                         </p>
-                        
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         </div>
                     </div>
-                
                 </div>
             </div>
         </div>
-    
+
+    </div>
+
     <!-- Footer -->
     {% endblock %}
     {% include "formatos/footeruser.html" %}
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Función para seleccionar o deseleccionar todos los checkboxes
+        function selectAllCheckboxes() {
+            var selectAll = document.getElementById('selectAll');
+            var checkboxes = document.querySelectorAll('.productCheckbox');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+    </script>
 
 </body>
 </html>

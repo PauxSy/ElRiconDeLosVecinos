@@ -401,10 +401,14 @@ def vista_inventario(request):
 def vista_actualizarproducto(request):
     return render(request,'actualizarProductoAdmin.html')
 
+from django.db.models import Q
+
 def vista_deshabilitarproducto(request):
     query = request.GET.get('search', '')  # Recuperar búsqueda si existe
     if query:
-        productos = Producto.objects.filter(nombre__icontains=query)
+        productos = Producto.objects.filter(
+            Q(nombre__icontains=query) | Q(id__icontains=query)
+        )
     else:
         productos = Producto.objects.all()  # Obtener todos los productos
 
@@ -412,19 +416,30 @@ def vista_deshabilitarproducto(request):
         'productos': productos
     })
 
+
+
 def vista_actualizarstock(request):
+    # Si el método es POST, actualizamos el stock de los productos
     if request.method == 'POST':
-        # Obtener la lista de IDs y nuevas cantidades desde el formulario
         for producto_id, nueva_cantidad in request.POST.items():
-            if producto_id.startswith("producto_"):  # Filtrar solo los productos
+            if producto_id.startswith("producto_"):
                 producto_id = producto_id.split("_")[1]
                 producto = Producto.objects.get(id=producto_id)
-                # Actualizar el stock del producto
                 producto.stock = nueva_cantidad
                 producto.save()
-        return redirect('nombre_de_tu_vista')  # Redirigir a la vista que desees después de actualizar el stock
+        return redirect('actualizarStock.html')  # Redirigir a la vista que desees después de actualizar el stock
+
+    # Si el método es GET, obtenemos los productos y aplicamos el filtro de búsqueda
     else:
-        productos = Producto.objects.all()  # Obtener todos los productos
+        query = request.GET.get('query', '')  # Obtener el valor de búsqueda desde la query string
+        if query:
+            # Filtrar productos por nombre o ID (asegúrate de ajustar los campos según tus necesidades)
+            productos = Producto.objects.filter(
+                Q(nombre__icontains=query) | Q(id__icontains=query)
+            )
+        else:
+            productos = Producto.objects.all()  # Si no hay búsqueda, mostrar todos los productos
+        
         return render(request, 'actualizarStock.html', {'productos': productos})
 
 def vista_panelpromociones(request):
