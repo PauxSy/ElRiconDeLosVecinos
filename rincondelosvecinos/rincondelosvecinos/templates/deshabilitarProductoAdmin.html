@@ -62,41 +62,25 @@
             </tr>
         </thead>
         <tbody>
+            {% for producto in productos %}
             <tr>
-                <td><input type="checkbox"></td>
-                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-1</td>
-                <td>Producto A</td>
-                <td>Descripcion A</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria A</td>
+                <td><input type="checkbox" name="producto_ids" value="{{ producto.id }}"></td>
+                <td>
+                    <img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="img-thumbnail" style="width: 100px; height: auto;">
+                </td>
+                <td>{{ producto.id }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>{{ producto.stock }}</td>
+                <td>${{ producto.precio }}</td>
+                <td>{{ producto.iva }}%</td>
+                <td>{{ producto.categoria }}</td>
             </tr>
-
+            {% empty %}
             <tr>
-                <td><input type="checkbox"></td>
-                <td><img src="{% static 'media/cafeTradicion170g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-2</td>
-                <td>Producto B</td>
-                <td>Descripcion B</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria B</td>
+                <td colspan="9" class="text-center">No se encontraron productos</td>
             </tr>
-
-            <tr>
-                <td><input type="checkbox"></td>
-                <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-3</td>
-                <td>Producto C</td>
-                <td>Descripcion C</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria C</td>
-            </tr>
+            {% endfor %}
         </tbody>
     </table>
     <div class="text-center">

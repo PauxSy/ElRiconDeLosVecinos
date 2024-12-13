@@ -379,3 +379,12 @@
     height: 50px;  /* Ajusta la altura si es necesario */
     font-size: 16px;  /* Ajusta el tamaño de la fuente */
 }
+
+
+.drop{
+    background-color: #252e38;
+}
+
+.drop-letra{
+    color: #ffffff;
+}

@@ -47,27 +47,26 @@
             </tr>
         </thead>
         <tbody>
+            {% for producto in productos %}
             <tr>
-                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-1</td>
-                <td>Producto A</td>
-                <td>100</td>
-                <td>Lácteos</td>
-                <td>Disponible</td>
-                <td>10</td>
-                <td><input type="number" class="form-control stock-input" min="0" placeholder="Nueva Cantidad"></td>
+                <td><img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="img-thumbnail"></td>
+                <td>{{ producto.id }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.precio }}</td>
+                <td>{{ producto.categoria }}</td>
+                <td>
+                    {% if producto.stock > 0 %}
+                        Disponible
+                    {% else %}
+                        Sin Stock
+                    {% endif %}
+                </td>
+                <td>{{ producto.stock }}</td>
+                <td>
+                    <input type="number" class="form-control stock-input" min="0" name="producto_{{ producto.id }}" value="{{ producto.stock }}">
+                </td>
             </tr>
-
-            <tr>
-                <td><img src="{% static 'media/cafeTradicion170g.webp' %}" alt="Producto B" class="img-thumbnail"></td>
-                <td>prod-2</td>
-                <td>Producto B</td>
-                <td>100</td>
-                <td>Despensa</td>
-                <td>Pocas Unidades</td>
-                <td>5</td>
-                <td><input type="number" class="form-control stock-input" min="0" placeholder="Nueva Cantidad"></td>
-            </tr>
+            {% endfor %}
         </tbody>
     </table>
     

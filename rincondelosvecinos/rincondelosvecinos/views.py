@@ -402,13 +402,47 @@ def vista_actualizarproducto(request):
     return render(request,'actualizarProductoAdmin.html')
 
 def vista_deshabilitarproducto(request):
-    return render(request,'deshabilitarProductoAdmin.html')
+    query = request.GET.get('search', '')  # Recuperar búsqueda si existe
+    if query:
+        productos = Producto.objects.filter(nombre__icontains=query)
+    else:
+        productos = Producto.objects.all()  # Obtener todos los productos
+
+    return render(request, 'deshabilitarProductoAdmin.html', {
+        'productos': productos
+    })
 
 def vista_actualizarstock(request):
-    return render(request,'actualizarStock.html')
+    if request.method == 'POST':
+        # Obtener la lista de IDs y nuevas cantidades desde el formulario
+        for producto_id, nueva_cantidad in request.POST.items():
+            if producto_id.startswith("producto_"):  # Filtrar solo los productos
+                producto_id = producto_id.split("_")[1]
+                producto = Producto.objects.get(id=producto_id)
+                # Actualizar el stock del producto
+                producto.stock = nueva_cantidad
+                producto.save()
+        return redirect('nombre_de_tu_vista')  # Redirigir a la vista que desees después de actualizar el stock
+    else:
+        productos = Producto.objects.all()  # Obtener todos los productos
+        return render(request, 'actualizarStock.html', {'productos': productos})
 
 def vista_panelpromociones(request):
-    return render(request,'crearPromocionAdmin.html')
+    productos = Producto.objects.all()
+    
+   # Calcular el precio con descuento para cada producto
+    for producto in productos:
+        promocion = producto.get_promocion()  # Obtén la promoción activa para el producto
+        if promocion:
+            # Aplica el descuento solo si hay una promoción activa
+            precio_con_descuento = producto.precio - (producto.precio * (promocion.descuento / 100))
+        else:
+            precio_con_descuento = producto.precio  # Si no hay promoción, el precio es el original
+        
+        # Redondear el precio con descuento para que no tenga decimales
+        producto.precio_con_descuento = round(precio_con_descuento)
+        
+    return render(request,'crearPromocionAdmin.html',{'productos': productos})
 
 def vista_registrovendedor(request):
     return render(request,'RegistroVendedor.html')
