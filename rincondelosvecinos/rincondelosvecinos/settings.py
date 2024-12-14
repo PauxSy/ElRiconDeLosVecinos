@@ -107,3 +107,10 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_AGE = 1209600  # 2 semanas
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',  # Caché en memoria
+        'TIMEOUT': 600,  # Tiempo de expiración del caché en segundos (opcional)
+    }
+}

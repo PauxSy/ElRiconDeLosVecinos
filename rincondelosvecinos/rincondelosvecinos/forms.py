@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario
+from .models import Producto, Usuario
 
 class UsuarioForm(forms.ModelForm):
     contrasena = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
@@ -46,3 +46,17 @@ class UsuarioForm(forms.ModelForm):
             self.add_error("confirm_contrasena", "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
 
         return cleaned_data
+    
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['img_url', 'nombre', 'precio', 'stock', 'descripcion', 'iva', 'categoria']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 4}),
+            'iva': forms.NumberInput(attrs={'readonly': True}),  # Campo solo lectura
+        }
+        labels = {
+            'categoria': 'Categoría',
+            'iva': 'IVA (19%)',
+        }
+

@@ -1,9 +1,9 @@
+from decimal import Decimal
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
-from rincondelosvecinos.forms import UsuarioForm
 from .models import Producto , Usuario,Administrador
 from django.core.mail import send_mail
 from django.http import JsonResponse
@@ -16,9 +16,47 @@ import os
 import hashlib
 from django.utils.timezone import now, timedelta
 from django.core.mail import EmailMultiAlternatives
+from .forms import ProductoForm, UsuarioForm
+from django.views.decorators.http import require_POST
+from django.utils.html import strip_tags
 
 
 
+from decimal import Decimal
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Producto
+from .forms import ProductoForm  # Asegúrate de tener un ModelForm para el modelo Producto
+
+def vista_agregarproductoadmin(request):
+    if not request.session.get('admin_autenticado'):  # Verifica si está autenticado
+        messages.error(request, 'No tienes permisos para acceder a esta sección.')
+        return render(request, 'catalogo.html')
+
+    admin_id = request.session.get('admin_id')
+    if not admin_id:
+        messages.error(request, 'No se puede identificar al administrador. Por favor, inicia sesión.')
+        return render(request, 'inicioSesionUser.html')
+
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, request.FILES)
+        if form.is_valid():
+            producto = form.save(commit=False)
+            producto.iva = round(producto.precio * Decimal('0.19'))
+            producto.admin_id = admin_id
+            producto.save()
+            messages.success(request, 'Producto agregado exitosamente.')  # Mensaje para SweetAlert
+            return render(request, 'agregarProductoAdmin.html')
+        else:
+            messages.error(request, 'Por favor, corrige los errores del formulario.')
+    else:
+        form = ProductoForm()
+
+    categorias = Producto.CATEGORIAS
+    return render(request, 'agregarProductoAdmin.html', {'form': form, 'categorias': categorias})
+
+import json
+        
 
 def vista_iniciouser(request):
     if request.method == 'POST':
@@ -33,7 +71,7 @@ def vista_iniciouser(request):
             # Verificar si la cuenta está bloqueada
             if usuario.bloqueado:
                 messages.error(request, "Tu cuenta está bloqueada. Por favor, restablece tu contraseña para desbloquearla.")
-                return redirect('recuperarcontrasena')
+                return render(request, 'recuperarcontrasena.html')
 
             # Verificar si la cuenta no está activa (no confirmada)
             if not usuario.is_active:
@@ -68,7 +106,7 @@ def vista_iniciouser(request):
                 else:
                     # Recordar que debe confirmar su cuenta si han pasado menos de 23 horas
                     messages.warning(request, "Debes confirmar tu cuenta. Revisa el correo que te enviamos para activarla.")
-                return redirect('iniciouser')
+                return render(request, 'inicioSesionUser.html')
 
             # Verificar la contraseña
             if usuario.contrasena == encriptar_con_salt(password, usuario.salt):
@@ -85,7 +123,7 @@ def vista_iniciouser(request):
                 request.session['email'] = usuario.email
 
                 messages.success(request, "Inicio de sesión exitoso")
-                return redirect('catalogo')
+                return redirect('catalogo')  # Redirige a la vista del dashboard
             else:
                 # Incrementar intentos fallidos y bloquear si es necesario
                 usuario.intentos_fallidos += 1
@@ -93,7 +131,7 @@ def vista_iniciouser(request):
                     usuario.bloqueado = True
                 usuario.save()
                 messages.error(request, "Contraseña incorrecta")
-                return redirect('iniciouser')
+                return render(request, 'inicioSesionUser.html')
 
         elif admin:
             # Verificar la contraseña para el administrador
@@ -102,16 +140,18 @@ def vista_iniciouser(request):
                 request.session['admin_autenticado'] = True
                 request.session['email'] = admin.email
                 request.session['is_admin'] = True
+                request.session['admin_id'] = admin.id
+
 
                 messages.success(request, "Inicio de sesión exitoso como administrador")
-                return redirect('dashboard')  # Página del administrador
+                return render(request, 'dashboard.html')
             else:
                 messages.error(request, "Contraseña incorrecta para administrador")
-                return redirect('iniciouser')
+                return render(request, 'inicioSesionUser.html')
 
         else:
             messages.error(request, "El email no está registrado")
-            return redirect('iniciouser')
+            return render(request, 'inicioSesionUser.html')
 
     return render(request, 'inicioSesionUser.html')
 
@@ -146,7 +186,7 @@ def vista_recuperarcontrasena(request):
     # Verificar si el usuario ya está autenticado
     if request.session.get("nombre_usuario") and request.session.get("primer_apellido"):
         messages.error(request, "Ya tienes una sesión iniciada. Por favor, cierra sesión antes de recuperar la contraseña.")
-        return redirect("catalogo")
+        return render(request, 'catalogo.html')
 
     if request.method == "POST":
         email = request.POST.get("email")
@@ -166,22 +206,34 @@ def vista_recuperarcontrasena(request):
         if usuario:
             user_type = "usuario"
             user_id = usuario.id
+            nombre_usuario = usuario.nombre
         else:
             user_type = "admin"
             user_id = administrador.id
+            nombre_usuario = administrador.nombre
 
         reset_link = request.build_absolute_uri(
             reverse("reset_password", args=[f"{user_type}_{user_id}"])
         )
 
+        # Renderizar la plantilla HTML para el correo
+        context = {
+            "nombre_usuario": nombre_usuario,
+            "reset_password_link": reset_link,
+        }
+
+        email_html_content = render_to_string("recuperarpass.html", context)
+        email_text_content = strip_tags(email_html_content)  # Convertir a texto plano para clientes que no soportan HTML
+
         # Enviar el correo de recuperación
         try:
             send_mail(
-                subject="Recuperación de contraseña",
-                message=f"Hola, para restablecer tu contraseña haz clic en el siguiente enlace: {reset_link}",
+                subject="Recuperación de contraseña - El Rincón de los Vecinos",
+                message=email_text_content,
                 from_email="elrincondelosvecinoschile@gmail.com",  # Cambia por tu correo
                 recipient_list=[email],
                 fail_silently=False,
+                html_message=email_html_content,  # Mensaje en formato HTML
             )
             messages.success(request, "El correo de recuperación fue enviado exitosamente. Revisa tu bandeja de entrada.")
         except Exception as e:
@@ -229,7 +281,7 @@ def reset_password(request, user_id):
         usuario_obj.save()
 
         messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
-        return redirect("catalogo")
+        return render(request, 'catalogo.html')
 
     # Renderizar la plantilla con el ID en el contexto
     return render(request, "reset_password.html", {"user_id": user_id})
@@ -318,7 +370,7 @@ def cerrar_sesion(request):
     request.session.flush()
     # Crea un mensaje de éxito
     messages.success(request, "Has cerrado sesión exitosamente.")
-    return redirect('catalogo')  # Redirige al catálogo
+    return render(request, 'catalogo.html')
 
 
 def vista_registrouser(request):
@@ -328,7 +380,7 @@ def vista_perfiluser(request):
     # Verificar si el usuario está autenticado
     if not request.session.get('email'):
         messages.error(request, "Debes iniciar sesión para acceder a tu perfil.")
-        return redirect('iniciouser')
+        return render(request, 'inicioSesionUser.html')
 
     # Obtener el usuario autenticado usando el email de la sesión
     email = request.session['email']
@@ -350,7 +402,7 @@ def vista_perfiluser(request):
         print({usuario.nombre})
         print({usuario.primer_apellido})
 
-        return redirect('perfiluser')
+        return render(request, 'perfilUser.html')
 
     # Renderizar el formulario con los datos actuales del usuario
     return render(request, 'perfilUser.html', {'usuario': usuario})
@@ -373,7 +425,7 @@ def vista_inicioadmin(request):
 
             # Comparación directa de la contraseña
             if contrasena == admin.contrasena:
-                return redirect('dashboard')  # Redirige al dashboard si todo es correcto
+                return render(request, 'dashboard.html')
             else:
                 messages.error(request, 'La contraseña ingresada es incorrecta.')
         except Administrador.DoesNotExist:
@@ -391,9 +443,6 @@ def validar_rut(rut):
 
 def vista_reporteadmin(request):
     return render(request,'generarReportesAdmin.html')
-
-def vista_agregarproductoadmin(request):
-    return render(request,'agregarProductoAdmin.html')
 
 def vista_inventario(request):
     return render(request,'verinventario.html')
@@ -427,7 +476,7 @@ def vista_actualizarstock(request):
                 producto = Producto.objects.get(id=producto_id)
                 producto.stock = nueva_cantidad
                 producto.save()
-        return redirect('actualizarStock.html')  # Redirigir a la vista que desees después de actualizar el stock
+                return render(request, 'actualizarStock.html')
 
     # Si el método es GET, obtenemos los productos y aplicamos el filtro de búsqueda
     else:
@@ -592,7 +641,7 @@ def registrar_usuario(request):
             email.send()
 
             messages.success(request, "Te hemos enviado un correo para confirmar tu cuenta. Revisa tu bandeja de entrada.")
-            return redirect("catalogo")
+            return render(request, 'catalogo.html')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -614,7 +663,7 @@ def activar_cuenta(request, uidb64, token):
         usuario.is_active = True
         usuario.save()
         messages.success(request, "¡Tu cuenta ha sido activada con éxito! Ahora puedes iniciar sesión.")
-        return redirect("iniciouser")
+        return render(request, 'inicioSesionUser.html')
     else:
         messages.error(request, "El enlace de activación no es válido o ha expirado.")
         return render(request, "activation_invalid.html")

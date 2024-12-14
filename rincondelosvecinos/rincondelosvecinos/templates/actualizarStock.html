@@ -149,6 +149,33 @@
             });
         }
     </script>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{{ message.tags }}", // Success, Error, Info, etc.
+                        title: "{{ message }}", // Contenido del mensaje
+                        showConfirmButton: true,
+                        timer: 3000 // Tiempo en milisegundos
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{{ message.tags }}", // Success, Error, Info, etc.
+                        title: "{{ message }}", // Contenido del mensaje
+                        showConfirmButton: true,
+                        timer: 3000 // Tiempo en milisegundos
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 </html>

@@ -46,18 +46,6 @@
                         <p><a href="{% url 'recuperarcontrasena' %}">¿Olvidó su contraseña?</a></p>
                     </div>
                 </form>
-                {% if messages %}
-                    <div class="alert alert-danger mt-3">
-                        {% for message in messages %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                {% if bloqueado_hasta %}
-                    <div class="alert alert-warning mt-3">
-                        <p>Has sido bloqueado temporalmente. Intenta de nuevo después de {{ tiempo_restante }} minutos.</p>
-                    </div>
-                {% endif %}
             </div>
 
             <!-- Botón para llevarme a registrar user -->
@@ -110,5 +98,20 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}", // Mapear los tags a SweetAlert
+                        title: "{{ message|escapejs }}", // Escapa caracteres especiales para JavaScript
+                        showConfirmButton: true,
+                        timer: 3000 // Tiempo en milisegundos
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 </html>

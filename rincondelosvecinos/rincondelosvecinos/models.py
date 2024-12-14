@@ -3,7 +3,35 @@ from datetime import datetime, timedelta
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 
+   
 class Producto(models.Model):
+    
+    CATEGORIAS = [
+        ('Postres', 'Postres'),
+        ('Dulces', 'Dulces'),
+        ('Bebidas', 'Bebidas'),
+        ('Abarrotes', 'Abarrotes'),
+        ('Alacena', 'Alacena'),
+        ('Lacteos', 'Lácteos'),
+        ('Aliños', 'Aliños'),
+        ('Fiambreria', 'Fiambrería'),
+        ('Limpieza', 'Limpieza'),
+        ('Cereales', 'Cereales'),
+        ('Snacks', 'Snacks'),
+        ('Frutos Secos', 'Frutos Secos'),
+        ('Panadería', 'Panadería'),
+        ('Carnes', 'Carnes'),
+        ('Vegetales', 'Vegetales'),
+    ]
+    
+
+    
+    ESTADOS = [
+        ('habilitado', 'Habilitado'),
+        ('deshabilitado', 'Deshabilitado'),
+    ]
+        
+
     # El campo 'id' es la clave primaria (PK) y Django la crea automáticamente, así que no es necesario declararla explícitamente
     # Si deseas personalizarla, puedes hacerlo así:
     img_url = models.CharField(max_length=255)  # URL de la imagen, varchar(255)
@@ -12,7 +40,8 @@ class Producto(models.Model):
     stock = models.DecimalField(max_digits=10, decimal_places=0)   # Stock disponible, decimal(10,0)
     descripcion = models.CharField(max_length=300)  # Descripción del producto, varchar(300)
     iva = models.DecimalField(max_digits=10, decimal_places=0)     # IVA, decimal(10,0)
-    categoria = models.CharField(max_length=50)    # Categoría del producto, varchar(50)
+    categoria = models.CharField(max_length=50, choices=CATEGORIAS)
+    estado = models.CharField(max_length=50, choices=ESTADOS, default='desactivado')  # Estado del producto, por defecto 'activado'
     admin_id = models.IntegerField()               # ID del administrador, entero
     
     

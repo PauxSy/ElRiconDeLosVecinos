@@ -21,7 +21,9 @@
         
         
 
-        <form id="form-producto" class="custom-form">
+        <form method="post" action="{% url 'agregarproducto' %}" enctype="multipart/form-data" class="custom-form" id="agregarProductoAdmin">
+            {% csrf_token %}
+            
             <!-- de momento añadí un campo id de manera manual  -->
             <!-- Evaluar como gestionaremos el tema del ID , si implementar algo que genere de manera autoincremental el id o generalo de manera
             manual y luego hacer validaciones para que este no se repita -->
@@ -31,51 +33,48 @@
                 </button>
           
             <div class="mb-3">
-                <label for="idProducto" class="form-label">ID del Producto</label>
-                <input type="text" class="form-control" id="idProducto" required>
-                <div class="invalid-feedback">El ID ya existe o no es válido.</div>
-            </div>
-
-            <div class="mb-3">
                 <label for="imagenProductoUrl" class="form-label">URL de la Imagen del Producto</label>
-                <input type="url" class="form-control" id="imagenProductoUrl" placeholder="https://jumbo.vtexassets.com/arquivos/ids/1012654-900-900?width=900&height=900&aspect=true" required>
+                <input type="url" class="form-control" id="imagenProductoUrl" placeholder="https://jumbo.vtexassets.com/arquivos/ids/1012654-900-900?width=900&height=900&aspect=true" name="img_url" required>
                 <div class="invalid-feedback">Debe ingresar una URL válida para la imagen</div>
             </div>
 
             <div class="mb-3">
                 <label for="nombreProducto" class="form-label">Nombre del producto</label>
-                <input type="text" class="form-control" id="nombreProducto" pattern="[A-Za-z\s]+" required>
+                <input type="text" class="form-control" id="nombreProducto" pattern="[A-Za-z\s]+" name="nombre" required>
                 <div class="invalid-feedback">El nombre solo debe contener letras</div>
             </div>
 
             <div class="mb-3">
                 <label for="descripcionProducto" class="form-label">Descripción del Producto</label>
-                <textarea class="form-control" id="descripcionProducto" pattern="[A-Za-z0-9\s]+" required></textarea>
+                <textarea class="form-control" id="descripcionProducto" pattern="[A-Za-z0-9\s]+"  name="descripcion" required></textarea>
                 <div class="invalid-feedback">La descripción solo puede contener letras y números</div>
             </div>
 
             <div class="mb-3">
                 <label for="stockProducto" class="form-label">Stock del producto</label>
-                <input type="number" class="form-control" id="stockProducto" min="0" required>
+                <input type="number" class="form-control" id="stockProducto" min="0" name="stock" required>
                 <div class="invalid-feedback">El stock debe ser un número válido</div>
             </div>
 
             <div class="mb-3">
                 <label for="precioProducto" class="form-label">Precio del producto</label>
-                <input type="number" class="form-control" id="precioProducto" min="0" step="0.01" required>
+                <input type="number" class="form-control" id="precioProducto" min="0" step="0.01" name="precio" required>
                 <div class="invalid-feedback">El precio debe ser un número válido</div>
             </div>
 
             <div class="mb-3">
-                <label for="ivaProducto" class="form-label">IVA del producto (%)</label>
-                <input type="number" class="form-control" id="ivaProducto" min="0" step="0.01" required>
-                <div class="invalid-feedback">El IVA debe ser un número entre 0 y 100</div>
+                <label for="ivaProducto" class="form-label" >IVA del Producto (19%)</label>
+                <input type="number" class="form-control" id="ivaProducto" name="iva" readonly>
             </div>
-
+        
             <div class="mb-3">
                 <label for="categoriaProducto" class="form-label">Categoría del producto</label>
-                <input type="text" class="form-control" id="categoriaProducto" pattern="[A-Za-z\s]+" required>
-                <div class="invalid-feedback">La categoría solo debe contener letras</div>
+                <select class="form-control" id="categoriaProducto" name="categoria" required>
+                    <option value="" disabled selected>Selecciona una categoría</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.0 }}" {% if categoria.0 == producto.categoria %}selected{% endif %}>{{ categoria.1 }}</option>
+                    {% endfor %}
+                </select>
             </div>
 
             <div class="text-center">
@@ -116,20 +115,60 @@
         </div>
     </div>
 
-
-
-
-
-
-
-    
-
     <!-- Footer -->
     {% endblock %}
     {% include "formatos/footeradmin.html"%}
 
     <!-- Scripts -->
-    
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const precioInput = document.getElementById("precioProducto");
+            const ivaInput = document.getElementById("ivaProducto");
+        
+            precioInput.addEventListener("input", function () {
+                const precio = parseFloat(precioInput.value) || 0;
+                const iva = Math.floor(precio * 0.19); // Trunca los decimales
+                ivaInput.value = iva; // Asigna el valor calculado al campo
+                            
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}", // Mapear los tags a SweetAlert
+                        title: "{{ message|escapejs }}", // Escapa caracteres especiales para JavaScript
+                        showConfirmButton: true,
+                        timer: 3000 // Tiempo en milisegundos
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#categoriaProducto').select2({
+                placeholder: 'Selecciona una categoría', // Texto de ayuda
+                allowClear: true, // Permite limpiar la selección
+                width: '100%' // Asegura que se ajuste al contenedor
+            });
+        });
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                {% if messages %}
+                    {% for message in messages %}
+                        Swal.fire({
+                            icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}", // Mapear los tags a SweetAlert
+                            title: "{{ message|escapejs }}", // Escapa caracteres especiales para JavaScript
+                            showConfirmButton: true,
+                            timer: 3000 // Tiempo en milisegundos
+                        });
+                    {% endfor %}
+                {% endif %}
+            });
+        </script>
 </body>
 </html>

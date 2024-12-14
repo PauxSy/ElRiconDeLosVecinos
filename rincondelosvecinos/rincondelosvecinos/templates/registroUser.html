@@ -135,5 +135,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'userregistry.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}", // Mapear los tags a SweetAlert
+                        title: "{{ message|escapejs }}", // Escapa caracteres especiales para JavaScript
+                        showConfirmButton: true,
+                        timer: 3000 // Tiempo en milisegundos
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 </html>
