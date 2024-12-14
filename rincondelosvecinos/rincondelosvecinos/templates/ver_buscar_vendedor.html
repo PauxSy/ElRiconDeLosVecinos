@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'estilos.css' %}">
+</head>
+<body>
+ <!-- nav admin -->
+    {% include "formatos/navbarvendedor.html" %}
+    {% block content %}
+
+    
+    <!-- que pueda buscar por diferentes campos : stock ,precio y categoria -->
+
+    <div class="container mt-5">
+        <h2 class="text-center">Ver productos del inventario</h2>
+        <br><br>
+    </div> 
+    <div class="container mt-3">
+
+        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualModal">
+            <i class="fas fa-info-circle"></i> Ver Manual de Usuario
+        </button>
+
+        <form class="d-flex" role="search">
+            <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" aria-label="Buscar">
+            <button class="btn btn-danger" type="submit">Buscar</button>
+        </form>
+    </div>
+
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Imagen</th>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Stock</th>
+                <th>Precio</th>
+                <th>IVA</th>
+                <th>Categoría</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-1</td>
+                <td>Producto A</td>
+                <td>Descripcion A</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria A</td>
+            </tr>
+
+            <tr>
+                <td><img src="{% static 'media/cafeTradicion170g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-2</td>
+                <td>Producto B</td>
+                <td>Descripcion B</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria B</td>
+            </tr>
+            
+            <tr>
+                <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
+                <td>prod-3</td>
+                <td>Producto C</td>
+                <td>Descripcion C</td>
+                <td>10</td>
+                <td>100</td>
+                <td>21%</td>
+                <td>Categoria C</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <!-- Modal del Manual -->
+    <div class="modal fade" id="manualModal" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso - Buscar y ver productos en inventario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+
+                    <h3>&iquest;C&oacute;mo realizar b&uacute;squedas?</h3>
+                    <p>Puedes buscar productos en la tabla utilizando diferentes criterios:</p>
+
+                    <h4>1. Buscar por stock</h4>
+                    <ul>
+                        <li>En el cuadro de b&uacute;squeda, ingresa la cantidad m&iacute;nima o m&aacute;xima de stock deseada (por ejemplo, <code>10</code>).</li>
+                        <li>Haz clic en el bot&oacute;n <strong>"Buscar"</strong>.</li>
+                        <li>El sistema mostrar&aacute; solo los productos cuyo stock coincida con el valor ingresado.</li>
+                    </ul>
+
+                    <h4>2. Buscar por precio</h4>
+                    <ul>
+                        <li>Ingresa un rango de precios o un precio espec&iacute;fico en el cuadro de b&uacute;squeda (por ejemplo, <code>100</code>).</li>
+                        <li>Presiona el bot&oacute;n <strong>"Buscar"</strong>.</li>
+                        <li>Se listar&aacute;n los productos cuyo precio coincida con el valor ingresado.</li>
+                    </ul>
+
+                    <h4>3. Buscar por categor&iacute;a</h4>
+                    <ul>
+                        <li>Escribe el nombre de la categor&iacute;a en el cuadro de b&uacute;squeda (por ejemplo, <code>Categor&iacute;a A</code>).</li>
+                        <li>Haz clic en <strong>"Buscar"</strong>.</li>
+                        <li>El inventario filtrar&aacute; los productos que pertenezcan a esa categor&iacute;a.</li>
+                    </ul>
+
+                    <h3>Ejemplo de uso</h3>
+                    <p>1. Deseas buscar todos los productos con un precio de <code>100</code>:</p>
+                    <ul>
+                        <li>Ingresa <code>100</code> en el cuadro de b&uacute;squeda.</li>
+                        <li>Presiona <strong>"Buscar"</strong>.</li>
+                        <li>Ver&aacute;s solo los productos cuyo precio sea <code>100</code>.</li>
+                    </ul>
+                    
+
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Footer -->
+    {% endblock %}
+    {% include "formatos/footervendedor.html"%}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

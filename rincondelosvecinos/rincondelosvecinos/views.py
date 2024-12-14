@@ -190,30 +190,167 @@ def vista_recuperarcontrasena(request):
     return render(request, "recuperarcontrasena.html")
 
 
+# def reset_password(request, user_id):
+#     if request.method == "POST":
+#         nueva_contrasena = request.POST.get("nueva_contrasena")
+#         confirmar_contrasena = request.POST.get("confirmar_contrasena")
+
+
+#         # Diferenciar entre usuario y administrador según el prefijo del ID
+#         if user_id.startswith("usuario_"):
+#             user_id = user_id.replace("usuario_", "")
+#             usuario_obj = Usuario.objects.filter(id=user_id).first()
+#         elif user_id.startswith("admin_"):
+#             user_id = user_id.replace("admin_", "")
+#             usuario_obj = Administrador.objects.filter(id=user_id).first()
+#         else:
+#             usuario_obj = None
+
+#         # Validar si existe el usuario o administrador correspondiente
+#         if not usuario_obj:
+#             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
+#             return render(request, "reset_password.html", {"user_id": user_id})
+        
+
+        
+#         # Validar si las contraseñas coinciden
+#         if nueva_contrasena != confirmar_contrasena:
+#             messages.error(request, "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
+#             return render(request, "reset_password.html", {"user_id": user_id})
+
+#         # Validar complejidad de la nueva contraseña
+#         if len(nueva_contrasena) < 6 or \
+#            not any(c.isalpha() for c in nueva_contrasena) or \
+#            not any(c.isdigit() for c in nueva_contrasena) or \
+#            not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in nueva_contrasena):
+#             messages.error(request, "La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.")
+#             return render(request, "reset_password.html", {"user_id": user_id})
+
+#         # Generar un nuevo salt y encriptar la nueva contraseña
+#         salt = os.urandom(8).hex()
+#         nueva_contrasena_encriptada = hashlib.sha256((nueva_contrasena + salt).encode("utf-8")).hexdigest()
+
+#         # Actualizar la contraseña y desbloquear la cuenta si estaba bloqueada
+#         usuario_obj.contrasena = nueva_contrasena_encriptada
+#         usuario_obj.salt = salt
+#         if hasattr(usuario_obj, "intentos_fallidos"):
+#             usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
+#             usuario_obj.bloqueado = False  # Desbloquear la cuenta
+
+#         usuario_obj.save()
+
+
+
+#         messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
+#         return redirect("catalogo")
+
+
+#     # Renderizar la plantilla con el ID en el contexto
+#     return render(request, "reset_password.html", {"user_id": user_id})
+
+
+# def reset_password(request, user_id):
+#     if request.method == "POST":
+#         nueva_contrasena = request.POST.get("nueva_contrasena")
+#         confirmar_contrasena = request.POST.get("confirmar_contrasena")
+
+#         # Diferenciar entre usuario y administrador según el prefijo del ID
+#         if user_id.startswith("usuario_"):
+#             user_id = user_id.replace("usuario_", "")
+#             usuario_obj = Usuario.objects.filter(id=user_id).first()
+#         elif user_id.startswith("admin_"):
+#             user_id = user_id.replace("admin_", "")
+#             usuario_obj = Administrador.objects.filter(id=user_id).first()
+#         else:
+#             usuario_obj = None
+
+#         # Validar si existe el usuario o administrador correspondiente
+#         if not usuario_obj:
+#             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
+#             return render(request, "reset_password.html", {"user_id": user_id})
+
+#         # Validar contraseñas: coincidencia y complejidad
+#         errores = []
+
+#         if nueva_contrasena != confirmar_contrasena:
+#             errores.append("Las contraseñas no coinciden.")
+
+#         if len(nueva_contrasena) < 6 or \
+#            not any(c.isalpha() for c in nueva_contrasena) or \
+#            not any(c.isdigit() for c in nueva_contrasena) or \
+#            not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in nueva_contrasena):
+#             errores.append("La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.")
+
+#         if errores:
+#             for error in errores:
+#                 messages.error(request, error)
+#             return render(request, "reset_password.html", {"user_id": user_id})
+
+#         # Generar un nuevo salt y encriptar la nueva contraseña
+#         salt = os.urandom(8).hex()
+#         nueva_contrasena_encriptada = hashlib.sha256((nueva_contrasena + salt).encode("utf-8")).hexdigest()
+
+#         # Actualizar la contraseña y desbloquear la cuenta si estaba bloqueada
+#         usuario_obj.contrasena = nueva_contrasena_encriptada
+#         usuario_obj.salt = salt
+#         if hasattr(usuario_obj, "intentos_fallidos"):
+#             if usuario_obj.bloqueado == True:
+#                 usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
+#                 usuario_obj.bloqueado = False  # Desbloquear la cuenta
+#                 messages.success(request, "Tu cuenta a sido Desbloqueada")
+
+#         usuario_obj.save()
+#         messages.success(request, "Tu contraseña ha sido actualizada con éxito")
+#         return redirect("catalogo")
+
+#     # Renderizar la plantilla con el ID en el contexto
+#     return render(request, "reset_password.html", {"user_id": user_id})
+
+
 def reset_password(request, user_id):
     if request.method == "POST":
         nueva_contrasena = request.POST.get("nueva_contrasena")
         confirmar_contrasena = request.POST.get("confirmar_contrasena")
 
-        # Validar si las contraseñas coinciden
-        if nueva_contrasena != confirmar_contrasena:
-            messages.error(request, "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
-            return render(request, "reset_password.html", {"user_id": user_id})
-
-        # Diferenciar entre usuario y administrador según el prefijo del ID
-        if user_id.startswith("usuario_"):
-            user_id = user_id.replace("usuario_", "")
-            usuario_obj = Usuario.objects.filter(id=user_id).first()
-        elif user_id.startswith("admin_"):
-            user_id = user_id.replace("admin_", "")
-            usuario_obj = Administrador.objects.filter(id=user_id).first()
+        # Usar una variable temporal para procesar el ID del usuario
+        temp_user_id = user_id
+        if temp_user_id.startswith("usuario_"):
+            temp_user_id = temp_user_id.replace("usuario_", "")
+            usuario_obj = Usuario.objects.filter(id=temp_user_id).first()
+        elif temp_user_id.startswith("admin_"):
+            temp_user_id = temp_user_id.replace("admin_", "")
+            usuario_obj = Administrador.objects.filter(id=temp_user_id).first()
         else:
             usuario_obj = None
 
         # Validar si existe el usuario o administrador correspondiente
         if not usuario_obj:
             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
-            return render(request, "reset_password.html", {"user_id": user_id})
+            return render(request, "reset_password.html", {"user_id": user_id})  # Conserva el `user_id` original
+
+        # Validar contraseñas: coincidencia y complejidad
+        errores = []
+
+        if nueva_contrasena != confirmar_contrasena:
+            errores.append("Las contraseñas no coinciden.")
+
+
+        if nueva_contrasena == confirmar_contrasena:
+            # Verificar las condiciones de la contraseña
+            if (
+                len(nueva_contrasena) < 6 or  # Longitud mínima de 6 caracteres
+                not any(c.isalpha() for c in nueva_contrasena) or  # Al menos una letra
+                not any(c.isdigit() for c in nueva_contrasena) or  # Al menos un número
+                not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in nueva_contrasena)  # Al menos un caracter especial
+            ):
+                errores.append(
+                    "La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales."
+                )
+        
+        if errores:
+            for error in errores:
+                messages.error(request, error)
+            return render(request, "reset_password.html", {"user_id": user_id})  # Conserva el `user_id` original
 
         # Generar un nuevo salt y encriptar la nueva contraseña
         salt = os.urandom(8).hex()
@@ -223,16 +360,25 @@ def reset_password(request, user_id):
         usuario_obj.contrasena = nueva_contrasena_encriptada
         usuario_obj.salt = salt
         if hasattr(usuario_obj, "intentos_fallidos"):
-            usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
-            usuario_obj.bloqueado = False  # Desbloquear la cuenta
+            if usuario_obj.bloqueado:
+                usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
+                usuario_obj.bloqueado = False  # Desbloquear la cuenta
+                messages.success(request, "Tu cuenta ha sido desbloqueada.")
 
         usuario_obj.save()
-
-        messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
-        return redirect("catalogo")
-
+        messages.success(request, "Tu contraseña ha sido actualizada con éxito.Dirígete nuevamente a la pagina e iniciar sesión y ingresa tu nueva contraseña.")
+        
+        
     # Renderizar la plantilla con el ID en el contexto
     return render(request, "reset_password.html", {"user_id": user_id})
+
+
+
+
+
+
+
+
 
 
 #--------FUNCIONALIDADES CARRITO----------------
@@ -459,12 +605,24 @@ def vista_perfiladmin(request):
 
 
 
-# ---------------vendedor---------------- 
+# ---------------vendedor----------------
+
+def vista_perfilvendedor(request):
+    return render(request,'perfilvendedor.html') 
+
+
+def vista_ver_buscar_vendedor(request):
+    return render(request,'ver_buscar_vendedor.html')
+
 def vista_panelvendedor(request):
     return render(request,'panelvendedor.html')
 
 
 # ---------------bodeguero---------------- 
+def vista_perfilbodeguero(request):
+    return render(request,'perfilbodeguero.html') 
+
+
 def vista_panelbodeguero(request):
     return render(request,'panelBodeguero.html')
 

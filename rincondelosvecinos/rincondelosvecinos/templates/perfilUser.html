@@ -89,6 +89,21 @@
             </div>
         </div>
     </div>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Eliminar Cuenta</h5>
+            </div>
+            <div class="card-body">
+                <p>Si quieres eliminar tu cuenta, envía una solicitud utilizando el siguiente botón.</p>
+                <form action="/eliminar-cuenta" method="POST">
+                    <button type="submit" class="btn btn-outline-danger">ELIMINAR CUENTA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {% endblock %}
 
     <!-- Modal Manual de Usuario -->
@@ -100,6 +115,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    
                     <h6><strong>Rut:</strong></h6>
                     <p>El RUT es un dato único y personal, por lo que, conforme al protocolo del sitio, no es posible modificarlo.. </p>
 
@@ -109,15 +125,14 @@
                     <h6><strong>Email:</strong></h6>
                     <p>Ingrese un correo electrónico válido. Asegúrese de que no esté registrado en otro usuario en este sitio.</p>
 
-                    <h6><strong>Contraseña:</strong></h6>
-                    <p>La contraseña debe tener al menos 6 caracteres, incluir letras, números y caracteres especiales.</p>
-
                     <h6><strong>Teléfono:</strong></h6>
                     <p>Ingrese su número de teléfono con 9 dígitos (Ej: 987654321).</p>
 
                     <h6><strong>Dirección Particular y de Facturación:</strong></h6>
-                    <p>Proporcione las direcciones correctas, una para correspondencia y otra para facturación.</p>
+                    <p>Asegúrese de proporcionar direcciones completas y precisas, incluyendo calle, número y comuna.</p>
+
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
