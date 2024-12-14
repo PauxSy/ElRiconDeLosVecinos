@@ -39,10 +39,13 @@ urlpatterns = [
     path('perfiladmin/', views.vista_perfiladmin, name='perfiladmin'),
 
     # ---------------vendedor----------------
+    path('ver_buscar_vendedor/', views.vista_ver_buscar_vendedor, name='ver_buscar_vendedor'),
+    path('perfilvendedor/', views.vista_perfilvendedor, name='perfilvendedor'),
 
     path('panelvendedor/', views.vista_panelvendedor, name='panelvendedor'),
 
     # ---------------bodeguero----------------
+    path('perfilbodeguero/', views.vista_perfilbodeguero, name='perfilbodeguero'),
   
     path('panelbodeguero/', views.vista_panelbodeguero, name='panelbodeguero'),
 
