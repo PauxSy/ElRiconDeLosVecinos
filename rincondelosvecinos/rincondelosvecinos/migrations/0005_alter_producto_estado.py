@@ -10,9 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='producto',
-            name='estado',
-            field=models.CharField(choices=[('habilitado', 'Habilitado'), ('deshabilitado', 'Deshabilitado')], default='desactivado', max_length=50),
-        ),
+        # migrations.AddField(
+#     model_name='producto',
+#     name='estado',
+#     field=models.CharField(max_length=100),
+# ),
+
     ]

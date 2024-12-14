@@ -342,13 +342,13 @@ def obtener_carrito(request):
 #--------FUNCIONALIDADES CARRITO----------------
 
 def vista_catalogo(request):
-    query = request.GET.get('search', '')  
+    query = request.GET.get('search', '')  # Obtener el parámetro 'search' desde la URL
     if query:
-        productos = Producto.objects.filter(nombre__icontains=query) 
+        productos = Producto.objects.filter(nombre__icontains=query, estado='habilitado')  # Filtrar por nombre y estado habilitado
     else:
-        productos = Producto.objects.all()
+        productos = Producto.objects.filter(estado='habilitado')  # Si no hay búsqueda, mostrar solo productos habilitados
         
-    usuario_autenticado = request.session.get('email') is not None
+    usuario_autenticado = request.session.get('email') is not None  # Verificar si el usuario está autenticado
 
     return render(request, 'catalogo.html', {
         'productos': productos,
@@ -452,7 +452,24 @@ def vista_actualizarproducto(request):
 
 from django.db.models import Q
 
+from django.shortcuts import render, redirect
+from .models import Producto
+
 def vista_deshabilitarproducto(request):
+    if request.method == 'POST':
+        # Recuperar los productos seleccionados y sus nuevos estados
+        producto_ids = request.POST.getlist('producto_ids')  # Lista de IDs de los productos seleccionados
+        nuevos_estados = request.POST  # Los nuevos estados para cada producto
+
+        for producto_id in producto_ids:
+            producto = Producto.objects.get(id=producto_id)
+            nuevo_estado = nuevos_estados.get(f'estado_producto_{producto_id}')
+            if nuevo_estado:
+                producto.estado = nuevo_estado
+                producto.save()
+
+        return redirect('deshabilitarproducto')  # Redirigir para evitar reenvíos del formulario
+
     query = request.GET.get('search', '')  # Recuperar búsqueda si existe
     if query:
         productos = Producto.objects.filter(
@@ -464,6 +481,7 @@ def vista_deshabilitarproducto(request):
     return render(request, 'deshabilitarProductoAdmin.html', {
         'productos': productos
     })
+
 
 
 

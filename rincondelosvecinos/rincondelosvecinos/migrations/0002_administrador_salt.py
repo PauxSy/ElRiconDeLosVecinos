@@ -10,10 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Comentamos la operación que genera conflictos
-        # migrations.AddField(
-        #     model_name='administrador',
-        #     name='salt',
-        #     field=models.CharField(blank=True, max_length=16, null=True),
-        # ),
+        
+        migrations.AddField(
+            model_name='administrador',
+            name='salt',
+            field=models.CharField(blank=True, max_length=16, null=True),
+        ),
     ]

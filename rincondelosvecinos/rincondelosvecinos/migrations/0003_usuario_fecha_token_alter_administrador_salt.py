@@ -16,9 +16,9 @@ class Migration(migrations.Migration):
         #     name='fecha_token',
         #     field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
         # ),
-        migrations.AlterField(
-            model_name='administrador',
-            name='salt',
-            field=models.CharField(max_length=16),
-        ),
+        # migrations.AlterField(
+        #     model_name='administrador',
+        #     name='salt',
+        #     field=models.CharField(max_length=16),
+        # ),
     ]

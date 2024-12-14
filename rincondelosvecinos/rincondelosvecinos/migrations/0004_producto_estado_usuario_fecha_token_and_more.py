@@ -11,19 +11,20 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='producto',
-            name='estado',
-            field=models.CharField(choices=[('activado', 'Activado'), ('desactivado', 'Desactivado')], default='desactivado', max_length=11),
-        ),
-        migrations.AddField(
-            model_name='usuario',
-            name='fecha_token',
-            field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
-        ),
-        migrations.AlterField(
-            model_name='producto',
-            name='categoria',
-            field=models.CharField(choices=[('Postres', 'Postres'), ('Dulces', 'Dulces'), ('Bebidas', 'Bebidas'), ('Abarrotes', 'Abarrotes'), ('Alacena', 'Alacena'), ('Lacteos', 'Lácteos'), ('Aliños', 'Aliños'), ('Fiambreria', 'Fiambrería'), ('Limpieza', 'Limpieza'), ('Cereales', 'Cereales'), ('Snacks', 'Snacks'), ('Frutos Secos', 'Frutos Secos'), ('Panadería', 'Panadería'), ('Carnes', 'Carnes'), ('Vegetales', 'Vegetales')], max_length=50),
-        ),
+       # migrations.AddField(
+#     model_name='producto',
+#     name='estado',
+#     field=models.CharField(choices=[('activado', 'Activado'), ('desactivado', 'Desactivado')], default='desactivado', max_length=11),
+# ),
+
+        # migrations.AddField(
+        #     model_name='usuario',
+        #     name='fecha_token',
+        #     field=models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True),
+        # ),
+        # migrations.AlterField(
+        #     model_name='producto',
+        #     name='categoria',
+        #     field=models.CharField(choices=[('Postres', 'Postres'), ('Dulces', 'Dulces'), ('Bebidas', 'Bebidas'), ('Abarrotes', 'Abarrotes'), ('Alacena', 'Alacena'), ('Lacteos', 'Lácteos'), ('Aliños', 'Aliños'), ('Fiambreria', 'Fiambrería'), ('Limpieza', 'Limpieza'), ('Cereales', 'Cereales'), ('Snacks', 'Snacks'), ('Frutos Secos', 'Frutos Secos'), ('Panadería', 'Panadería'), ('Carnes', 'Carnes'), ('Vegetales', 'Vegetales')], max_length=50),
+        # ),
     ]
