@@ -735,7 +735,7 @@ def vista_perfiluser(request):
         print({usuario.nombre})
         print({usuario.primer_apellido})
 
-        return render(request, 'perfilUser.html')
+        return redirect('perfiluser')
 
     # Renderizar el formulario con los datos actuales del usuario
     return render(request, 'perfilUser.html', {'usuario': usuario})

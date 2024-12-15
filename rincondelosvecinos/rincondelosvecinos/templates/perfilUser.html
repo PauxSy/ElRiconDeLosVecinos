@@ -36,21 +36,21 @@
                     <div class="row mb-3">
                         <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10">
-                            <input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" required pattern="[A-Za-z\s]+" title="Solo se permiten letras">
+                            <input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" required required pattern="[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+" title="Solo se permiten letras">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label for="primer_apellido" class="col-sm-2 col-form-label">Apellido Paterno</label>
                         <div class="col-sm-10">
-                            <input type="text" name="primer_apellido" class="form-control" value="{{ usuario.primer_apellido }}" required pattern="[A-Za-z\s]+" title="Solo se permiten letras">
+                            <input type="text" name="primer_apellido" class="form-control" value="{{ usuario.primer_apellido }}" required pattern="[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+" title="Solo se permiten letras">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label for="segundo_apellido" class="col-sm-2 col-form-label">Apellido Materno</label>
                         <div class="col-sm-10">
-                            <input type="text" name="segundo_apellido" class="form-control" value="{{usuario.segundo_apellido}}" required pattern="[A-Za-z\s]+" title="Solo se permiten letras">
+                            <input type="text" name="segundo_apellido" class="form-control" value="{{usuario.segundo_apellido}}" required pattern="[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+" title="Solo se permiten letras">
                         </div>
                     </div>
 
@@ -71,14 +71,14 @@
                     <div class="row mb-3">
                         <label for="direccion_particular" class="col-sm-2 col-form-label">Direccion Particular</label>
                         <div class="col-sm-10">
-                            <input type="text" name="direccion_particular" class="form-control" value="{{ usuario.direccion_particular }}" pattern="^[A-Za-z0-9\s#.,\-]+$">
+                            <input type="text" name="direccion_particular" class="form-control" value="{{ usuario.direccion_particular }}" pattern="^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9\s#.,\-]+$">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <label for="direccion_facturacion" class="col-sm-2 col-form-label">Direccion Facturación</label>
                         <div class="col-sm-10">
-                            <input type="text" name="direccion_facturacion" class="form-control" value="{{ usuario.direccion_facturacion }}" pattern="^[A-Za-z0-9\s#.,\-]+$">
+                            <input type="text" name="direccion_facturacion" class="form-control" value="{{ usuario.direccion_facturacion }}" pattern="^[A-Za-zñÑáéíóúÁÉÍÓÚ0-9\s#.,\-]+$">
                         </div>
                     </div>
 
