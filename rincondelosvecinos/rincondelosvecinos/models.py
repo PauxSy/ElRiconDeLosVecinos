@@ -36,20 +36,25 @@ class Producto(models.Model):
     # Si deseas personalizarla, puedes hacerlo así:
     img_url = models.CharField(max_length=255)  # URL de la imagen, varchar(255)
     nombre = models.CharField(max_length=100)   # Nombre del producto, varchar(100)
+    stock = models.IntegerField()   # Stock disponible, decimal(10,0)
+    descripcion = models.CharField(max_length=1000)  # Descripción del producto, varchar(300)
     precio = models.DecimalField(max_digits=10, decimal_places=0)  # Precio del producto, decimal(10,0)
-    stock = models.DecimalField(max_digits=10, decimal_places=0)   # Stock disponible, decimal(10,0)
-    descripcion = models.CharField(max_length=300)  # Descripción del producto, varchar(300)
     iva = models.DecimalField(max_digits=10, decimal_places=0)     # IVA, decimal(10,0)
+    precio_total = models.DecimalField(max_digits=12, decimal_places=0, default=0)  # Precio total
     categoria = models.CharField(max_length=50, choices=CATEGORIAS)
-    estado = models.CharField(max_length=50, choices=ESTADOS, default='desactivado')  # Estado del producto, por defecto 'activado'
+    estado = models.CharField(max_length=50, choices=ESTADOS, default='Habilitado')  # Estado del producto, por defecto 'activado'
     admin_id = models.IntegerField()               # ID del administrador, entero
     
+    def save(self, *args, **kwargs):
+        # Calcular el precio total antes de guardar
+        self.precio_total = int(self.precio + (self.precio * self.iva / 100))
+        super().save(*args, **kwargs)
     
     class Meta:
         db_table = 'Productos'  # Este es el nombre exacto de la tabla en la base de datos
-   
+        
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - Total: {self.precio_total}"
     
     def get_promocion(self):
         # Este método devuelve la promoción activa si existe
@@ -156,5 +161,35 @@ except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
 
 
+from django.db import models
 
-    
+class Vendedor(models.Model):
+    id = models.AutoField(primary_key=True)
+    rut = models.CharField(max_length=12, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    contrasena = models.CharField(max_length=255)
+    salt = models.CharField(max_length=16)  # Campo para el salt
+    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
+    admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
+
+    class Meta:
+        db_table = 'Vendedor'
+
+    def __str__(self):
+        return f"{self.rut} - {self.email} - {'Activa' if self.estado else 'Inactiva'}"
+
+
+class Bodeguero(models.Model):
+    id = models.AutoField(primary_key=True)
+    rut = models.CharField(max_length=12, unique=True)
+    email = models.EmailField(max_length=100, unique=True)
+    contrasena = models.CharField(max_length=255)
+    salt = models.CharField(max_length=16)  # Campo para el salt
+    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
+    admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
+
+    class Meta:
+        db_table = 'Bodeguero'
+
+    def __str__(self):
+        return f"{self.rut} - {self.email} - {'Activa' if self.estado else 'Inactiva'}"

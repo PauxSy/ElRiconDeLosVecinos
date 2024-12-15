@@ -3,162 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo</title>
+    <title>Gestión de Inventario</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     {% load static %}
     <link rel="stylesheet" href="{% static 'estilos.css' %}">
+    <style>
+        .modal-content {
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script>
+        function habilitarEdicion() {
+            const campos = document.querySelectorAll('.editable');
+            campos.forEach(campo => {
+                // Solo habilitar campos que no sean IVA
+                if (campo.name.indexOf("iva_") === -1) {
+                    campo.disabled = false; // Habilita todos los campos excepto IVA
+                }
+            });
+        }
+        
+
+        function guardarCambios() {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Esta acción aplicará los cambios realizados.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, aplicar cambios',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('form-productos');
+                    form.submit(); // Enviar el formulario si el usuario confirma
+                }
+            });
+        }
+    </script>
 </head>
 <body>
- <!-- nav admin -->
+    <!-- Navbar -->
     {% include "formatos/navbaradmin.html" %}
-    {% block content %}
 
-    <!-- tabla para gestionar deshabilitar producots del catalogo -->
-     <!-- la idea es posterior a esto implmentar JS para renderizar la info 
-     y tambien hacer validaciones de momento deje esto con css y html pero 
-     se puede optimizar con JS -->
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Gestión de Inventario</h1>
+        </div>
 
-     <div class="container mt-5">
-        <h2 class="text-center">Modificar información de productos </h2>
-        <br><br>
-        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
-            <i class="fas fa-info-circle"></i> Manual de Usuario
-        </button>
-        <h5>Seleccione el producto que desea Modificar<h5>
-        <br>
-        
-    <div class="container mt-3">
-        <form class="d-flex" role="search">
-            <input class="form-control me-2 search-barCustom" type="search" placeholder="Buscar productos" aria-label="Buscar">
-            <button class="btn btn-danger" type="submit">Buscar</button>
+        <!-- Formulario de búsqueda -->
+        <div class="container mt-3">
+        <form class="d-flex" method="get">
+            <input class="form-control me-2" type="search" name="search" placeholder="Buscar productos" value="{{ query }}">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </form>
+        </div>      
+
+<!-- Botones de acción -->
+<div class="mt-4">
+    <div class="d-flex justify-content-start gap-3">
+        <button class="btn btn-success" onclick="location.href='{% url 'agregarproducto' %}'">Agregar Productos</button>
+        <button class="btn btn-warning" onclick="habilitarEdicion()">Modificar Productos</button>
+        <button class="btn btn-info" onclick="guardarCambios()">Guardar Cambios</button>
+        <button class="btn btn-secondary" onclick="location.href='{% url 'generar_informe' %}'">Generar Informe</button>
+        {% if es_bodeguero %}
+        <button class="btn btn-primary" onclick="location.href='{% url 'modificar_stock' %}'">Modificar Stock</button>
+    {% endif %}
+    </div>
+</div>
+
+        <!-- Tabla de productos -->
+        <form id="form-productos" method="post" action="{% url 'guardar_productos' %}">
+            {% csrf_token %}
+            <table class="table table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Stock</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>IVA</th>
+                        <th>Precio Total</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td><input type="text" name="id_{{ producto.id }}" value="{{ producto.id }}" class="form-control" disabled style="width: 50px;"></td>                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modalImagen{{ producto.id }}">
+                                <img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" style="width: 50px; height: 50px; border-radius: 5px;">
+                            </a>
+
+                            <!-- Modal para cambiar imagen -->
+                            <div class="modal fade" id="modalImagen{{ producto.id }}" tabindex="-1" aria-labelledby="modalLabel{{ producto.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel{{ producto.id }}">Cambiar Imagen</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <form method="post" action="{% url 'cambiar_imagen_producto' producto.id %}">
+                                            {% csrf_token %}
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label for="imagenUrl{{ producto.id }}">Nueva URL de Imagen:</label>
+                                                    <input type="url" name="img_url" id="imagenUrl{{ producto.id }}" class="form-control" placeholder="Ingrese la URL de la nueva imagen" required>
+                                                </div>
+                                                <div class="mt-3 text-center">
+                                                    <img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="img-thumbnail" style="width: 150px; height: 150px;">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><input type="text" name="nombre_{{ producto.id }}" value="{{ producto.nombre }}" class="form-control editable" disabled style="width: 150px; text-align: center;"></td>
+                        <td><input type="number" name="stock_{{ producto.id }}" value="{{ producto.stock }}" class="form-control editable" disabled style="width: 70px; text-align: center;"></td>
+                        <td><textarea name="descripcion_{{ producto.id }}" class="form-control editable" disabled style="width: 200px; resize: none;" >{{ producto.descripcion }}</textarea></td>
+                        <td><input type="number" name="precio_{{ producto.id }}" value="{{ producto.precio }}" class="form-control editable" style="width: 100px; text-align: center;" disabled oninput="calcularIVAYPrecioTotal({{ producto.id }})"></td>
+                        <td><input type="number" name="iva_{{ producto.id }}" value="{{ producto.iva }}" class="form-control editable" style="width: 100px; text-align: center;" disabled></td>
+                        <td><input type="text" name="precio_total_{{ producto.id }}" value="{{ producto.precio_total }}" class="form-control" style="width: 100px; text-align: center;"  disabled></td>
+                        <td>
+                            <select name="categoria_{{ producto.id }}" class="form-select editable" disabled>
+                                {% for key, value in producto.CATEGORIAS %}
+                                    <option value="{{ key }}" {% if key == producto.categoria %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="estado_{{ producto.id }}" class="form-select editable" disabled>
+                                {% for key, value in producto.ESTADOS %}
+                                    <option value="{{ key }}" {% if key == producto.estado %}selected{% endif %}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </form>
     </div>
 
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Imagen</th>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Stock</th>
-                <th>Precio</th>
-                <th>IVA</th>
-                <th>Categoría</th>
-                <th>Modificar</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-
-                <td><img src="{% static 'media/lecheEntera1Lt.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-1</td>
-                <td>Producto A</td>
-                <td>Descripcion A</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria A</td>
-                <td>
-                    <button class="btn btn-danger mt-3">
-                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                    </button>
-                </td>
-            </tr>
-
-            <tr>
-                <td><img src="{% static 'media/cafeTradicion170g.webp' %}"alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-2</td>
-                <td>Producto B</td>
-                <td>Descripcion B</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria B</td>
-                <td>
-                    <button class="btn btn-danger mt-3">
-                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                    </button>
-                </td>
-            </tr>
-
-            <tr>
-                <td><img src="{% static 'media/cheetos300g.webp' %}" alt="Producto A" class="img-thumbnail"></td>
-                <td>prod-3</td>
-                <td>Producto C</td>
-                <td>Descripcion C</td>
-                <td>10</td>
-                <td>100</td>
-                <td>21%</td>
-                <td>Categoria C</td>
-                <td>
-                    <button class="btn btn-danger mt-3">
-                        <a href="{% url 'actualizarproducto' %}" class="nav-link" >Modificar</a>
-                    </button>
-                </td>
-                
-            </tr>
-        </tbody>
-    </table>
-    
-    <!-- Modal del Manual -->
-    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-
-                <div class="modal-body">
-                    <h4>Bienvenido al Manual de Modificar Producto</h4>
-                    <p>Este manual le guiará a través de las funcionalidades para Modificar los datos de un producto en el inventario.</p>
-                    
-                    <h5>1. Modificar Producto</h5>
-                    <p>Para editar un producto existente, primero debe hacer clic en el botón "Modificar" al lado del producto deseado en la lista de productos. Esto lo llevará al formulario para editar el producto.</p>
-                    
-                    <h5>2. ID del Producto</h5>
-                    <p>Una vez dentro del formulario de edición, ingrese el ID del producto. Asegúrese de que el ID sea único para este producto. Si está editando un producto existente, el ID será prellenado.</p>
-            
-                    <h5>3. Imagen del Producto</h5>
-                    <p>Ingrese la URL de la imagen del producto. Puede cambiarla si está editando el producto. Asegúrese de que la URL sea válida.</p>
-            
-                    <h5>4. Nombre del Producto</h5>
-                    <p>Si desea modificar el nombre, haga clic sobre el campo correspondiente y edite el nombre del producto. Recuerde que solo puede contener letras.</p>
-            
-                    <h5>5. Descripción del Producto</h5>
-                    <p>Modifique la descripción del producto, si es necesario. Esta descripción solo puede contener letras y números.</p>
-            
-                    <h5>6. Stock del Producto</h5>
-                    <p>Asegúrese de modificar el stock si es necesario. El stock debe ser un número positivo.</p>
-            
-                    <h5>7. Precio del Producto</h5>
-                    <p>Puede cambiar el precio del producto según sea necesario. El precio debe ser un número positivo.</p>
-            
-                    <h5>8. IVA del Producto (%)</h5>
-                    <p>Si se requiere, puede modificar el porcentaje de IVA del producto. Asegúrese de que el porcentaje sea válido (entre 0 y 100).</p>
-            
-                    <h5>9. Categoría del Producto</h5>
-                    <p>Si es necesario cambiar la categoría del producto, modifique este campo. La categoría solo puede contener letras.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Footer -->
-    {% endblock %}
-    {% include "formatos/footeradmin.html"%}
-
-    <!-- Scripts -->
-     <!-- Bootstrap JS (incluye Popper.js para el funcionamiento del modal) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    {% include "formatos/footeradmin.html" %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function calcularIVAYPrecioTotal(productId) {
+            // Obtener los elementos correspondientes
+            const precioInput = document.querySelector(`input[name="precio_${productId}"]`);
+            const ivaInput = document.querySelector(`input[name="iva_${productId}"]`);
+            const precioTotalInput = document.querySelector(`input[name="precio_total_${productId}"]`);
+        
+            // Verificar si los inputs existen
+            if (!precioInput || !ivaInput || !precioTotalInput) {
+                console.error(`No se encontraron todos los elementos para el producto ID ${productId}`);
+                return;
+            }
+        
+            // Asegurarse de que el valor de precio sea numérico
+            const precio = parseFloat(precioInput.value) || 0;
+        
+            // Calcular el IVA y el precio total
+            const iva = (precio * 0.19); // IVA como el 19% del precio
+            const precioTotal = precio + iva;
+        
+            // Actualizar los campos en el frontend
+            ivaInput.value = iva.toFixed(2); // Mostrar IVA con 2 decimales
+            precioTotalInput.value = precioTotal.toFixed(2); // Mostrar precio total con 2 decimales
+        }
+        
+    </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Recalcular el IVA y el Precio Total para todos los productos
+    document.querySelectorAll('input[name^="precio_"]').forEach(precioInput => {
+        const productId = precioInput.name.split('_')[1];
+        calcularIVAYPrecioTotal(productId);
+    });
+
+    // Mostrar mensajes de SweetAlert si hay mensajes de Django
+    {% if messages %}
+        {% for message in messages %}
+            Swal.fire({
+                icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}",
+                title: "{{ message|escapejs }}",
+                showConfirmButton: true,
+                timer: 3000
+            });
+        {% endfor %}
+    {% endif %}
+});
+    </script>
 </body>
 </html>

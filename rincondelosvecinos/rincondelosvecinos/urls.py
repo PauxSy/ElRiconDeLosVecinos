@@ -29,7 +29,7 @@ urlpatterns = [
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),
     path('agregarproducto/', views.vista_agregarproductoadmin, name='agregarproducto'),
     path('inventario/', views.vista_inventario, name='inventario'),
-    path('actualizarproducto/', views.vista_actualizarproducto, name='actualizarproducto'),
+    #path('actualizarproducto/', views.vista_actualizarproducto, name='actualizarproducto'),
     path('deshabilitarproducto/', views.vista_deshabilitarproducto, name='deshabilitarproducto'),
     path('actualizarstock/', views.vista_actualizarstock, name='actualizarstock'),
     path('panelpromociones/', views.vista_panelpromociones, name='panelpromociones'),
@@ -37,6 +37,11 @@ urlpatterns = [
     path('dashboard/', views.vista_dashboard, name='dashboard'),
 
     path('perfiladmin/', views.vista_perfiladmin, name='perfiladmin'),
+    
+    path('guardar_productos/', views.guardar_productos, name='guardar_productos'),
+    path('cambiar-imagen/<int:id>/', views.cambiar_imagen_producto, name='cambiar_imagen_producto'),
+    path('generar_informe/', views.generar_informe_inventario, name='generar_informe'),
+
 
     # ---------------vendedor----------------
     path('ver_buscar_vendedor/', views.vista_ver_buscar_vendedor, name='ver_buscar_vendedor'),

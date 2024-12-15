@@ -1,12 +1,13 @@
 from decimal import Decimal
+from functools import wraps
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
-from .models import Producto , Usuario,Administrador
+from .models import Bodeguero, Producto , Usuario,Administrador, Vendedor
 from django.core.mail import send_mail
-from django.http import JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
@@ -20,14 +21,163 @@ from .forms import ProductoForm, UsuarioForm
 from django.views.decorators.http import require_POST
 from django.utils.html import strip_tags
 
-
-
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Producto
 from .forms import ProductoForm  # Asegúrate de tener un ModelForm para el modelo Producto
+import openpyxl
 
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # Verificar si la sesión identifica al usuario como administrador
+        if request.session.get('admin_autenticado', False) and request.session.get('is_admin', False):
+            return view_func(request, *args, **kwargs)
+        else:
+            # Agregar un mensaje de error y redirigir
+            messages.error(request, "No tienes permiso para acceder a esta página.")
+            return redirect('vista_inicio')  # Cambia 'vista_inicio' a la vista adecuada
+    return _wrapped_view
+
+def role_required(allowed_roles):
+    """
+    Decorador para verificar si el usuario pertenece a uno de los roles permitidos.
+    """
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            # Obtener roles del usuario desde la sesión
+            is_admin = request.session.get('is_admin', False)
+            is_bodeguero = request.session.get('is_bodeguero', False)
+            is_vendedor = request.session.get('is_vendedor', False)
+            
+            # Verificar si el usuario tiene al menos uno de los roles permitidos
+            if ('admin' in allowed_roles and is_admin) or \
+               ('bodeguero' in allowed_roles and is_bodeguero) or \
+               ('vendedor' in allowed_roles and is_vendedor):
+                return view_func(request, *args, **kwargs)
+            
+            # Si no tiene permisos, redirigir y mostrar mensaje
+            messages.error(request, "No tienes permisos para acceder a esta sección.")
+            return redirect('login')  # Cambiar por la vista adecuada para redirigir
+            
+        return _wrapped_view
+    return decorator
+
+
+@admin_required
+def generar_informe_inventario(request):
+    # Crear un libro de trabajo y una hoja
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Inventario"
+
+    # Agregar un título con la fecha actual
+    fecha_actual = datetime.now().strftime("%d-%m-%Y")
+    titulo = f"Informe Inventario - {fecha_actual}"
+    sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=10)
+    sheet.cell(row=1, column=1).value = titulo
+    sheet.cell(row=1, column=1).font = openpyxl.styles.Font(size=14, bold=True)
+    sheet.cell(row=1, column=1).alignment = openpyxl.styles.Alignment(horizontal="center")
+
+    # Agregar encabezados en la fila 3
+    headers = ['ID', 'Nombre', 'Descripción', 'Stock', 'Precio', 'IVA', 'Precio Total', 'Categoría', 'Estado', 'Imagen URL']
+    for col_num, header in enumerate(headers, 1):
+        sheet.cell(row=3, column=col_num, value=header)
+        sheet.cell(row=3, column=col_num).font = openpyxl.styles.Font(bold=True)
+
+    # Agregar datos a partir de la fila 4
+    productos = Producto.objects.all()
+    for row_num, producto in enumerate(productos, start=4):
+        sheet.cell(row=row_num, column=1, value=producto.id)
+        sheet.cell(row=row_num, column=2, value=producto.nombre)
+        sheet.cell(row=row_num, column=3, value=producto.descripcion)
+        sheet.cell(row=row_num, column=4, value=producto.stock)
+        sheet.cell(row=row_num, column=5, value=producto.precio)
+        sheet.cell(row=row_num, column=6, value=producto.iva)
+        sheet.cell(row=row_num, column=7, value=producto.precio_total)
+        sheet.cell(row=row_num, column=8, value=producto.categoria)
+        sheet.cell(row=row_num, column=9, value=producto.estado)
+        sheet.cell(row=row_num, column=10, value=producto.img_url)
+
+    # Configurar el nombre del archivo con la fecha actual
+    nombre_archivo = f"Informe_Inventario_{fecha_actual}.xlsx"
+
+    # Configurar la respuesta HTTP
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+
+    # Guardar el archivo en la respuesta
+    workbook.save(response)
+    return response
+
+@admin_required
+def cambiar_imagen_producto(request, id):
+    if request.method == 'POST':
+        producto = get_object_or_404(Producto, id=id)
+        nueva_url = request.POST.get('img_url')
+
+        if nueva_url:
+            producto.img_url = nueva_url
+            producto.save()
+            messages.success(request, "La imagen del producto ha sido actualizada correctamente.")
+        else:
+            messages.error(request, "No se pudo actualizar la imagen. Por favor, ingresa una URL válida.")
+
+    return redirect('inventario')
+
+def guardar_productos(request):
+    if request.method == 'POST':
+        errores = []
+        for producto in Producto.objects.all():
+            try:
+                # Extraer datos específicos del producto por su ID
+                img_url = request.POST.get(f'img_url_{producto.id}', producto.img_url)
+                nombre = request.POST.get(f'nombre_{producto.id}', producto.nombre)
+                descripcion = request.POST.get(f'descripcion_{producto.id}', producto.descripcion)
+                stock = int(request.POST.get(f'stock_{producto.id}', producto.stock) or 0)
+                precio = float(request.POST.get(f'precio_{producto.id}', producto.precio) or 0)
+                iva = precio * 0.19  # Calcular el IVA (19%)
+                precio_total = precio + iva  # Calcular el precio total
+                categoria = request.POST.get(f'categoria_{producto.id}', producto.categoria)
+                estado = request.POST.get(f'estado_{producto.id}', producto.estado)
+
+                # Actualizar el producto
+                producto.img_url = img_url
+                producto.nombre = nombre
+                producto.descripcion = descripcion
+                producto.stock = stock
+                producto.precio = precio
+                producto.iva = round(iva, 2)  # Redondear a 2 decimales
+                producto.precio_total = round(precio_total, 2)  # Redondear a 2 decimales
+                producto.categoria = categoria
+                producto.estado = estado
+
+                # Guardar en la base de datos
+                producto.save()
+
+            except Exception as e:
+                errores.append(f"Error en producto ID {producto.id}: {str(e)}")
+
+        if errores:
+            messages.error(request, f"Errores detectados: {', '.join(errores)}")
+        else:
+            messages.success(request, "Productos actualizados correctamente.")
+
+    return redirect('inventario')
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # Verificar si el usuario está autenticado y es administrador
+        if request.user.is_authenticated and getattr(request.user, 'is_admin', False):
+            return view_func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
+    return _wrapped_view
+
+@admin_required
 def vista_agregarproductoadmin(request):
     if not request.session.get('admin_autenticado'):  # Verifica si está autenticado
         messages.error(request, 'No tienes permisos para acceder a esta sección.')
@@ -46,7 +196,7 @@ def vista_agregarproductoadmin(request):
             producto.admin_id = admin_id
             producto.save()
             messages.success(request, 'Producto agregado exitosamente.')  # Mensaje para SweetAlert
-            return render(request, 'agregarProductoAdmin.html')
+            return render(request, 'verinventario.html')
         else:
             messages.error(request, 'Por favor, corrige los errores del formulario.')
     else:
@@ -55,17 +205,18 @@ def vista_agregarproductoadmin(request):
     categorias = Producto.CATEGORIAS
     return render(request, 'agregarProductoAdmin.html', {'form': form, 'categorias': categorias})
 
-import json
-        
+
 
 def vista_iniciouser(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
 
-        # Buscar en Usuarios y Administradores
+        # Buscar en Usuarios, Administradores, Vendedores y Bodegueros
         usuario = Usuario.objects.filter(email=email).first()
         admin = Administrador.objects.filter(email=email).first()
+        vendedor = Vendedor.objects.filter(email=email).first()
+        bodeguero = Bodeguero.objects.filter(email=email).first()
 
         if usuario:
             # Verificar si la cuenta está bloqueada
@@ -123,7 +274,7 @@ def vista_iniciouser(request):
                 request.session['email'] = usuario.email
 
                 messages.success(request, "Inicio de sesión exitoso")
-                return redirect('catalogo')  # Redirige a la vista del dashboard
+                return redirect('catalogo')  # Redirige al catálogo o panel del usuario
             else:
                 # Incrementar intentos fallidos y bloquear si es necesario
                 usuario.intentos_fallidos += 1
@@ -142,11 +293,40 @@ def vista_iniciouser(request):
                 request.session['is_admin'] = True
                 request.session['admin_id'] = admin.id
 
-
                 messages.success(request, "Inicio de sesión exitoso como administrador")
-                return render(request, 'dashboard.html')
+                return redirect('dashboard')  # Redirige al panel del administrador
             else:
                 messages.error(request, "Contraseña incorrecta para administrador")
+                return render(request, 'inicioSesionUser.html')
+
+        elif vendedor:
+            # Verificar la contraseña para el vendedor
+            if vendedor.contrasena == encriptar_con_salt(password, vendedor.salt):
+                # Configurar la sesión
+                request.session['vendedor_autenticado'] = True
+                request.session['email'] = vendedor.email
+                request.session['is_vendedor'] = True
+                request.session['vendedor_id'] = vendedor.id
+
+                messages.success(request, "Inicio de sesión exitoso como vendedor")
+                return redirect('panelvendedor')  # Redirige al panel del vendedor
+            else:
+                messages.error(request, "Contraseña incorrecta para vendedor")
+                return render(request, 'inicioSesionUser.html')
+
+        elif bodeguero:
+            # Verificar la contraseña para el bodeguero
+            if bodeguero.contrasena == encriptar_con_salt(password, bodeguero.salt):
+                # Configurar la sesión
+                request.session['bodeguero_autenticado'] = True
+                request.session['email'] = bodeguero.email
+                request.session['is_bodeguero'] = True
+                request.session['bodeguero_id'] = bodeguero.id
+
+                messages.success(request, "Inicio de sesión exitoso como bodeguero")
+                return redirect('panelbodeguero')  # Redirige al panel del bodeguero
+            else:
+                messages.error(request, "Contraseña incorrecta para bodeguero")
                 return render(request, 'inicioSesionUser.html')
 
         else:
@@ -489,19 +669,25 @@ def obtener_carrito(request):
 #--------FUNCIONALIDADES CARRITO----------------
 
 def vista_catalogo(request):
+
+    usuario_autenticado = request.session.get('email') is not None  # Verificar si el usuario está autenticado
+
     query = request.GET.get('search', '')  # Obtener el parámetro 'search' desde la URL
     if query:
         productos = Producto.objects.filter(nombre__icontains=query, estado='habilitado')  # Filtrar por nombre y estado habilitado
-    else:
-        productos = Producto.objects.filter(estado='habilitado')  # Si no hay búsqueda, mostrar solo productos habilitados
-        
-    usuario_autenticado = request.session.get('email') is not None  # Verificar si el usuario está autenticado
-
-    return render(request, 'catalogo.html', {
-        'productos': productos,
+        return render(request, 'catalogo.html', {
+        'productos': productos, 
         'query': query,
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
+    else:
+        productos = Producto.objects.filter(estado='habilitado')  # Si no hay búsqueda, mostrar solo productos habilitados
+        return render(request, 'catalogo.html', {
+        'productos': productos, 
+        'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
+    })
+                
+
 
 def vista_detalleproducto(request, id):
     # Obtén el producto con el id proporcionado en la URL
@@ -591,11 +777,31 @@ def validar_rut(rut):
 def vista_reporteadmin(request):
     return render(request,'generarReportesAdmin.html')
 
+@role_required(['admin', 'bodeguero', 'vendedor'])
 def vista_inventario(request):
-    return render(request,'verinventario.html')
+    """
+    Vista para listar productos en el inventario con soporte para búsqueda.
+    """
 
-def vista_actualizarproducto(request):
-    return render(request,'actualizarProductoAdmin.html')
+    # Mostrar todos los productos
+    productos = Producto.objects.all()
+    print(productos)
+    
+    query = request.GET.get('search', '')  # Capturar término de búsqueda
+    if query:
+        # Filtrar productos por nombre o descripción
+        productos = Producto.objects.filter(
+            Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+        )
+    else:
+        # Mostrar todos los productos
+        productos = Producto.objects.all()
+        print(productos)
+
+    return render(request, 'verinventario.html', {
+        'productos': productos,
+        'query': query,
+    })
 
 from django.db.models import Q
 
@@ -676,11 +882,11 @@ def vista_panelpromociones(request):
 def vista_registroEmpleado(request):
     return render(request,'RegistroVendedor_Bodeguero.html')
 
-
+@admin_required
 def vista_dashboard(request):
     return render(request,'dashboard.html')
 
-
+@admin_required
 def vista_perfiladmin(request):
     return render(request,'perfiladmin.html')
 
