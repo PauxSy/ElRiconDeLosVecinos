@@ -299,7 +299,42 @@ def vista_iniciouser(request):
                 messages.error(request, "Contraseña incorrecta para administrador")
                 return render(request, 'inicioSesionUser.html')
 
+        # elif vendedor:
+        #     # Verificar la contraseña para el vendedor
+        #     if vendedor.contrasena == encriptar_con_salt(password, vendedor.salt):
+        #         # Configurar la sesión
+        #         request.session['vendedor_autenticado'] = True
+        #         request.session['email'] = vendedor.email
+        #         request.session['is_vendedor'] = True
+        #         request.session['vendedor_id'] = vendedor.id
+
+        #         messages.success(request, "Inicio de sesión exitoso como vendedor")
+        #         return redirect('panelvendedor')  # Redirige al panel del vendedor
+        #     else:
+        #         messages.error(request, "Contraseña incorrecta para vendedor")
+        #         return render(request, 'inicioSesionUser.html')
+
+        # elif bodeguero:
+        #     # Verificar la contraseña para el bodeguero
+        #     if bodeguero.contrasena == encriptar_con_salt(password, bodeguero.salt):
+        #         # Configurar la sesión
+        #         request.session['bodeguero_autenticado'] = True
+        #         request.session['email'] = bodeguero.email
+        #         request.session['is_bodeguero'] = True
+        #         request.session['bodeguero_id'] = bodeguero.id
+
+        #         messages.success(request, "Inicio de sesión exitoso como bodeguero")
+        #         return redirect('panelbodeguero')  # Redirige al panel del bodeguero
+        #     else:
+        #         messages.error(request, "Contraseña incorrecta para bodeguero")
+        #         return render(request, 'inicioSesionUser.html')
+
         elif vendedor:
+            # Verificar si el vendedor está activo
+            if not vendedor.estado:
+                messages.error(request, "El vendedor está inactivo. Contacte al administrador.")
+                return render(request, 'inicioSesionUser.html')
+
             # Verificar la contraseña para el vendedor
             if vendedor.contrasena == encriptar_con_salt(password, vendedor.salt):
                 # Configurar la sesión
@@ -315,6 +350,11 @@ def vista_iniciouser(request):
                 return render(request, 'inicioSesionUser.html')
 
         elif bodeguero:
+            # Verificar si el bodeguero está activo
+            if not bodeguero.estado:
+                messages.error(request, "El bodeguero está inactivo. Contacte al administrador.")
+                return render(request, 'inicioSesionUser.html')
+
             # Verificar la contraseña para el bodeguero
             if bodeguero.contrasena == encriptar_con_salt(password, bodeguero.salt):
                 # Configurar la sesión
@@ -1212,6 +1252,7 @@ def vista_registroEmpleado(request):
                     email=email,
                     contrasena=contrasena_encriptada,
                     salt=salt,
+                    estado=True,
                     admin_id=administrador,  # Asignar la instancia de Administrador
                 )
                 vendedor.save()
@@ -1222,8 +1263,9 @@ def vista_registroEmpleado(request):
                     email=email,
                     contrasena=contrasena_encriptada,
                     salt=salt,
+                    estado=True,
                     admin_id=administrador,  # Asignar la instancia de Administrador
-                    is_active =False
+                    
                 )
                 bodeguero.save()
 
@@ -1238,5 +1280,130 @@ def vista_registroEmpleado(request):
             return redirect('registroEmpleado')
 
     return render(request, 'RegistroVendedor_Bodeguero.html')
+
+
+
+
+
+
+
+# from itertools import chain
+# from django.shortcuts import render, redirect
+# from django.db.models import Q
+# from .models import Vendedor, Bodeguero
+
+# def vista_deshabilitar_personal(request):
+#     if request.method == 'POST':
+#         # Recuperar los vendedores/bodegueros seleccionados y sus nuevos estados
+#         persona_ids = request.POST.getlist('persona_ids')  # Lista de IDs de los vendedores/bodegueros seleccionados
+#         nuevos_estados = request.POST  # Los nuevos estados para cada persona
+
+#         for persona_id in persona_ids:
+#             try:
+#                 persona = Vendedor.objects.get(id=persona_id)
+#             except Vendedor.DoesNotExist:
+#                 persona = Bodeguero.objects.get(id=persona_id)
+            
+#             nuevo_estado = nuevos_estados.get(f'estado_persona_{persona_id}')
+#             if nuevo_estado:
+#                 persona.estado = nuevo_estado == "activo"  # Cambiar estado a True/False según el valor
+#                 persona.save()
+
+#         return redirect('deshabilitarpersonal')  # Redirigir para evitar reenvíos del formulario
+    
+
+#     # Realizar la búsqueda si existe
+#     query = request.GET.get('search', '')  # Recuperar búsqueda si existe
+#     if query:
+#         # Mapeo de cadenas "activo"/"inactivo" a valores booleanos
+#         estado_mapeo = {
+#             "activo": True,
+#             "inactivo": False
+#         }
+
+#         # Consultas para vendedores y bodegueros
+#         vendedores = Vendedor.objects.filter(
+#             Q(rut__icontains=query) |
+#             Q(email__icontains=query) |
+#             Q(estado=estado_mapeo.get(query.lower(), None))  # Buscar estado como True/False
+#         )
+#         bodegueros = Bodeguero.objects.filter(
+#             Q(rut__icontains=query) |
+#             Q(email__icontains=query) |
+#             Q(estado=estado_mapeo.get(query.lower(), None))  # Buscar estado como True/False
+#         )
+#         personas = list(chain(vendedores, bodegueros))  # Combinar vendedores y bodegueros
+#     else:
+#         vendedores = Vendedor.objects.all()
+#         bodegueros = Bodeguero.objects.all()
+#         personas = list(chain(vendedores, bodegueros))  # Combinar vendedores y bodegueros
+
+#     return render(request, 'deshabilitarempleado.html', {
+#         'personas': personas
+#     })
+    
+from itertools import chain
+from django.shortcuts import render, redirect
+from django.db.models import Q
+from .models import Vendedor, Bodeguero
+
+def vista_deshabilitar_personal(request):
+    if request.method == 'POST':
+        # Recuperar los vendedores/bodegueros seleccionados y sus nuevos estados
+        persona_ids = request.POST.getlist('persona_ids')
+        nuevos_estados = request.POST
+
+        for persona_id in persona_ids:
+            try:
+                persona = Vendedor.objects.get(id=persona_id)
+            except Vendedor.DoesNotExist:
+                persona = Bodeguero.objects.get(id=persona_id)
+            
+            nuevo_estado = nuevos_estados.get(f'estado_persona_{persona_id}')
+            if nuevo_estado:
+                persona.estado = nuevo_estado == "activo"
+                persona.save()
+
+        return redirect('deshabilitarpersonal')
+    
+    # Realizar la búsqueda si existe
+    query = request.GET.get('search', '').strip().lower()
+    personas = []
+
+    if query:
+        # Mapeo de cadenas "activo"/"inactivo" a valores booleanos
+        estado_mapeo = {
+            "activo": True,
+            "inactivo": False
+        }
+
+        if query in ["vendedor", "bodeguero"]:  # Búsqueda por cargo
+            if query == "vendedor":
+                personas = Vendedor.objects.all()
+            elif query == "bodeguero":
+                personas = Bodeguero.objects.all()
+        else:
+            # Búsqueda genérica
+            vendedores = Vendedor.objects.filter(
+                Q(rut__icontains=query) |
+                Q(email__icontains=query) |
+                Q(estado=estado_mapeo.get(query, None))
+            )
+            bodegueros = Bodeguero.objects.filter(
+                Q(rut__icontains=query) |
+                Q(email__icontains=query) |
+                Q(estado=estado_mapeo.get(query, None))
+            )
+            personas = list(chain(vendedores, bodegueros))
+    else:
+        # Si no hay búsqueda, devolver todos
+        vendedores = Vendedor.objects.all()
+        bodegueros = Bodeguero.objects.all()
+        personas = list(chain(vendedores, bodegueros))
+
+    return render(request, 'deshabilitarempleado.html', {
+        'personas': personas
+    })
+
 
 

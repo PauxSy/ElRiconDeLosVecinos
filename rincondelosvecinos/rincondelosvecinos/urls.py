@@ -34,14 +34,14 @@ urlpatterns = [
     path('actualizarstock/', views.vista_actualizarstock, name='actualizarstock'),
     path('panelpromociones/', views.vista_panelpromociones, name='panelpromociones'),
     path('registroEmpleado/', views.vista_registroEmpleado, name='registroEmpleado'),
-    path('dashboard/', views.vista_dashboard, name='dashboard'),
-
-    path('perfiladmin/', views.vista_perfiladmin, name='perfiladmin'),
+    path('deshabilitarpersonal/', views.vista_deshabilitar_personal, name='deshabilitarpersonal'),
     
+    path('dashboard/', views.vista_dashboard, name='dashboard'),
     path('guardar_productos/', views.guardar_productos, name='guardar_productos'),
     path('cambiar-imagen/<int:id>/', views.cambiar_imagen_producto, name='cambiar_imagen_producto'),
     path('generar_informe/', views.generar_informe_inventario, name='generar_informe'),
 
+    path('perfiladmin/', views.vista_perfiladmin, name='perfiladmin'),
 
     # ---------------vendedor----------------
     path('ver_buscar_vendedor/', views.vista_ver_buscar_vendedor, name='ver_buscar_vendedor'),

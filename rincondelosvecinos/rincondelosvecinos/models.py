@@ -156,6 +156,7 @@ class Vendedor(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     contrasena = models.CharField(max_length=255)
     salt = models.CharField(max_length=16)  # Campo para el salt
+    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
     admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
 
     class Meta:
@@ -163,6 +164,9 @@ class Vendedor(models.Model):
 
     def __str__(self):
         return f"{self.rut} - {self.email} - {'Activa' if self.estado else 'Inactiva'}"
+    
+    def get_cargo(self):
+        return "Vendedor"  # Esta función retorna el cargo como Vendedor
 
 
 class Bodeguero(models.Model):
@@ -171,6 +175,7 @@ class Bodeguero(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     contrasena = models.CharField(max_length=255)
     salt = models.CharField(max_length=16)  # Campo para el salt
+    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
     admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
 
     class Meta:
@@ -178,4 +183,7 @@ class Bodeguero(models.Model):
 
     def __str__(self):
         return f"{self.rut} - {self.email} - {'Activa' if self.estado else 'Inactiva'}"
+    
+    def get_cargo(self):
+        return "Bodeguero"  # Esta función retorna el cargo como Bodeguero
     
