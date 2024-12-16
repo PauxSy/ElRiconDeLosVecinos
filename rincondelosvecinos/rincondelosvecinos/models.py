@@ -2,8 +2,7 @@ from django.db import models
 from datetime import datetime, timedelta
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
-
-   
+ 
 class Producto(models.Model):
     
     CATEGORIAS = [
@@ -31,7 +30,6 @@ class Producto(models.Model):
         ('deshabilitado', 'Deshabilitado'),
     ]
         
-
     # El campo 'id' es la clave primaria (PK) y Django la crea automáticamente, así que no es necesario declararla explícitamente
     # Si deseas personalizarla, puedes hacerlo así:
     img_url = models.CharField(max_length=255)  # URL de la imagen, varchar(255)
@@ -60,9 +58,6 @@ class Producto(models.Model):
         # Este método devuelve la promoción activa si existe
         return self.promocion_set.filter(estado='activa').first()  # Asegúrate de que el estado de la promoción sea "activa"
     
-   
-
-
 class Promocion(models.Model):
     descuento = models.DecimalField(max_digits=10, decimal_places=0)
     preciodescuento = models.DecimalField(max_digits=10, decimal_places=0)
@@ -75,7 +70,6 @@ class Promocion(models.Model):
     def __str__(self):
         return f"Promoción de {self.producto.nombre}"
     
-
 class Usuario(models.Model):
     rut = models.CharField(max_length=12, unique=True)
     nombre = models.CharField(max_length=50)
@@ -97,14 +91,12 @@ class Usuario(models.Model):
     USERNAME_FIELD = 'email'  # Define que el email será el identificador único
     REQUIRED_FIELDS = ['rut', 'contrasena']  
 
-
     class Meta:
         db_table = 'Usuarios'
     
     def __str__(self):
         return f"{self.nombre} {self.primer_apellido}"
     
-
     # Métodos requeridos por Django
     @property
     def is_anonymous(self):
@@ -128,7 +120,6 @@ class Usuario(models.Model):
             return True
         return False
 
-
     def reiniciar_intentos(self):
         """Reiniciar los intentos fallidos y desbloquear al usuario."""
         self.intentos_fallidos = 0
@@ -148,9 +139,6 @@ class Administrador(models.Model):
     def __str__(self):
         return f"{self.rut} - {self.email}"
     
-  
-
-
 # prueba conexión a BD
 from django.db import connection
 
@@ -160,7 +148,6 @@ try:
 except Exception as e:
     print(f"Error al conectar a la base de datos: {e}")
 
-
 from django.db import models
 
 class Vendedor(models.Model):
@@ -169,7 +156,6 @@ class Vendedor(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     contrasena = models.CharField(max_length=255)
     salt = models.CharField(max_length=16)  # Campo para el salt
-    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
     admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
 
     class Meta:
@@ -185,7 +171,6 @@ class Bodeguero(models.Model):
     email = models.EmailField(max_length=100, unique=True)
     contrasena = models.CharField(max_length=255)
     salt = models.CharField(max_length=16)  # Campo para el salt
-    estado = models.BooleanField(default=True)  # True = Activa, False = Inactiva
     admin_id = models.ForeignKey('Administrador', on_delete=models.CASCADE, db_column='admin_id')  # Relación con Administrador
 
     class Meta:
@@ -193,3 +178,4 @@ class Bodeguero(models.Model):
 
     def __str__(self):
         return f"{self.rut} - {self.email} - {'Activa' if self.estado else 'Inactiva'}"
+    

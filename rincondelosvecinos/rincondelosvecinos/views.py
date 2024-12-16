@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONEC
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
-from .models import Bodeguero, Producto , Usuario,Administrador, Vendedor
+from .models import Bodeguero, Producto , Usuario,Administrador, Vendedor 
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
@@ -24,7 +24,7 @@ from django.utils.html import strip_tags
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Producto
+from .models import Producto 
 from .forms import ProductoForm  # Asegúrate de tener un ModelForm para el modelo Producto
 import openpyxl
 
@@ -177,7 +177,7 @@ def admin_required(view_func):
             return HttpResponseForbidden("No tienes permiso para acceder a esta página.")
     return _wrapped_view
 
-@admin_required
+# @admin_required
 def vista_agregarproductoadmin(request):
     if not request.session.get('admin_autenticado'):  # Verifica si está autenticado
         messages.error(request, 'No tienes permisos para acceder a esta sección.')
@@ -336,6 +336,9 @@ def vista_iniciouser(request):
     return render(request, 'inicioSesionUser.html')
 
 
+
+
+
 def tu_vista_admin(request):
     admin_menu_items = [
         {"label": "Ver Perfil", "url_name": "perfiluser"},
@@ -357,7 +360,6 @@ def has_module_perms(self, app_label):
 def is_staff(self):
         """Definir si el usuario es parte del staff."""
         return False
-
 
 
 
@@ -390,7 +392,7 @@ def vista_recuperarcontrasena(request):
         else:
             user_type = "admin"
             user_id = administrador.id
-            nombre_usuario = administrador.nombre
+            nombre_usuario = administrador.email 
 
         reset_link = request.build_absolute_uri(
             reverse("reset_password", args=[f"{user_type}_{user_id}"])
@@ -879,10 +881,15 @@ def vista_panelpromociones(request):
         
     return render(request,'crearPromocionAdmin.html',{'productos': productos})
 
-def vista_registroEmpleado(request):
-    return render(request,'RegistroVendedor_Bodeguero.html')
 
-@admin_required
+
+
+
+
+
+
+
+# @admin_required
 def vista_dashboard(request):
     return render(request,'dashboard.html')
 
@@ -948,17 +955,6 @@ def finalizar_compra(request):
 
 
 #-------------- Registrar Usuario ---------------------#
-
-# Generar un salt aleatorio
-def generar_salt():
-    return os.urandom(8).hex()
-
-
-# Encriptar la contraseña usando el salt
-def encriptar_con_salt(password, salt):
-    password_bytes = (password + salt).encode('utf-8')
-    return hashlib.sha256(password_bytes).hexdigest()
-
 def crear_administrador():
     print("=== Crear Administrador ===")
     
@@ -982,10 +978,115 @@ def crear_administrador():
     print(f"Administrador creado exitosamente:\nRUT: {rut}\nEmail: {email}")
     print(f"Salt generado: {salt} (se guarda automáticamente en la base de datos)")
 
+
+
+
+from .models import Bodeguero, Producto , Usuario,Administrador, Vendedor 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.contrib.auth.tokens import default_token_generator
+from .models import Vendedor, Bodeguero, Administrador  # Ajusta según tus modelos
+
+
+
+
+
+# Generar un salt aleatorio
+def generar_salt():
+    return os.urandom(8).hex()
+
+
+# Encriptar la contraseña usando el salt
+def encriptar_con_salt(password, salt):
+    password_bytes = (password + salt).encode('utf-8')
+    return hashlib.sha256(password_bytes).hexdigest()
+
+
+# def validar_campo_unico(request):
+
+
+#     campo = request.GET.get("campo")
+#     valor = request.GET.get("valor")
+
+#     # Verificación para cada campo único
+#     if campo == "rut" and Usuario.objects.filter(rut=valor).exists():
+#         return JsonResponse({"existe": True, "mensaje": "Este RUT ya está registrado."})
+    
+#     elif campo == "email" and Usuario.objects.filter(email=valor).exists():
+#         return JsonResponse({"existe": True, "mensaje": "Este correo electrónico ya está registrado."})
+    
+
+
+#     elif campo == "telefono" and Usuario.objects.filter(telefono=valor).exists():
+#         return JsonResponse({"existe": True, "mensaje": "Este número de teléfono ya está registrado."})
+
+#     return JsonResponse({"existe": False})
+
+
+
+
+def validar_campo_unico(request):
+    # Obtener el campo y el valor enviados en la solicitud
+    campo = request.GET.get("campo")
+    valor = request.GET.get("valor")
+
+    # Validación del campo "rut" en las cuatro tablas
+    if campo == "rut":
+        if (Vendedor.objects.filter(rut=valor).exists() or 
+            Bodeguero.objects.filter(rut=valor).exists() or 
+            Usuario.objects.filter(rut=valor).exists() or 
+            Administrador.objects.filter(rut=valor).exists()):
+            return JsonResponse({"existe": True, "mensaje": "Este RUT ya está registrado."})
+
+    # Validación del campo "email" en las cuatro tablas
+    elif campo == "email":
+        if (Vendedor.objects.filter(email=valor).exists() or 
+            Bodeguero.objects.filter(email=valor).exists() or 
+            Usuario.objects.filter(email=valor).exists() or 
+            Administrador.objects.filter(email=valor).exists()):
+            return JsonResponse({"existe": True, "mensaje": "Este correo electrónico ya está registrado."})
+
+    # Validación del campo "telefono" solo en la tabla Usuario (manteniendo tu lógica original)
+    elif campo == "telefono" and Usuario.objects.filter(telefono=valor).exists():
+        return JsonResponse({"existe": True, "mensaje": "Este número de teléfono ya está registrado."})
+
+    # Si el valor no existe en ninguna tabla, retornar que no existe
+    return JsonResponse({"existe": False})
+
+
+
+
+
+
+
+
+def activar_cuenta(request, uidb64, token):
+
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        usuario = Usuario.objects.get(id=uid)
+    except (Usuario.DoesNotExist, ValueError, TypeError):
+        usuario = None
+
+    if usuario and default_token_generator.check_token(usuario, token):
+        usuario.is_active = True
+        usuario.save()
+        messages.success(request, "¡Tu cuenta ha sido activada con éxito! Ahora puedes iniciar sesión.")
+        return render(request, 'inicioSesionUser.html')
+    else:
+        messages.error(request, "El enlace de activación no es válido o ha expirado.")
+
+
 def registrar_usuario(request):
     if request.method == "POST":
         form = UsuarioForm(request.POST)
         if form.is_valid():
+            
             usuario = form.save(commit=False)
 
             # Generar un salt único
@@ -1035,32 +1136,107 @@ def registrar_usuario(request):
     return render(request, "registroUser.html", {"form": form})
 
 
-def activar_cuenta(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        usuario = Usuario.objects.get(id=uid)
-    except (Usuario.DoesNotExist, ValueError, TypeError):
-        usuario = None
 
-    if usuario and default_token_generator.check_token(usuario, token):
-        usuario.is_active = True
-        usuario.save()
-        messages.success(request, "¡Tu cuenta ha sido activada con éxito! Ahora puedes iniciar sesión.")
-        return render(request, 'inicioSesionUser.html')
-    else:
-        messages.error(request, "El enlace de activación no es válido o ha expirado.")
-        return render(request, "activation_invalid.html")
 
-def validar_campo_unico(request):
-    campo = request.GET.get("campo")
-    valor = request.GET.get("valor")
 
-    # Verificación para cada campo único
-    if campo == "rut" and Usuario.objects.filter(rut=valor).exists():
-        return JsonResponse({"existe": True, "mensaje": "Este RUT ya está registrado."})
-    elif campo == "email" and Usuario.objects.filter(email=valor).exists():
-        return JsonResponse({"existe": True, "mensaje": "Este correo electrónico ya está registrado."})
-    elif campo == "telefono" and Usuario.objects.filter(telefono=valor).exists():
-        return JsonResponse({"existe": True, "mensaje": "Este número de teléfono ya está registrado."})
 
-    return JsonResponse({"existe": False})
+def vista_registroEmpleado(request):
+    if request.method == 'POST':
+
+        admin_id = request.session.get('admin_id')
+
+        if not admin_id:
+            messages.error(request, "No se pudo identificar al administrador. Por favor, inicie sesión nuevamente.")
+            return redirect('inicioSesionUser')
+
+        try:
+            # Recuperar la instancia del administrador
+            administrador = Administrador.objects.get(id=admin_id)
+        except Administrador.DoesNotExist:
+            messages.error(request, "El administrador no existe.")
+            return redirect('registroEmpleado')
+        
+        rol = request.POST.get('rolEmpleado', '').strip()
+        rut = request.POST.get('rutEmpleado', '').strip()
+        email = request.POST.get('emailEmpleado', '').strip()
+        contrasena= request.POST.get('passEmpleado', '').strip()
+        confirm_contrasena = request.POST.get('confirmPassEmpleado', '').strip()
+        
+        if not rol:
+            messages.error(request, 'Debe seleccionar un tipo de cuenta (Vendedor o Bodeguero).')
+            return redirect('registroEmpleado')  # Redirige a la misma página
+
+
+        if not rol or not rut or not email or not contrasena or not confirm_contrasena:
+            messages.error(request, "Todos los campos son obligatorios.")
+            return redirect('registroEmpleado')
+        
+
+        if "@" not in email or "." not in email.split("@")[-1]:
+            messages.error(request, "Ingrese un correo electrónico válido.")
+            return redirect('registroEmpleado')
+
+        if contrasena != confirm_contrasena:
+            messages.error(request, "Las contraseñas no coinciden.")
+            return redirect('registroEmpleado')
+        
+        if contrasena == confirm_contrasena:
+            # Verificar las condiciones de la contraseña
+            if (
+                len(contrasena) < 6 or  # Longitud mínima de 6 caracteres
+                not any(c.isalpha() for c in contrasena) or  # Al menos una letra
+                not any(c.isdigit() for c in contrasena) or  # Al menos un número
+                not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in contrasena)  # Al menos un caracter especial
+
+            ):
+                messages.error(request, "La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.")
+
+
+        # Validación para evitar duplicados en cualquiera de las tablas
+        if Vendedor.objects.filter(rut=rut).exists() or Bodeguero.objects.filter(rut=rut).exists() or Usuario.objects.filter(rut=rut).exists() or Administrador.objects.filter(rut=rut).exists():
+            messages.error(request, "El RUT ingresado ya está en uso.")
+            return redirect('registroEmpleado')
+
+        if Vendedor.objects.filter(email=email).exists() or Bodeguero.objects.filter(email=email).exists() or Usuario.objects.filter(email=email).exists() or Administrador.objects.filter(email=email).exists():
+            messages.error(request, "El correo electrónico ingresado ya está en uso.")
+            return redirect('registroEmpleado')
+        
+
+        try:
+            salt = generar_salt()
+            contrasena_encriptada = encriptar_con_salt(contrasena, salt)
+
+            if rol == 'vendedor':
+                vendedor = Vendedor(
+                    rut=rut,
+                    email=email,
+                    contrasena=contrasena_encriptada,
+                    salt=salt,
+                    admin_id=administrador,  # Asignar la instancia de Administrador
+                )
+                vendedor.save()
+              
+            elif rol == 'bodeguero':
+                bodeguero = Bodeguero(
+                    rut=rut,
+                    email=email,
+                    contrasena=contrasena_encriptada,
+                    salt=salt,
+                    admin_id=administrador,  # Asignar la instancia de Administrador
+                    is_active =False
+                )
+                bodeguero.save()
+
+            messages.success(request, "Empelado registrado con exito")
+            return redirect('registroEmpleado')
+            
+
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())  # Mostrar el error en la consola
+            messages.error(request, f"Ocurrió un error: {e}")
+            return redirect('registroEmpleado')
+
+    return render(request, 'RegistroVendedor_Bodeguero.html')
+
+
