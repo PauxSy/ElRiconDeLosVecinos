@@ -402,8 +402,6 @@ def is_staff(self):
         return False
 
 
-
-
 def vista_recuperarcontrasena(request):
     # Verificar si el usuario ya está autenticado
     if request.session.get("nombre_usuario") and request.session.get("primer_apellido"):
@@ -416,23 +414,42 @@ def vista_recuperarcontrasena(request):
             messages.error(request, "Por favor, ingresa un correo electrónico.")
             return render(request, "recuperarcontrasena.html")
 
-        # Buscar el usuario o administrador con el correo proporcionado
+        # Buscar el usuario, administrador, vendedor o bodeguero con el correo proporcionado
         usuario = Usuario.objects.filter(email=email).first()
         administrador = Administrador.objects.filter(email=email).first()
+        vendedor = Vendedor.objects.filter(email=email).first()  # Buscar vendedor
+        bodeguero = Bodeguero.objects.filter(email=email).first()  # Buscar bodeguero
 
-        if not usuario and not administrador:
+        if not usuario and not administrador and not vendedor and not bodeguero:
             messages.error(request, "No existe una cuenta asociada a este correo.")
             return render(request, "recuperarcontrasena.html")
 
-        # Generar un enlace de restablecimiento para usuario o administrador
+        # Verificar si el vendedor o bodeguero está inactivo
+        if vendedor and not vendedor.estado:
+            messages.error(request, "El vendedor está inactivo. No se puede enviar el correo de recuperación.")
+            return render(request, "recuperarcontrasena.html")
+
+        if bodeguero and not bodeguero.estado:
+            messages.error(request, "El bodeguero está inactivo. No se puede enviar el correo de recuperación.")
+            return render(request, "recuperarcontrasena.html")
+
+        # Generar un enlace de restablecimiento para usuario, administrador, vendedor o bodeguero
         if usuario:
             user_type = "usuario"
             user_id = usuario.id
             nombre_usuario = usuario.nombre
-        else:
+        elif administrador:
             user_type = "admin"
             user_id = administrador.id
-            nombre_usuario = administrador.email 
+            nombre_usuario = administrador.email
+        elif vendedor:
+            user_type = "vendedor"
+            user_id = vendedor.id
+            nombre_usuario = vendedor.email  # Usar el correo del vendedor
+        elif bodeguero:
+            user_type = "bodeguero"
+            user_id = bodeguero.id
+            nombre_usuario = bodeguero.email  # Usar el correo del bodeguero
 
         reset_link = request.build_absolute_uri(
             reverse("reset_password", args=[f"{user_type}_{user_id}"])
@@ -464,121 +481,6 @@ def vista_recuperarcontrasena(request):
     return render(request, "recuperarcontrasena.html")
 
 
-# def reset_password(request, user_id):
-#     if request.method == "POST":
-#         nueva_contrasena = request.POST.get("nueva_contrasena")
-#         confirmar_contrasena = request.POST.get("confirmar_contrasena")
-
-
-#         # Diferenciar entre usuario y administrador según el prefijo del ID
-#         if user_id.startswith("usuario_"):
-#             user_id = user_id.replace("usuario_", "")
-#             usuario_obj = Usuario.objects.filter(id=user_id).first()
-#         elif user_id.startswith("admin_"):
-#             user_id = user_id.replace("admin_", "")
-#             usuario_obj = Administrador.objects.filter(id=user_id).first()
-#         else:
-#             usuario_obj = None
-
-#         # Validar si existe el usuario o administrador correspondiente
-#         if not usuario_obj:
-#             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
-#             return render(request, "reset_password.html", {"user_id": user_id})
-        
-
-        
-#         # Validar si las contraseñas coinciden
-#         if nueva_contrasena != confirmar_contrasena:
-#             messages.error(request, "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.")
-#             return render(request, "reset_password.html", {"user_id": user_id})
-
-#         # Validar complejidad de la nueva contraseña
-#         if len(nueva_contrasena) < 6 or \
-#            not any(c.isalpha() for c in nueva_contrasena) or \
-#            not any(c.isdigit() for c in nueva_contrasena) or \
-#            not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in nueva_contrasena):
-#             messages.error(request, "La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.")
-#             return render(request, "reset_password.html", {"user_id": user_id})
-
-#         # Generar un nuevo salt y encriptar la nueva contraseña
-#         salt = os.urandom(8).hex()
-#         nueva_contrasena_encriptada = hashlib.sha256((nueva_contrasena + salt).encode("utf-8")).hexdigest()
-
-#         # Actualizar la contraseña y desbloquear la cuenta si estaba bloqueada
-#         usuario_obj.contrasena = nueva_contrasena_encriptada
-#         usuario_obj.salt = salt
-#         if hasattr(usuario_obj, "intentos_fallidos"):
-#             usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
-#             usuario_obj.bloqueado = False  # Desbloquear la cuenta
-
-#         usuario_obj.save()
-
-
-
-#         messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
-#         return redirect("catalogo")
-
-
-#     # Renderizar la plantilla con el ID en el contexto
-#     return render(request, "reset_password.html", {"user_id": user_id})
-
-
-# def reset_password(request, user_id):
-#     if request.method == "POST":
-#         nueva_contrasena = request.POST.get("nueva_contrasena")
-#         confirmar_contrasena = request.POST.get("confirmar_contrasena")
-
-#         # Diferenciar entre usuario y administrador según el prefijo del ID
-#         if user_id.startswith("usuario_"):
-#             user_id = user_id.replace("usuario_", "")
-#             usuario_obj = Usuario.objects.filter(id=user_id).first()
-#         elif user_id.startswith("admin_"):
-#             user_id = user_id.replace("admin_", "")
-#             usuario_obj = Administrador.objects.filter(id=user_id).first()
-#         else:
-#             usuario_obj = None
-
-#         # Validar si existe el usuario o administrador correspondiente
-#         if not usuario_obj:
-#             messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
-#             return render(request, "reset_password.html", {"user_id": user_id})
-
-#         # Validar contraseñas: coincidencia y complejidad
-#         errores = []
-
-#         if nueva_contrasena != confirmar_contrasena:
-#             errores.append("Las contraseñas no coinciden.")
-
-#         if len(nueva_contrasena) < 6 or \
-#            not any(c.isalpha() for c in nueva_contrasena) or \
-#            not any(c.isdigit() for c in nueva_contrasena) or \
-#            not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/`~" for c in nueva_contrasena):
-#             errores.append("La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales.")
-
-#         if errores:
-#             for error in errores:
-#                 messages.error(request, error)
-#             return render(request, "reset_password.html", {"user_id": user_id})
-
-#         # Generar un nuevo salt y encriptar la nueva contraseña
-#         salt = os.urandom(8).hex()
-#         nueva_contrasena_encriptada = hashlib.sha256((nueva_contrasena + salt).encode("utf-8")).hexdigest()
-
-#         # Actualizar la contraseña y desbloquear la cuenta si estaba bloqueada
-#         usuario_obj.contrasena = nueva_contrasena_encriptada
-#         usuario_obj.salt = salt
-#         if hasattr(usuario_obj, "intentos_fallidos"):
-#             if usuario_obj.bloqueado == True:
-#                 usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
-#                 usuario_obj.bloqueado = False  # Desbloquear la cuenta
-#                 messages.success(request, "Tu cuenta a sido Desbloqueada")
-
-#         usuario_obj.save()
-#         messages.success(request, "Tu contraseña ha sido actualizada con éxito")
-#         return redirect("catalogo")
-
-#     # Renderizar la plantilla con el ID en el contexto
-#     return render(request, "reset_password.html", {"user_id": user_id})
 
 
 def reset_password(request, user_id):
@@ -594,12 +496,23 @@ def reset_password(request, user_id):
         elif temp_user_id.startswith("admin_"):
             temp_user_id = temp_user_id.replace("admin_", "")
             usuario_obj = Administrador.objects.filter(id=temp_user_id).first()
+
+
+        elif temp_user_id.startswith("vendedor_"):
+            temp_user_id = temp_user_id.replace("vendedor_", "")
+            usuario_obj = Vendedor.objects.filter(id=temp_user_id).first()  # Se añadió esta parte para vendedores
+
+
+        elif temp_user_id.startswith("bodeguero_"):
+            temp_user_id = temp_user_id.replace("bodeguero_", "")
+            usuario_obj = Bodeguero.objects.filter(id=temp_user_id).first()  # Y aquí para bodegueros
         else:
             usuario_obj = None
 
+
         # Validar si existe el usuario o administrador correspondiente
         if not usuario_obj:
-            messages.error(request, "El usuario o administrador no existe. Por favor, verifica tu información.")
+            messages.error(request, "El usuario no existe. Por favor, verifica tu información.")
             return render(request, "reset_password.html", {"user_id": user_id})  # Conserva el `user_id` original
 
         # Validar contraseñas: coincidencia y complejidad
@@ -607,7 +520,6 @@ def reset_password(request, user_id):
 
         if nueva_contrasena != confirmar_contrasena:
             errores.append("Las contraseñas no coinciden.")
-
 
         if nueva_contrasena == confirmar_contrasena:
             # Verificar las condiciones de la contraseña
@@ -620,7 +532,7 @@ def reset_password(request, user_id):
                 errores.append(
                     "La contraseña debe tener al menos 6 caracteres, incluyendo letras, números y caracteres especiales."
                 )
-        
+
         if errores:
             for error in errores:
                 messages.error(request, error)
@@ -638,22 +550,20 @@ def reset_password(request, user_id):
                 usuario_obj.intentos_fallidos = 0  # Reiniciar intentos fallidos
                 usuario_obj.bloqueado = False  # Desbloquear la cuenta
                 messages.success(request, "Tu cuenta ha sido desbloqueada.")
+                messages.success(request, "Dirígete nuevamente a la pagina y inicia sesión con tu nueva contraseña")
+
 
         usuario_obj.save()
 
-        messages.success(request, "Tu contraseña ha sido actualizada con éxito y tu cuenta ha sido desbloqueada.")
-        return redirect("catalogo")
+        messages.success(request, "Tu contraseña ha sido actualizada con éxito ")
+        messages.success(request, "Dirígete nuevamente a la pagina y inicia sesión con tu nueva contraseña")
+
+
+        # return redirect("catalogo") debe mantenerse en la misma página para evitar errores con nombres incorrectos cuando bodeguero o vendedor cambian contraseña
+        return render(request, "reset_password.html", {"user_id": user_id})
 
     # Renderizar la plantilla con el ID en el contexto
     return render(request, "reset_password.html", {"user_id": user_id})
-
-
-
-
-
-
-
-
 
 
 #--------FUNCIONALIDADES CARRITO----------------
@@ -1284,106 +1194,208 @@ def vista_registroEmpleado(request):
 
 
 
-
-
-
 # from itertools import chain
 # from django.shortcuts import render, redirect
 # from django.db.models import Q
 # from .models import Vendedor, Bodeguero
 
-# def vista_deshabilitar_personal(request):
+# def vista_actualizainfoempleado(request):
 #     if request.method == 'POST':
-#         # Recuperar los vendedores/bodegueros seleccionados y sus nuevos estados
-#         persona_ids = request.POST.getlist('persona_ids')  # Lista de IDs de los vendedores/bodegueros seleccionados
-#         nuevos_estados = request.POST  # Los nuevos estados para cada persona
+#         persona_ids = request.POST.getlist('persona_ids')
+#         nuevos_datos = request.POST
 
 #         for persona_id in persona_ids:
 #             try:
 #                 persona = Vendedor.objects.get(id=persona_id)
+#                 cargo_actual = "vendedor"
 #             except Vendedor.DoesNotExist:
 #                 persona = Bodeguero.objects.get(id=persona_id)
-            
-#             nuevo_estado = nuevos_estados.get(f'estado_persona_{persona_id}')
+#                 cargo_actual = "bodeguero"
+
+#             # Obtener los datos sensibles que no están en el HTML
+#             contrasena = persona.contrasena
+#             salt = persona.salt
+#             admin_id = persona.admin_id
+
+#             # Actualizar estado
+#             nuevo_estado = nuevos_datos.get(f'estado_persona_{persona_id}')
 #             if nuevo_estado:
-#                 persona.estado = nuevo_estado == "activo"  # Cambiar estado a True/False según el valor
+#                 persona.estado = nuevo_estado == "activo"
+
+#             # Actualizar RUT
+#             nuevo_rut = nuevos_datos.get(f'rut_persona_{persona_id}')
+#             if nuevo_rut:
+#                 persona.rut = nuevo_rut
+
+#             # Actualizar Email
+#             nuevo_email = nuevos_datos.get(f'email_persona_{persona_id}')
+#             if nuevo_email:
+#                 persona.email = nuevo_email
+
+#             # Verificar cambio de cargo
+#             nuevo_cargo = nuevos_datos.get(f'cargo_persona_{persona_id}')
+#             if nuevo_cargo and nuevo_cargo != cargo_actual:
+#                 # Eliminar el registro actual
+#                 persona.delete()
+
+#                 # Crear un nuevo registro en la tabla correspondiente
+#                 if nuevo_cargo == "vendedor":
+#                     Vendedor.objects.create(
+#                         rut=nuevo_rut,
+#                         email=nuevo_email,
+#                         contrasena=contrasena,
+#                         salt=salt,
+#                         estado=(nuevo_estado == "activo"),
+#                         admin_id=admin_id
+#                     )
+#                 elif nuevo_cargo == "bodeguero":
+#                     Bodeguero.objects.create(
+#                         rut=nuevo_rut,
+#                         email=nuevo_email,
+#                         contrasena=contrasena,
+#                         salt=salt,
+#                         estado=(nuevo_estado == "activo"),
+#                         admin_id=admin_id
+#                     )
+#             else:
+#                 # Guardar cambios normales
 #                 persona.save()
 
-#         return redirect('deshabilitarpersonal')  # Redirigir para evitar reenvíos del formulario
-    
+#         return redirect('actualizainfoempleado')
 
 #     # Realizar la búsqueda si existe
-#     query = request.GET.get('search', '')  # Recuperar búsqueda si existe
-#     if query:
-#         # Mapeo de cadenas "activo"/"inactivo" a valores booleanos
-#         estado_mapeo = {
-#             "activo": True,
-#             "inactivo": False
-#         }
+#     query = request.GET.get('search', '').strip().lower()
+#     personas = []
 
-#         # Consultas para vendedores y bodegueros
-#         vendedores = Vendedor.objects.filter(
-#             Q(rut__icontains=query) |
-#             Q(email__icontains=query) |
-#             Q(estado=estado_mapeo.get(query.lower(), None))  # Buscar estado como True/False
-#         )
-#         bodegueros = Bodeguero.objects.filter(
-#             Q(rut__icontains=query) |
-#             Q(email__icontains=query) |
-#             Q(estado=estado_mapeo.get(query.lower(), None))  # Buscar estado como True/False
-#         )
-#         personas = list(chain(vendedores, bodegueros))  # Combinar vendedores y bodegueros
+#     if query:
+#         estado_mapeo = {"activo": True, "inactivo": False}
+
+#         if query in ["vendedor", "bodeguero"]:
+#             if query == "vendedor":
+#                 personas = Vendedor.objects.all()
+#             elif query == "bodeguero":
+#                 personas = Bodeguero.objects.all()
+#         else:
+#             vendedores = Vendedor.objects.filter(
+#                 Q(rut__icontains=query) |
+#                 Q(email__icontains=query) |
+#                 Q(estado=estado_mapeo.get(query, None))
+#             )
+#             bodegueros = Bodeguero.objects.filter(
+#                 Q(rut__icontains=query) |
+#                 Q(email__icontains=query) |
+#                 Q(estado=estado_mapeo.get(query, None))
+#             )
+#             personas = list(chain(vendedores, bodegueros))
 #     else:
 #         vendedores = Vendedor.objects.all()
 #         bodegueros = Bodeguero.objects.all()
-#         personas = list(chain(vendedores, bodegueros))  # Combinar vendedores y bodegueros
+#         personas = list(chain(vendedores, bodegueros))
 
-#     return render(request, 'deshabilitarempleado.html', {
+#     return render(request, 'actualizainfoempleado.html', {
 #         'personas': personas
 #     })
-    
+
+
+
+import re
 from itertools import chain
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from .models import Vendedor, Bodeguero
 
-def vista_deshabilitar_personal(request):
+def validar_rut(rut):
+    # Expresión regular para validar el formato del RUT chileno
+    rut_regex = r'^\d{7,8}-[\dkK]$'
+    return bool(re.match(rut_regex, rut))
+
+def validar_email(email):
+    # Validar si el email tiene el formato adecuado
+    return email.endswith('@gmail.com')
+
+def vista_actualizainfoempleado(request):
     if request.method == 'POST':
-        # Recuperar los vendedores/bodegueros seleccionados y sus nuevos estados
         persona_ids = request.POST.getlist('persona_ids')
-        nuevos_estados = request.POST
+        nuevos_datos = request.POST
 
         for persona_id in persona_ids:
             try:
                 persona = Vendedor.objects.get(id=persona_id)
+                cargo_actual = "vendedor"
             except Vendedor.DoesNotExist:
                 persona = Bodeguero.objects.get(id=persona_id)
-            
-            nuevo_estado = nuevos_estados.get(f'estado_persona_{persona_id}')
+                cargo_actual = "bodeguero"
+
+            # Obtener los datos sensibles que no están en el HTML
+            contrasena = persona.contrasena
+            salt = persona.salt
+            admin_id = persona.admin_id
+
+            # Actualizar estado
+            nuevo_estado = nuevos_datos.get(f'estado_persona_{persona_id}')
             if nuevo_estado:
                 persona.estado = nuevo_estado == "activo"
+
+            # Validar y actualizar RUT
+            nuevo_rut = nuevos_datos.get(f'rut_persona_{persona_id}')
+            if nuevo_rut and not validar_rut(nuevo_rut):
+                messages.error(request, f"El RUT {nuevo_rut} no es válido.")
+                return render(request, 'actualizainfoempleado.html')
+            if nuevo_rut:
+                persona.rut = nuevo_rut
+
+            # Validar y actualizar Email
+            nuevo_email = nuevos_datos.get(f'email_persona_{persona_id}')
+            if nuevo_email and not validar_email(nuevo_email):
+                messages.error(request, f"El correo {nuevo_email} debe ser un correo de Gmail (@gmail.com).")
+                return render(request, 'actualizainfoempleado.html')
+            if nuevo_email:
+                persona.email = nuevo_email
+
+            # Verificar cambio de cargo
+            nuevo_cargo = nuevos_datos.get(f'cargo_persona_{persona_id}')
+            if nuevo_cargo and nuevo_cargo != cargo_actual:
+                # Eliminar el registro actual
+                persona.delete()
+
+                # Crear un nuevo registro en la tabla correspondiente
+                if nuevo_cargo == "vendedor":
+                    Vendedor.objects.create(
+                        rut=nuevo_rut,
+                        email=nuevo_email,
+                        contrasena=contrasena,
+                        salt=salt,
+                        estado=(nuevo_estado == "activo"),
+                        admin_id=admin_id
+                    )
+                elif nuevo_cargo == "bodeguero":
+                    Bodeguero.objects.create(
+                        rut=nuevo_rut,
+                        email=nuevo_email,
+                        contrasena=contrasena,
+                        salt=salt,
+                        estado=(nuevo_estado == "activo"),
+                        admin_id=admin_id
+                    )
+            else:
+                # Guardar cambios normales
                 persona.save()
 
-        return redirect('deshabilitarpersonal')
-    
+        return redirect('actualizainfoempleado')
+
     # Realizar la búsqueda si existe
     query = request.GET.get('search', '').strip().lower()
     personas = []
 
     if query:
-        # Mapeo de cadenas "activo"/"inactivo" a valores booleanos
-        estado_mapeo = {
-            "activo": True,
-            "inactivo": False
-        }
+        estado_mapeo = {"activo": True, "inactivo": False}
 
-        if query in ["vendedor", "bodeguero"]:  # Búsqueda por cargo
+        if query in ["vendedor", "bodeguero"]:
             if query == "vendedor":
                 personas = Vendedor.objects.all()
             elif query == "bodeguero":
                 personas = Bodeguero.objects.all()
         else:
-            # Búsqueda genérica
             vendedores = Vendedor.objects.filter(
                 Q(rut__icontains=query) |
                 Q(email__icontains=query) |
@@ -1396,14 +1408,10 @@ def vista_deshabilitar_personal(request):
             )
             personas = list(chain(vendedores, bodegueros))
     else:
-        # Si no hay búsqueda, devolver todos
         vendedores = Vendedor.objects.all()
         bodegueros = Bodeguero.objects.all()
         personas = list(chain(vendedores, bodegueros))
 
-    return render(request, 'deshabilitarempleado.html', {
+    return render(request, 'actualizainfoempleado.html', {
         'personas': personas
     })
-
-
-

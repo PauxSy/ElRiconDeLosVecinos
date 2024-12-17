@@ -14,13 +14,11 @@
     {% include "formatos/navbaradmin.html" %}
     {% block content %}
 
-    <!-- tabla para gestionar deshabilitar vendedores y bodegueros -->
     <div class="container mt-5">
-        <h2 class="text-center">Panel de gestion de empleados</h2>
+        <h2 class="text-center">Panel de gestión de empleados</h2>
         <br><br>
 
         <!-- Botón para mostrar el manual -->
-    
         <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
             <i class="fas fa-info-circle"></i> Manual de Usuario
         </button>
@@ -28,13 +26,28 @@
         <h5>Seleccione los vendedores o bodegueros que desea gestionar:</h5>
         <br>
 
+        <!-- Bloque para mostrar los mensajes de error fuera de la tabla -->
+        {% if messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="errorMessage">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        {% endif %}
+
+        <!-- Formulario de búsqueda -->
         <div class="container mt-3">
             <form class="d-flex" role="search">
-                <input class="form-control me-2 search-barCustom" type="search" name="search" placeholder="Buscar por RUT o email o Cargo o Estado" aria-label="Buscar">
+                <input class="form-control me-2 search-barCustom" type="search" name="search" placeholder="Buscar por RUT, email, Cargo o Estado" aria-label="Buscar">
                 <button class="btn btn-danger" type="submit">Buscar</button>
             </form>
         </div>
-        <form action="{% url 'deshabilitarpersonal' %}" method="post">
+
+        <!-- Formulario principal -->
+        <form action="{% url 'actualizainfoempleado' %}" method="post">
             {% csrf_token %}
             <table class="table table-bordered">
                 <thead class="table-dark">
@@ -50,9 +63,18 @@
                     {% for persona in personas %}
                     <tr>
                         <td><input type="checkbox" name="persona_ids" value="{{ persona.id }}"></td>
-                        <td>{{ persona.get_cargo }}</td>  <!-- Mostrar el cargo (Vendedor/Bodeguero) -->
-                        <td>{{ persona.rut }}</td>
-                        <td>{{ persona.email }}</td>
+                        <td>
+                            <select class="form-select" name="cargo_persona_{{ persona.id }}">
+                                <option value="vendedor" {% if persona.get_cargo == "Vendedor" %}selected{% endif %}>Vendedor</option>
+                                <option value="bodeguero" {% if persona.get_cargo == "Bodeguero" %}selected{% endif %}>Bodeguero</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="rut_persona_{{ persona.id }}" value="{{ persona.rut }}">
+                        </td>
+                        <td>
+                            <input type="email" class="form-control" name="email_persona_{{ persona.id }}" value="{{ persona.email }}">
+                        </td>
                         <td>
                             <select class="form-select" name="estado_persona_{{ persona.id }}">
                                 <option value="activo" {% if persona.estado %}selected{% endif %}>Activo</option>
@@ -62,31 +84,30 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">No se encontraron resultados</td>
+                        <td colspan="5" class="text-center">No hay datos para mostrar</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        
-            <div class="text-center">
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-center gap-3">
                 <button type="submit" class="btn btn-danger mt-3">Aplicar cambios</button>
+                <a href="{% url 'registroEmpleado' %}" class="btn btn-success mt-3">Crear Cuenta</a>
             </div>
         </form>
 
+        <!-- Modal del manual -->
         <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="deshabilitarModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deshabilitarModalLabel">Manual de Uso - Panel de gestion de usuario</h5>
+                        <h5 class="modal-title" id="deshabilitarModalLabel">Manual de Uso - Panel de gestión de usuario</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
-                        <h4></h4>
-                        <p></p>
-                        
-                        <h5></h5>
-                        <p></p>
-                        
+                        <h4>Instrucciones:</h4>
+                        <p>Aquí puedes gestionar los empleados registrados, actualizando su información, estado o cargo.</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -94,18 +115,27 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     {% endblock %}
-    {% include "formatos/footeradmin.html"%}
+    {% include "formatos/footeradmin.html" %}
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.classList.remove('show'); // Bootstrap animación fade
+                    errorMessage.classList.add('fade');
+                    setTimeout(() => {
+                        errorMessage.remove();
+                    }, 1500); // Tiempo para que termine la animación
+                }, 5000); // Mantener visible durante 5 segundos
+            }
+
             const selectAllCheckbox = document.querySelector('thead input[type="checkbox"]');
             const personaCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-        
+
             selectAllCheckbox.addEventListener('change', (event) => {
                 personaCheckboxes.forEach(checkbox => {
                     checkbox.checked = event.target.checked;
@@ -113,7 +143,5 @@
             });
         });
     </script>
-
 </body>
 </html>
-

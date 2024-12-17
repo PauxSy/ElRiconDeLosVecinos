@@ -34,7 +34,8 @@ urlpatterns = [
     path('actualizarstock/', views.vista_actualizarstock, name='actualizarstock'),
     path('panelpromociones/', views.vista_panelpromociones, name='panelpromociones'),
     path('registroEmpleado/', views.vista_registroEmpleado, name='registroEmpleado'),
-    path('deshabilitarpersonal/', views.vista_deshabilitar_personal, name='deshabilitarpersonal'),
+    path('actualizainfoempleado/', views.vista_actualizainfoempleado, name='actualizainfoempleado'),
+
     
     path('dashboard/', views.vista_dashboard, name='dashboard'),
     path('guardar_productos/', views.guardar_productos, name='guardar_productos'),
