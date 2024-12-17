@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Mercado Pago</title>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+    <h1>Pagar con Mercado Pago</h1>
+    <button id="checkout-btn">Pagar</button>
+
+    <script>
+        // Configura Mercado Pago con tu PUBLIC_KEY
+        const mp = new MercadoPago('TU_PUBLIC_KEY', {
+            locale: 'es-CL'
+        });
+
+        // Evento del botón
+        document.getElementById('checkout-btn').addEventListener('click', function () {
+            // Petición al backend para obtener la preferencia
+            fetch('/create_preference/', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    // Abre el Checkout con la preferencia recibida
+                    mp.checkout({
+                        preference: {
+                            id: data.id
+                        },
+                        autoOpen: true
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

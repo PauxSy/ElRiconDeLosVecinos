@@ -23,7 +23,7 @@ urlpatterns = [
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('activar/<uidb64>/<token>/', views.activar_cuenta, name='activar_cuenta'),
     path('finalizarcompra/', views.finalizar_compra, name='finalizarcompra'),
-
+    path('crear-preferencia/', views.crear_preferencia, name='crear_preferencia'),
 
     # ---------------Admin----------------
     path('reporteadmin/', views.vista_reporteadmin, name='reporteadmin'),

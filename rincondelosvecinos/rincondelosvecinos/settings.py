@@ -114,3 +114,5 @@ CACHES = {
         'TIMEOUT': 600,  # Tiempo de expiración del caché en segundos (opcional)
     }
 }
+
+MERCADOPAGO_ACCESS_TOKEN = 'TEST-1180076556578537-112416-9211bb5aa1ba4134af5841bffe71e048-138154677'

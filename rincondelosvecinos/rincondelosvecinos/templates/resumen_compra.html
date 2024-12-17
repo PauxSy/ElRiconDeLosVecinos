@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Compra</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <script src="https://sdk.mercadopago.com/js/v2"></script> <!-- SDK de Mercado Pago -->
 </head>
 <body>
@@ -20,7 +19,7 @@
                     <div class="card-body text-center">
                         <h3 class="text-success">Resumen del Pedido</h3>
                         <ul id="cart-items-list" class="list-group list-unstyled mb-4">
-                            <!-- Aquí se agregarán los productos dinámicamente con JavaScript -->
+                            <!-- Productos dinámicos -->
                         </ul>
                         <h4 id="total" class="mb-4 text-success">Total: <strong>$0</strong></h4>
                     </div>
@@ -32,72 +31,21 @@
         </div>
     </div>
 
-
-    <!-- Botón para mostrar el manual -->
-    <div class="container mt-5 text-center">
-        <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
-            <i class="fas fa-info-circle"></i> Manual de Usuario
-        </button>
-    </div>
-
-
-    <!-- Modal del Manual -->
-    <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-
-                <div class="modal-body">
-
-                    <h4>Instructivo para Completar tu Compra</h4>
-                    <p><strong>Paso 1: Redirige a Mercado Pago</strong></p>
-                    <p>Haz clic en el botón <strong>"Completar compra"</strong> para ser redirigido a Mercado Pago.</p>
-                    <p>En Mercado Pago, podrás elegir el método de pago que más te convenga, ya sea tarjeta de crédito, débito, efectivo o transferencia.</p>
-                    
-                    <p><strong>Paso 2: Realiza el Pago</strong></p>
-                    <p>Una vez estés en Mercado Pago, sigue los pasos indicados para completar tu pago de manera segura.</p>
-                    <p>Asegúrate de ingresar la información correcta y de confirmar tu pago.</p>
-
-                    <p><strong>Paso 3: Verifica el Resumen de tu Compra</strong></p>
-                    <p>Después de completar el pago exitosamente,Podrás ver el <strong>resumen de tu compra</strong> en tu <strong>Historial de Compras</strong>, donde podrás revisar todos los detalles de tu pedido. </p>
-  
-                    
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS (incluye Popper.js para el funcionamiento del modal) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-
     <script>
-        // Cargar productos desde el carrito
-        document.addEventListener('DOMContentLoaded', function() {
-            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];  // Obtener los productos del carrito desde localStorage
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
             const cartItemsList = document.getElementById('cart-items-list');
             const totalElement = document.getElementById('total');
+            let total = 0;
 
             if (cartItems.length > 0) {
-                let total = 0;  // Variable para el total
                 cartItems.forEach(item => {
-                    // Verificar si el producto tiene descuento o no
-                    const price = item.priceWithDiscount && item.discount ? item.priceWithDiscount : item.price;
-                    const subtotal = item.quantity * price;  // Calcular el subtotal para cada producto
-                    item.subtotal = subtotal;  // Asignamos el subtotal al producto
+                    const price = item.priceWithDiscount || item.price;
+                    const subtotal = item.quantity * price;
+                    total += subtotal;
 
-                    // Crear el elemento de lista con los datos del producto
                     const li = document.createElement('li');
-                    li.classList.add('mb-4');  // Clase para agregar margen inferior (2 saltos de línea)
+                    li.classList.add('mb-4');
                     li.innerHTML = `
                         <strong>${item.name}</strong><br>
                         Cantidad: ${item.quantity}<br>
@@ -105,51 +53,39 @@
                         <img src="${item.image}" alt="${item.name}" width="100"><br>
                     `;
                     cartItemsList.appendChild(li);
-
-                    total += subtotal; // Sumar el subtotal al total general
                 });
 
-                // Mostrar el total con 0 decimales
                 totalElement.innerHTML = `Total: <strong>$${Math.round(total)}</strong>`;
             } else {
-                const li = document.createElement('li');
-                li.textContent = 'No hay productos en el carrito.';
-                cartItemsList.appendChild(li);
+                cartItemsList.innerHTML = '<li>No hay productos en el carrito.</li>';
             }
 
             // Mercado Pago
-            const mp = new MercadoPago("TEST-f2823eb1-c558-448f-82e4-d64540aa9e82", { locale: "es-AR" });
+            const mp = new MercadoPago('TEST-f2823eb1-c558-448f-82e4-d64540aa9e82', { locale: 'es-CL' });  // Clave pública de Sandbox
 
-            document.getElementById('btnPagar').addEventListener('click', function () {
-                const totalAmount = Math.round(total);  // Asegurarse de que el total sea un número entero
-
+            document.getElementById("btnPagar").addEventListener("click", () => {
                 fetch('/crear-preferencia/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
-                    body: JSON.stringify({
-                        title: "Resumen de Compra",
-                        unit_price: totalAmount,
-                        quantity: 1
-                    })
+                    body: JSON.stringify(cartItems)
                 })
                 .then(response => response.json())
                 .then(data => {
                     mp.checkout({
                         preference: { id: data.preference_id },
-                        autoOpen: true
+                        autoOpen: true, // Abre el checkout automáticamente
                     });
                 })
                 .catch(error => console.error('Error al crear la preferencia:', error));
             });
         });
     </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
-
-
-
-
-

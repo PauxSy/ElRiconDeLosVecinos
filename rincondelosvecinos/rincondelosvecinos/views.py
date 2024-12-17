@@ -1,10 +1,13 @@
 from decimal import Decimal
 from functools import wraps
+import json
+from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import get_object_or_404, render #PRUEBA PARA VER SI CONECTA CON LA BD
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect
+import mercadopago
 from .models import Bodeguero, Producto , Usuario,Administrador, Vendedor 
 from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
@@ -28,6 +31,56 @@ from .models import Producto
 from .forms import ProductoForm  # Asegúrate de tener un ModelForm para el modelo Producto
 import openpyxl
 
+def crear_preferencia(request):
+    if request.method == 'POST':
+        try:
+            # Leer y cargar el JSON desde el cuerpo de la solicitud
+            body = json.loads(request.body.decode('utf-8'))  # Decodificar y cargar JSON
+
+            print("Datos recibidos:", body)  # Log para depuración
+
+            # Configura el SDK de Mercado Pago
+            sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+
+            # Calcular el total del carrito usando las claves correctas
+            total = sum(item['quantity'] * item['price'] for item in body)
+
+            print("Total calculado:", total)
+
+            # Crear la preferencia de pago
+            preference_data = {
+                "items": [
+                    {
+                        "id": item['id'],
+                        "title": item['name'],
+                        "quantity": item['quantity'],
+                        "unit_price": float(item['price']),
+                        "currency_id": "CLP"
+                    }
+                    for item in body
+                ],
+                "back_urls": {
+                    "success": "https://tusitio.com/success",
+                    "failure": "https://tusitio.com/failure",
+                    "pending": "https://tusitio.com/pending"
+                },
+                "auto_return": "approved"
+            }
+
+            # Crear la preferencia con el SDK
+            preference_response = sdk.preference().create(preference_data)
+            preference_id = preference_response["response"]["id"]
+
+            print("Preference ID:", preference_id)  # Log para verificar
+
+            # Devolver el ID de la preferencia al frontend
+            return JsonResponse({"preference_id": preference_id})
+
+        except Exception as e:
+            print(f"Error al crear la preferencia: {e}")
+            return JsonResponse({"error": "Error al crear la preferencia"}, status=500)
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
 
 def admin_required(view_func):
     @wraps(view_func)
