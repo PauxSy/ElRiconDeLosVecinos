@@ -1247,110 +1247,6 @@ def vista_registroEmpleado(request):
 
 
 
-# from itertools import chain
-# from django.shortcuts import render, redirect
-# from django.db.models import Q
-# from .models import Vendedor, Bodeguero
-
-# def vista_actualizainfoempleado(request):
-#     if request.method == 'POST':
-#         persona_ids = request.POST.getlist('persona_ids')
-#         nuevos_datos = request.POST
-
-#         for persona_id in persona_ids:
-#             try:
-#                 persona = Vendedor.objects.get(id=persona_id)
-#                 cargo_actual = "vendedor"
-#             except Vendedor.DoesNotExist:
-#                 persona = Bodeguero.objects.get(id=persona_id)
-#                 cargo_actual = "bodeguero"
-
-#             # Obtener los datos sensibles que no están en el HTML
-#             contrasena = persona.contrasena
-#             salt = persona.salt
-#             admin_id = persona.admin_id
-
-#             # Actualizar estado
-#             nuevo_estado = nuevos_datos.get(f'estado_persona_{persona_id}')
-#             if nuevo_estado:
-#                 persona.estado = nuevo_estado == "activo"
-
-#             # Actualizar RUT
-#             nuevo_rut = nuevos_datos.get(f'rut_persona_{persona_id}')
-#             if nuevo_rut:
-#                 persona.rut = nuevo_rut
-
-#             # Actualizar Email
-#             nuevo_email = nuevos_datos.get(f'email_persona_{persona_id}')
-#             if nuevo_email:
-#                 persona.email = nuevo_email
-
-#             # Verificar cambio de cargo
-#             nuevo_cargo = nuevos_datos.get(f'cargo_persona_{persona_id}')
-#             if nuevo_cargo and nuevo_cargo != cargo_actual:
-#                 # Eliminar el registro actual
-#                 persona.delete()
-
-#                 # Crear un nuevo registro en la tabla correspondiente
-#                 if nuevo_cargo == "vendedor":
-#                     Vendedor.objects.create(
-#                         rut=nuevo_rut,
-#                         email=nuevo_email,
-#                         contrasena=contrasena,
-#                         salt=salt,
-#                         estado=(nuevo_estado == "activo"),
-#                         admin_id=admin_id
-#                     )
-#                 elif nuevo_cargo == "bodeguero":
-#                     Bodeguero.objects.create(
-#                         rut=nuevo_rut,
-#                         email=nuevo_email,
-#                         contrasena=contrasena,
-#                         salt=salt,
-#                         estado=(nuevo_estado == "activo"),
-#                         admin_id=admin_id
-#                     )
-#             else:
-#                 # Guardar cambios normales
-#                 persona.save()
-
-#         return redirect('actualizainfoempleado')
-
-#     # Realizar la búsqueda si existe
-#     query = request.GET.get('search', '').strip().lower()
-#     personas = []
-
-#     if query:
-#         estado_mapeo = {"activo": True, "inactivo": False}
-
-#         if query in ["vendedor", "bodeguero"]:
-#             if query == "vendedor":
-#                 personas = Vendedor.objects.all()
-#             elif query == "bodeguero":
-#                 personas = Bodeguero.objects.all()
-#         else:
-#             vendedores = Vendedor.objects.filter(
-#                 Q(rut__icontains=query) |
-#                 Q(email__icontains=query) |
-#                 Q(estado=estado_mapeo.get(query, None))
-#             )
-#             bodegueros = Bodeguero.objects.filter(
-#                 Q(rut__icontains=query) |
-#                 Q(email__icontains=query) |
-#                 Q(estado=estado_mapeo.get(query, None))
-#             )
-#             personas = list(chain(vendedores, bodegueros))
-#     else:
-#         vendedores = Vendedor.objects.all()
-#         bodegueros = Bodeguero.objects.all()
-#         personas = list(chain(vendedores, bodegueros))
-
-#     return render(request, 'actualizainfoempleado.html', {
-#         'personas': personas
-#     })
-
-
-
 import re
 from itertools import chain
 from django.shortcuts import render, redirect
@@ -1366,6 +1262,9 @@ def validar_email(email):
     # Validar si el email tiene el formato adecuado
     return email.endswith('@gmail.com')
 
+
+from django.contrib import messages  # Asegúrate de importar messages
+
 def vista_actualizainfoempleado(request):
     if request.method == 'POST':
         persona_ids = request.POST.getlist('persona_ids')
@@ -1379,7 +1278,7 @@ def vista_actualizainfoempleado(request):
                 persona = Bodeguero.objects.get(id=persona_id)
                 cargo_actual = "bodeguero"
 
-            # Obtener los datos sensibles que no están en el HTML
+            # Obtener datos sensibles
             contrasena = persona.contrasena
             salt = persona.salt
             admin_id = persona.admin_id
@@ -1393,25 +1292,25 @@ def vista_actualizainfoempleado(request):
             nuevo_rut = nuevos_datos.get(f'rut_persona_{persona_id}')
             if nuevo_rut and not validar_rut(nuevo_rut):
                 messages.error(request, f"El RUT {nuevo_rut} no es válido.")
-                return render(request, 'actualizainfoempleado.html')
+                return render(request, 'actualizainfoempleado.html', {'personas': cargar_personas()})
             if nuevo_rut:
                 persona.rut = nuevo_rut
+
 
             # Validar y actualizar Email
             nuevo_email = nuevos_datos.get(f'email_persona_{persona_id}')
             if nuevo_email and not validar_email(nuevo_email):
                 messages.error(request, f"El correo {nuevo_email} debe ser un correo de Gmail (@gmail.com).")
-                return render(request, 'actualizainfoempleado.html')
+                return render(request, 'actualizainfoempleado.html', {'personas': cargar_personas()})
             if nuevo_email:
                 persona.email = nuevo_email
+
 
             # Verificar cambio de cargo
             nuevo_cargo = nuevos_datos.get(f'cargo_persona_{persona_id}')
             if nuevo_cargo and nuevo_cargo != cargo_actual:
-                # Eliminar el registro actual
                 persona.delete()
 
-                # Crear un nuevo registro en la tabla correspondiente
                 if nuevo_cargo == "vendedor":
                     Vendedor.objects.create(
                         rut=nuevo_rut,
@@ -1430,24 +1329,29 @@ def vista_actualizainfoempleado(request):
                         estado=(nuevo_estado == "activo"),
                         admin_id=admin_id
                     )
+                messages.success(request, "Se aplicaron exitosamente los cambios.")
             else:
-                # Guardar cambios normales
                 persona.save()
+                messages.success(request, "Se aplicaron exitosamente los cambios.")
 
         return redirect('actualizainfoempleado')
 
-    # Realizar la búsqueda si existe
     query = request.GET.get('search', '').strip().lower()
-    personas = []
+    personas = cargar_personas(query)
+    return render(request, 'actualizainfoempleado.html', {'personas': personas})
+
+
+# Nueva función para cargar personas
+def cargar_personas(query=''):
+    from itertools import chain
+    estado_mapeo = {"activo": True, "inactivo": False}
 
     if query:
-        estado_mapeo = {"activo": True, "inactivo": False}
-
         if query in ["vendedor", "bodeguero"]:
             if query == "vendedor":
-                personas = Vendedor.objects.all()
+                return Vendedor.objects.all()
             elif query == "bodeguero":
-                personas = Bodeguero.objects.all()
+                return Bodeguero.objects.all()
         else:
             vendedores = Vendedor.objects.filter(
                 Q(rut__icontains=query) |
@@ -1459,12 +1363,14 @@ def vista_actualizainfoempleado(request):
                 Q(email__icontains=query) |
                 Q(estado=estado_mapeo.get(query, None))
             )
-            personas = list(chain(vendedores, bodegueros))
+            return list(chain(vendedores, bodegueros))
     else:
         vendedores = Vendedor.objects.all()
         bodegueros = Bodeguero.objects.all()
-        personas = list(chain(vendedores, bodegueros))
+        return list(chain(vendedores, bodegueros))
 
-    return render(request, 'actualizainfoempleado.html', {
-        'personas': personas
-    })
+
+
+
+
+

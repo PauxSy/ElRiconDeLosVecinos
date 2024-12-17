@@ -43,6 +43,8 @@
             <form class="d-flex" role="search">
                 <input class="form-control me-2 search-barCustom" type="search" name="search" placeholder="Buscar por RUT, email, Cargo o Estado" aria-label="Buscar">
                 <button class="btn btn-danger" type="submit">Buscar</button>
+                <br>
+                <a href="{% url 'actualizainfoempleado' %}" class="btn btn-success">Todos</a>
             </form>
         </div>
 
@@ -102,12 +104,50 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deshabilitarModalLabel">Manual de Uso - Panel de gestión de usuario</h5>
+                        <h5 class="modal-title" id="deshabilitarModalLabel">Manual de Uso - Panel de gestión de Empleados</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
                         <h4>Instrucciones:</h4>
-                        <p>Aquí puedes gestionar los empleados registrados, actualizando su información, estado o cargo.</p>
+                <ul>
+                    <li>
+                        <strong>Búsqueda de empleados:</strong>
+                        <p>Utiliza la barra de búsqueda para encontrar empleados por RUT, email, cargo (Vendedor o Bodeguero) o estado (Activo o Inactivo). Al presionar "Buscar", se mostrarán los resultados filtrados.</p>
+                    </li>
+                    <li>
+                        <strong>Visualizar todos los empleados:</strong>
+                        <p>Haz clic en el botón verde <strong>"Todos"</strong> para ver la lista completa de empleados.</p>
+                    </li>
+                    <li>
+                        <strong>Seleccionar empleados:</strong>
+                        <p>Marca la casilla junto al cargo para seleccionarlo o usa la del encabezado para seleccionar todos. Al seleccionar un registro, indicas que en esos se realizará un cambio en él.</p>
+                    </li>
+                    <li>
+                        <strong>Actualizar información:</strong>
+                        <ul>
+                            <li>Modifica el <strong>RUT</strong>, <strong>Email</strong> o <strong>Estado</strong> (Activo/Inactivo) desde las opciones desplegables y campos de texto.</li>
+                            <li>Recuerda que el correo electrónico debe ser un <strong>@gmail.com</strong> y el RUT debe tener el formato correcto (ej. 12345678-9).</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Cambiar cargo:</strong>
+                        <p>Si deseas cambiar el cargo del empleado (Vendedor a Bodeguero o viceversa), selecciona el nuevo cargo desde el desplegable. La información del empleado se actualizará automáticamente al aplicar los cambios.</p>
+                    </li>
+                    <li>
+                        <strong>Aplicar cambios:</strong>
+                        <p>Una vez que hayas realizado las modificaciones, presiona el botón <strong>"Aplicar cambios"</strong> para guardar la información actualizada.</p>
+                    </li>
+                    <li>
+                        <strong>Crear nueva cuenta:</strong>
+                        <p>Para agregar un nuevo empleado, haz clic en el botón verde <strong>"Crear Cuenta"</strong>.</p>
+                    </li>
+                </ul>
+                <h4>Notas importantes:</h4>
+                <ul>
+                    <li>Si el RUT o el correo electrónico no cumplen con el formato requerido, aparecerá un mensaje de error y no se guardarán los cambios.</li>
+                    <li>Solo los registros seleccionados serán modificados; si no seleccionas ninguno, el sistema no realizará ningún cambio.</li>
+                </ul>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
