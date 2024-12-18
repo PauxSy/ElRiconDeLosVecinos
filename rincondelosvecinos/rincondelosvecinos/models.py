@@ -66,8 +66,12 @@ class Producto(models.Model):
     def __str__(self):
         return f"{self.nombre} - Total: {self.precio_total}"
     
+    def get_promocion(selft):
+        return selft.promocion_set.filter(estado='activa').first()
+    
+    
+    
 
-        
 
 class Promocion(models.Model):
     descuento = models.IntegerField(default=0)

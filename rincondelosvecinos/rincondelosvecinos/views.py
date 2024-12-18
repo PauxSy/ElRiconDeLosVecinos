@@ -673,7 +673,109 @@ def agregar_producto_carrito(request, producto_id):
 def obtener_carrito(request):
     carrito = request.session.get('carrito', [])
     return JsonResponse({'cart_items': carrito})
+
+
 #--------FUNCIONALIDADES CARRITO----------------
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import Producto, Promocion
+# from django.contrib import messages
+
+# def vista_panelpromociones(request):
+#     promociones = Promocion.objects.all()
+
+#     if request.method == 'POST':
+#         for promocion in promociones:
+#             # Capturar el descuento y el estado desde el formulario
+#             descuento = request.POST.get(f'descuento_{promocion.id}', 0)
+#             estado = request.POST.get(f'estado_{promocion.id}', promocion.estado)  # Captura el estado específico de la promoción
+
+#             try:
+#                 # Actualizar la promoción en la base de datos
+#                 promocion.descuento = int(descuento)
+#                 promocion.estado = estado
+#                 promocion.save()
+#                 messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
+#             except Exception as e:
+#                 messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
+
+#         return redirect('panelpromociones')
+
+#     return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
+
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import Producto, Promocion
+# from django.contrib import messages
+# from django.db.models import Q
+
+# def vista_panelpromociones(request):
+#     query = request.GET.get('buscarProducto', '')  # Captura la consulta de búsqueda
+#     promociones = Promocion.objects.all()  # Consulta inicial
+
+#     if query:
+#         # Filtrar promociones basándose en nombre del producto, ID de promoción o estado
+#         promociones = promociones.filter(
+#             Q(producto__nombre__icontains=query) |  # Nombre del producto (insensible a mayúsculas/minúsculas)
+#             Q(id__icontains=query) |  # ID de la promoción
+#             Q(estado__icontains=query)  # Estado de la promoción
+#         )
+
+#     if request.method == 'POST':
+#         for promocion in promociones:
+#             descuento = request.POST.get(f'descuento_{promocion.id}', 0)
+#             estado = request.POST.get(f'estado_{promocion.id}', promocion.estado)
+#             try:
+#                 promocion.descuento = int(descuento)
+#                 promocion.estado = estado
+#                 promocion.save()
+#                 messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
+#             except Exception as e:
+#                 messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
+#         return redirect('panelpromociones')
+
+#     return render(request, 'crearPromocionAdmin.html', {'promociones': promociones, 'query': query})
+
+
+from django.shortcuts import render, redirect 
+from .models import Producto, Promocion
+from django.contrib import messages
+from django.db.models import Q
+
+def vista_panelpromociones(request):
+    query = request.GET.get('buscarProducto', '')  # Captura la consulta de búsqueda
+    promociones = Promocion.objects.all()  # Consulta inicial
+
+    if query:
+        # Filtrar promociones basándose en nombre del producto, ID de promoción o estado exacto
+        promociones = promociones.filter(
+            Q(producto__nombre__icontains=query) |  # Nombre del producto (insensible a mayúsculas/minúsculas)
+            Q(id__icontains=query) |  # ID de la promoción
+            Q(estado__iexact=query)  # Estado exacto, insensible a mayúsculas
+        )
+
+    if request.method == 'POST':
+        for promocion in promociones:
+            descuento = request.POST.get(f'descuento_{promocion.id}', 0)
+            estado = request.POST.get(f'estado_{promocion.id}', promocion.estado)
+            try:
+                promocion.descuento = int(descuento)
+                promocion.estado = estado
+                promocion.save()
+                messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
+            except Exception as e:
+                messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
+        return redirect('panelpromociones')
+
+    return render(request, 'crearPromocionAdmin.html', {'promociones': promociones, 'query': query})
+
+
+
+
 
 def vista_catalogo(request):
     usuario_autenticado = request.session.get('email') is not None  # Verificar si el usuario está autenticado
@@ -689,6 +791,8 @@ def vista_catalogo(request):
         'query': query,
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
+
+
 
 
 
@@ -871,31 +975,6 @@ def vista_actualizarstock(request):
 
 
 
-from django.shortcuts import render, redirect
-from .models import Producto, Promocion
-from django.contrib import messages
-
-def vista_panelpromociones(request):
-    promociones = Promocion.objects.all()
-
-    if request.method == 'POST':
-        for promocion in promociones:
-            # Capturar el descuento y el estado desde el formulario
-            descuento = request.POST.get(f'descuento_{promocion.id}', 0)
-            estado = request.POST.get(f'estado_{promocion.id}', promocion.estado)  # Captura el estado específico de la promoción
-
-            try:
-                # Actualizar la promoción en la base de datos
-                promocion.descuento = int(descuento)
-                promocion.estado = estado
-                promocion.save()
-                messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
-            except Exception as e:
-                messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
-
-        return redirect('panelpromociones')
-
-    return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
 
 
 

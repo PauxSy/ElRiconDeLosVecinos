@@ -24,12 +24,14 @@
                 <i class="fas fa-info-circle"></i> Manual de Usuario
             </button>
 
-
+            
             <form class="d-flex" id="formBuscarProducto" method="GET" role="search">
                 <input type="text" class="form-control me-2" id="buscarProducto" name="buscarProducto"
                        placeholder="Buscar producto por Nombre o ID o Estado" aria-label="Buscar"
                        value="{{ query|default:'' }}"> <!-- Mantener el valor ingresado -->
                 <button class="btn btn-success" type="submit">Buscar</button>
+                <a href="{% url 'panelpromociones' %}" class="btn btn-success">Todos</a>
+                
             </form>
             
 
@@ -68,15 +70,6 @@
                             <td id="precio_con_descuento_{{ promocion.id }}">$ {{ promocion.preciodescuento }}</td>
 
                             
-<!-- 
-                            <td>
-                                <select class="form-select" name="estado">
-                                    <option value="activa" {% if promocion.estado == 'activa' %}selected{% endif %}>Activa</option>
-                                    <option value="inactiva" {% if promocion.estado == 'inactiva' %}selected{% endif %}>Inactiva</option>
-                                </select>
-                            </td> -->
-
-
                             <td>
                                 <select class="form-select" name="estado_{{ promocion.id }}">
                                     <option value="activa" {% if promocion.estado == 'activa' %}selected{% endif %}>Activa</option>
@@ -140,10 +133,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    
-    
-    
-    
     
     
     <script>

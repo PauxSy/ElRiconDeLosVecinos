@@ -35,9 +35,12 @@
                         <img src="{{ producto.img_url }}" class="card-img-top" alt="{{ producto.nombre }}">
                     </a>
                     <div class="card-body text-center">
+
+                        
                         <h5 class="card-title">{{ producto.nombre }}</h5>
                         <div class="product-price">
                             <div class="price-details">
+
                                 {% if producto.get_promocion and producto.get_promocion.estado == 'activa' %}
                                     <div>
                                         <span class="text-decoration-line-through">${{ producto.precio|floatformat:0 }}</span><br>
@@ -49,6 +52,7 @@
                                         <span>${{ producto.precio|floatformat:0 }}</span><br>
                                     </div>
                                 {% endif %}
+
                             </div>
                         </div>
 
