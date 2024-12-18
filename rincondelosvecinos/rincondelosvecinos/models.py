@@ -187,3 +187,5 @@ class Bodeguero(models.Model):
     def get_cargo(self):
         return "Bodeguero"  # Esta función retorna el cargo como Bodeguero
     
+
+

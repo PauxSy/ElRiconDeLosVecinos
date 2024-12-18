@@ -674,24 +674,20 @@ def obtener_carrito(request):
 #--------FUNCIONALIDADES CARRITO----------------
 
 def vista_catalogo(request):
-
     usuario_autenticado = request.session.get('email') is not None  # Verificar si el usuario está autenticado
 
     query = request.GET.get('search', '')  # Obtener el parámetro 'search' desde la URL
     if query:
         productos = Producto.objects.filter(nombre__icontains=query, estado='habilitado')  # Filtrar por nombre y estado habilitado
-        return render(request, 'catalogo.html', {
+    else:
+        productos = Producto.objects.filter(estado='habilitado')  # Si no hay búsqueda, mostrar solo productos habilitados
+
+    return render(request, 'catalogo.html', {
         'productos': productos, 
         'query': query,
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
-    else:
-        productos = Producto.objects.filter(estado='habilitado')  # Si no hay búsqueda, mostrar solo productos habilitados
-        return render(request, 'catalogo.html', {
-        'productos': productos, 
-        'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
-    })
-                
+  
 
 
 def vista_detalleproducto(request, id):
