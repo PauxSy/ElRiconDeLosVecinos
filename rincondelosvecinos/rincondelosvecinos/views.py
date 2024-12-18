@@ -31,6 +31,8 @@ from .models import Producto
 from .forms import ProductoForm  # Asegúrate de tener un ModelForm para el modelo Producto
 import openpyxl
 
+from rincondelosvecinos import models
+
 def crear_preferencia(request):
     if request.method == 'POST':
         try:
@@ -691,7 +693,7 @@ def vista_catalogo(request):
         'productos': productos, 
         'usuario_autenticado': usuario_autenticado,  # Agregar al contexto
     })
-                
+
 
 
 def vista_detalleproducto(request, id):
@@ -867,22 +869,102 @@ def vista_actualizarstock(request):
         
         return render(request, 'actualizarStock.html', {'productos': productos})
 
+
+
+
+
+
+
+from django.shortcuts import render, redirect
+from .models import Producto, Promocion
+from django.contrib import messages
+
 def vista_panelpromociones(request):
-    productos = Producto.objects.all()
+    promociones = Promocion.objects.all()
+
+    if request.method == 'POST':
+        for promocion in promociones:
+            # Capturar el descuento y el estado desde el formulario
+            descuento = request.POST.get(f'descuento_{promocion.id}', 0)
+            estado = request.POST.get(f'estado_{promocion.id}', promocion.estado)  # Captura el estado específico de la promoción
+
+            try:
+                # Actualizar la promoción en la base de datos
+                promocion.descuento = int(descuento)
+                promocion.estado = estado
+                promocion.save()
+                messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
+            except Exception as e:
+                messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
+
+        return redirect('panelpromociones')
+
+    return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
+
+
+
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import Producto, Promocion
+# from django.contrib import messages
+
+# def vista_panelpromociones(request):
+#     promociones = Promocion.objects.all()
+
+#     if request.method == 'POST':
+#         for promocion in promociones:
+#             # Capturar el descuento desde el formulario
+#             descuento = request.POST.get(f'descuento_{promocion.id}', 0)
+#             estado = request.POST.get('estado', promocion.estado)
+
+#             try:
+#                 # Actualizar la promoción en la base de datos
+#                 promocion.descuento = int(descuento)
+#                 promocion.estado = estado
+#                 promocion.save()
+#                 messages.success(request, f"Promoción {promocion.id} actualizada con éxito.")
+#             except Exception as e:
+#                 messages.error(request, f"Error al actualizar la promoción {promocion.id}: {str(e)}")
+
+#         return redirect('panelpromociones')
+
+#     return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
+
+
+
+
+
+
+
+# from django.shortcuts import render, redirect
+# from django.http import JsonResponse
+# from .models import Producto, Promocion
+
+# def vista_panelpromociones(request):
+#     promociones = Promocion.objects.all()
     
-   # Calcular el precio con descuento para cada producto
-    for producto in productos:
-        promocion = producto.get_promocion()  # Obtén la promoción activa para el producto
-        if promocion:
-            # Aplica el descuento solo si hay una promoción activa
-            precio_con_descuento = producto.precio - (producto.precio * (promocion.descuento / 100))
-        else:
-            precio_con_descuento = producto.precio  # Si no hay promoción, el precio es el original
-        
-        # Redondear el precio con descuento para que no tenga decimales
-        producto.precio_con_descuento = round(precio_con_descuento)
-        
-    return render(request,'crearPromocionAdmin.html',{'productos': productos})
+#     # Itera sobre cada promoción en el QuerySet
+#     for promocion in promociones:
+#         promocion.preciodescuento = int(promocion.preciodescuento)  # Convierte preciodescuento a entero
+
+#     return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
+
+
+
+# def vista_panelpromociones(request):
+#     promociones = Promocion.objects.all()
+#     promociones.preciodescuento = int(promociones.preciodescuento)
+#     return render(request, 'crearPromocionAdmin.html', {'promociones': promociones})
+
+
+
+
+
+
+
+
 
 
 

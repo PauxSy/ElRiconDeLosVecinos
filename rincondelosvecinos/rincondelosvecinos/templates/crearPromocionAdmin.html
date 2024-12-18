@@ -10,67 +10,94 @@
     <link rel="stylesheet" href="{% static 'estilos.css' %}">
 </head>
 <body>
-   <!-- nav admin -->
-   {% include "formatos/navbaradmin.html" %}
-   {% block content %}
+    <!-- Navbar del administrador -->
+    {% include "formatos/navbaradmin.html" %}
+    {% block content %}
 
-    <div class="containter mt-5">
+    <div class="container mt-5">
         <h2 class="text-center">Panel de Promociones</h2>
         <br>
-        <div class="container mt-3">
 
+        <!-- Botón para abrir el modal del manual de usuario -->
+        <div class="container mt-3">
             <button type="button" class="btn btn-info btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#manualUsuario">
                 <i class="fas fa-info-circle"></i> Manual de Usuario
             </button>
 
-            <form  class="d-flex" id="formBuscarProducto" role="search">
-                <input type="text" class="form-control me-2" id="buscarProducto" placeholder="Puede buscar el producto por Nombre o ID" aria-label="Buscar">
+
+            <form class="d-flex" id="formBuscarProducto" method="GET" role="search">
+                <input type="text" class="form-control me-2" id="buscarProducto" name="buscarProducto"
+                       placeholder="Buscar producto por Nombre o ID o Estado" aria-label="Buscar"
+                       value="{{ query|default:'' }}"> <!-- Mantener el valor ingresado -->
                 <button class="btn btn-success" type="submit">Buscar</button>
             </form>
-            <div id="mensaje" class="mt-3"></div>
+            
+
+
+
         </div>
 
-        <table class="table table-bordered mt-4">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre del Producto</th>
-                    <th>Precio</th>
-                    <th>% Descuento</th>
-                    <th>Precio con descuento</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody id="tablePromociones">
-                {% for producto in productos %}
-                    <tr>
-                        <td>{{ producto.id }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>${{ producto.precio }}</td>
-                        <td>
-                            <input type="number" class="form-control" value="{{ producto.descuento }}" min="0" max="100">
-                        </td>
-                        <td>${{ producto.precio_con_descuento }}</td>
-                        <td>
-                            <select class="form-select">
-                                <option value="Activa" {% if producto.estado == 'Activa' %}selected{% endif %}>Activa</option>
-                                <option value="Inactiva" {% if producto.estado == 'Inactiva' %}selected{% endif %}>Inactiva</option>
-                            </select>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center">No hay productos disponibles.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Tabla de promociones -->
 
-        <div class="text-center mt-4">
-            <button class="btn btn-success" id="btnAplicarCambios">Aplicar Cambios</button>
-        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <table class="table table-bordered mt-4">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID Promoción</th>
+                        <th>Nombre del Producto</th>
+                        <th>Precio</th>
+                        <th>% Descuento</th>
+                        <th>Precio con descuento</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tablePromociones">
+                    {% for promocion in promociones %}
+                        <tr>
+                            
+                            <td>{{ promocion.id }}</td>
+                            <td>{{ promocion.producto.nombre }}</td>  <!-- Nombre del producto -->
+                            <td>${{ promocion.producto.precio }}</td>  <!-- Precio del producto -->
+                
+                            <td>
+                                <input type="number" class="form-control" name="descuento_{{ promocion.id }}" id="descuento_{{ promocion.id }}" value="{{ promocion.descuento }}" min="0" max="100" oninput="calcularPrecioConDescuento({{ promocion.id }}, {{ promocion.producto.precio }})">
+                            </td>
+
+                            <td id="precio_con_descuento_{{ promocion.id }}">$ {{ promocion.preciodescuento }}</td>
+
+                            
+<!-- 
+                            <td>
+                                <select class="form-select" name="estado">
+                                    <option value="activa" {% if promocion.estado == 'activa' %}selected{% endif %}>Activa</option>
+                                    <option value="inactiva" {% if promocion.estado == 'inactiva' %}selected{% endif %}>Inactiva</option>
+                                </select>
+                            </td> -->
+
+
+                            <td>
+                                <select class="form-select" name="estado_{{ promocion.id }}">
+                                    <option value="activa" {% if promocion.estado == 'activa' %}selected{% endif %}>Activa</option>
+                                    <option value="inactiva" {% if promocion.estado == 'inactiva' %}selected{% endif %}>Inactiva</option>
+                                </select>
+                            </td>
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                
+            </table>
+        
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success">Aplicar Cambios</button>
+            </div>
+        </form>
+        
+
     </div>
-
 
     <!-- Modal del Manual -->
     <div class="modal fade" id="manualUsuario" tabindex="-1" aria-labelledby="manualModalLabel" aria-hidden="true">
@@ -80,30 +107,25 @@
                     <h5 class="modal-title" id="manualModalLabel">Manual de Uso</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-
                 <div class="modal-body">
-                    <h4>Bienvenido al Manual para Crear una Promocion de Producto</h4>
+                    <h4>Bienvenido al Manual para Crear una Promoción de Producto</h4>
                     <p>Este manual le guiará a través de las funcionalidades necesarias para crear una promoción para un producto en el inventario.</p>
-             
+
                     <h5>1. Procedimiento para Modificar Promociones</h5>
                     <ol>
-                        <li>Utilice la barra de búsqueda para encontrar el producto que desea modificar.Ingresando el nombre del producto en el campo correspondiente.</li>
+                        <li>Utilice la barra de búsqueda para encontrar el producto que desea modificar ingresando el nombre del producto o su ID en el campo correspondiente.</li>
                         <li>Presione el botón <strong>"Buscar"</strong> para filtrar los resultados.</li>
                         <li>Una vez localizado el producto en la tabla, identifique la fila correspondiente.</li>
                         <li>En la columna <strong>"% Descuento"</strong>, introduzca el porcentaje de descuento que desea aplicar.</li>
-                        <li>Para que la promoción sea válida, asegúrese de cambiar el estado del producto en la columna <strong>"Estado"</strong>. Seleccione <strong>"Activa"</strong> para habilitarla o <strong>"Inactiva"</strong> para deshabilitarla, según lo que necesite.</li>
-                        <li>Finalmente, haga clic en el botón <strong>"Aplicar Cambios"</strong> para guardar y confirmar las modificaciones realizadas.</li>
+                        <li>Cambie el estado del producto en la columna <strong>"Estado"</strong>. Seleccione <strong>"Activa"</strong> para habilitarlo o <strong>"Inactiva"</strong> para deshabilitarlo.</li>
+                        <li>Haga clic en el botón <strong>"Aplicar Cambios"</strong> para guardar las modificaciones.</li>
                     </ol>
-
 
                     <h5>2. Notas Adicionales</h5>
                     <ul>
-                        <li>Los cálculos de descuento se realizan automáticamente una vez se introduce un nuevo valor en la columna "% Descuento".</li>
-                        <li>Asegúrese de hacer clic en "Aplicar Cambios" para que las modificaciones queden guardadas.</li>
+                        <li>Los cálculos de descuento se realizan automáticamente al modificar el valor en la columna "% Descuento".</li>
+                        <li>Es obligatorio presionar "Aplicar Cambios" para guardar las modificaciones.</li>
                     </ul>
-                
-            
-                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -112,53 +134,49 @@
         </div>
     </div>
 
-
-
     {% endblock %}
-    {% include "formatos/footeradmin.html"%}
+    {% include "formatos/footeradmin.html" %}
 
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const formBuscarProducto = document.getElementById('formBuscarProducto');
-        const resultadoProducto = document.getElementById('tablePromociones');
-        const mensaje = document.getElementById('mensaje');
- 
-        formBuscarProducto.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const query = document.getElementById('buscarProducto').value.trim().toLowerCase();
-            const productosFiltrados = Array.from(resultadoProducto.children).filter(row => {
-                const nombre = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                return nombre.includes(query);
-            });
- 
-            if (productosFiltrados.length > 0) {
-                mensaje.innerHTML = '';
-                resultadoProducto.innerHTML = '';
-                productosFiltrados.forEach(row => resultadoProducto.appendChild(row));
-            } else {
-                mensaje.innerHTML = '<div class="alert alert-danger">Producto no encontrado.</div>';
-                resultadoProducto.innerHTML = '';
-            }
+    
+    
+    
+    
+    
+    
+    <script>
+
+        function calcularPrecioConDescuento(productoId, precio) {
+
+            const descuento = document.getElementById(`descuento_${productoId}`).value;
+
+            const precioConDescuento = Math.round(precio - (precio * descuento / 100));
+            
+            document.getElementById(`precio_con_descuento_${productoId}`).textContent = `$${precioConDescuento}`;
+        }
+
+    </script>
+    
+
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}",
+                        title: "{{ message|escapejs }}",
+                        showConfirmButton: true,
+                        timer: 3000
+                    });
+                {% endfor %}
+            {% endif %}
         });
-    });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        {% if messages %}
-            {% for message in messages %}
-                Swal.fire({
-                    icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}warning{% endif %}", // Mapear los tags a SweetAlert
-                    title: "{{ message|escapejs }}", // Escapa caracteres especiales para JavaScript
-                    showConfirmButton: true,
-                    timer: 3000 // Tiempo en milisegundos
-                });
-            {% endfor %}
-        {% endif %}
-    });
-</script>
-
+    </script>
 </body>
 </html>
+
+
+

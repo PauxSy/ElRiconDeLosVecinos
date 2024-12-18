@@ -43,10 +43,22 @@ class Producto(models.Model):
     estado = models.CharField(max_length=50, choices=ESTADOS, default='Habilitado')  # Estado del producto, por defecto 'activado'
     admin_id = models.IntegerField()               # ID del administrador, entero
     
+
+
     def save(self, *args, **kwargs):
-        # Calcular el precio total antes de guardar
+        # Calcular el precio total antes de guardar, tomando el IVA en cuenta
         self.precio_total = int(self.precio + (self.precio * self.iva / 100))
         super().save(*args, **kwargs)
+
+        # Crear automáticamente una promoción asociada al producto recién guardado
+        if not Promocion.objects.filter(producto=self).exists():
+            Promocion.objects.create(
+                descuento=0,  # Descuento inicial en 0
+                preciodescuento=self.precio,  # Precio con descuento inicial igual al precio total
+                estado='inactiva',  # Estado por defecto inactiva
+                producto=self  # Asociar la promoción al producto creado
+            )
+
     
     class Meta:
         db_table = 'Productos'  # Este es el nombre exacto de la tabla en la base de datos
@@ -54,22 +66,36 @@ class Producto(models.Model):
     def __str__(self):
         return f"{self.nombre} - Total: {self.precio_total}"
     
-    def get_promocion(self):
-        # Este método devuelve la promoción activa si existe
-        return self.promocion_set.filter(estado='activa').first()  # Asegúrate de que el estado de la promoción sea "activa"
-    
+
+        
+
 class Promocion(models.Model):
-    descuento = models.DecimalField(max_digits=10, decimal_places=0)
-    preciodescuento = models.DecimalField(max_digits=10, decimal_places=0)
-    estado = models.CharField(max_length=10, choices=[('activa', 'inactiva')])
+    descuento = models.IntegerField(default=0)
+    preciodescuento = models.IntegerField(default=0)
+    estado = models.CharField(max_length=10, choices=[('activa', 'Activa'), ('inactiva', 'Inactiva')], default='inactiva')
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        # Calcular el precio con descuento antes de guardar
+        if self.descuento == 0:
+            # Si no hay descuento, el precio con descuento es igual al precio del producto
+            self.preciodescuento = self.producto.precio
+        else:
+            # Si hay descuento, se calcula en base al porcentaje
+            self.preciodescuento = int(self.producto.precio - (self.producto.precio * self.descuento / 100))
+
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'Promociones'
 
     def __str__(self):
         return f"Promoción de {self.producto.nombre}"
-    
+
+
+
+
+
 class Usuario(models.Model):
     rut = models.CharField(max_length=12, unique=True)
     nombre = models.CharField(max_length=50)
